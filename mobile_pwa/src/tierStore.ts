@@ -21,6 +21,7 @@ export function removeBoat(state: AppState, id: string): void {
   state.boats = state.boats.filter(b => b.uid !== id);
   state.selectedUids = state.selectedUids.filter(v => v !== id);
   state.events = state.events.filter(e => e.uid !== id); state.failures = state.failures.filter(f => f.uid !== id);
+  if (state.monthChecks) state.monthChecks=state.monthChecks.filter(c=>c.uid!==id);
 }
 export function orderedBoats(state: AppState) {
   const order = [...TIERS.flatMap(t => state.tiers[t]), ...state.boats.map(b => b.uid)];

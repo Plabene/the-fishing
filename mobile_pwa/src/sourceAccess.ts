@@ -7,7 +7,7 @@ export function renderSourceAccess(target: HTMLElement, state: AppState, selecte
   const boats = orderedBoats(state).filter(boat=>state.selectedUids.includes(boat.uid));
   const chosen = boats.find(boat=>boat.uid===selectedUid) || boats[0];
   const heading = el('div');
-  heading.append(el('h2','현재 예약 상황 확인'),el('p','실시간 연동 대기 · 앱 안의 달력은 가져온 기록을 표시합니다. 현재 잔여석은 선박의 공식 페이지에서 확인하세요.'));
+  heading.append(el('h2','공식 사이트에서 현재 잔여석 확인'),el('p','웹의 월별 조회 결과는 PC에서 수집한 이전 자료입니다. 선택한 선박의 현재 예약 상황은 공식 페이지에서 확인하세요.'));
   const controls = el('div','','source-access-controls');
   const label = el('label','선박 선택'), select = el('select'); select.id='source-boat';
   for (const tier of TIERS) {
