@@ -13,6 +13,7 @@ import { renderSourceAccess } from './sourceAccess';
 import { initializeMonthlyArchive } from './monthlyArchive';
 import { queryMonth } from './monthlyQuery';
 import { renderMonthlyList } from './monthlyView';
+import { diagnosticReport, renderDiagnostics } from './queryDiagnostics';
 const root = document.querySelector<HTMLDivElement>('#app')!;
 // Only static markup is inserted here. All imported content uses textContent/value.
 root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">≈</span><span>THEFISHING<small>선박별 예약 가능 일정</small></span></div><div class="hero-row"><div><p class="eyebrow">출조할 월과 인원을 선택하세요</p><h1>월별 예약 조회</h1><p>선택한 선박의 출조 일정과 잔여석을 날짜별로.</p></div><span id="connectivity"></span></div></div></header>
@@ -20,7 +21,7 @@ root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand
 
 <section class="calendar-shell" aria-label="월별 예약 조회"><div class="section-heading"><div><p class="eyebrow dark">월별 출조 일정 · 잔여석</p><h2 id="month-label"></h2></div><span id="source-badge" class="badge status-stale">조회 대기</span></div>
 <form id="query-form" class="query-controls"><div class="month-controls"><button id="prev" type="button" aria-label="이전 달">‹</button><label class="sr-only" for="month">조회 월</label><input id="month" type="month" min="2000-01" max="2099-12" required><button id="next" type="button" aria-label="다음 달">›</button></div><label class="people-label">출조 인원<input id="people" type="number" min="1" max="100" step="1" required></label><label class="mode-label">조회 방식<select id="query-mode"><option value="direct">브라우저 직접 조회</option><option value="saved">저장 자료 검색</option></select></label><button id="query-submit" class="primary" type="submit">실시간 월 조회</button><button id="stop-query" type="button" hidden>조회 취소</button></form>
-<p class="query-source">조회 버튼을 누르면 이 기기의 브라우저에서 월별 예약 정보를 직접 요청합니다. 성공한 선박만 갱신하며, 저장 자료와 조회 실패는 구분해서 표시합니다.</p><p id="live-progress" role="status" aria-live="polite"></p><details id="live-diagnostics" hidden><summary>선박별 조회 결과</summary><div id="live-rows"></div></details>
+<p class="query-source">조회 버튼을 누르면 이 기기의 브라우저에서 월별 예약 정보를 직접 요청합니다. 원본 사이트의 웹앱 접근 허용이 필요하며, 실패하면 아래 공식 달력 링크에서 확인할 수 있습니다. 성공한 선박만 갱신합니다.</p><p id="live-progress" role="status" aria-live="polite"></p><details id="live-diagnostics" hidden><summary>선박별 조회 결과</summary><div id="live-rows"></div><button id="copy-diagnostics" type="button">조회 진단 복사</button><textarea id="diagnostic-text" readonly hidden aria-label="조회 진단 내용"></textarea></details>
 <div id="archive-months" class="archive-months" aria-label="자료가 있는 월"></div><div id="query-status" class="query-status" role="status"></div>
 <div class="filters"><div id="tabs" class="tier-tabs" role="group" aria-label="선박 티어"></div><label class="search-label"><span class="sr-only">선박 또는 어종 검색</span><input id="search" type="search" placeholder="선박 · 항구 · 어종 검색"></label></div>
 <div class="result-toolbar"><label><input id="matching-only" type="checkbox" checked> 조회 당시 인원 충족 일정만</label><div class="view-tabs" role="group" aria-label="결과 보기"><button id="view-calendar" aria-pressed="true">달력</button><button id="view-list" aria-pressed="false">월 전체 목록</button></div></div>
@@ -36,7 +37,7 @@ let selectedDay = `${state.month}-01`, busy = false, editing: string | null = nu
 let sourceBoat = '', matchingOnly=true, listView=false, resultLimit=50;
 let importController: AbortController | null = null, undoState: AppState | null = null;
 let liveController:AbortController|null=null; const directProvider=new TheFishingDirect();
-let liveRows:LiveRow[]=[];
+let liveRows:LiveRow[]=[], liveMonth=state.month;
 const form = $<HTMLFormElement>('#boat-form');
 const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
 const say = (value: string) => { $('#message').textContent = value; };
@@ -84,8 +85,8 @@ function render() {
   for (const month of [...new Set([...state.events.map(e=>e.date.slice(0,7)),...(state.monthChecks || []).map(c=>c.month)])].sort()) {
     const b=el('button',`${month.slice(0,4)}년 ${Number(month.slice(5))}월 자료`); b.setAttribute('aria-pressed',String(month===state.month)); b.addEventListener('click',()=>{void setMonth(month);}); $('#archive-months').append(b);
   }
-  $('#live-diagnostics').hidden=!liveRows.length; $('#live-rows').replaceChildren();
-  for(const row of liveRows) $('#live-rows').append(el('p',`${row.boat.name} · ${row.result.message}`,row.result.status==='ALLOWED_READABLE' ? 'live-ok':'live-failure'));
+  $('#live-diagnostics').hidden=!liveRows.length;
+  renderDiagnostics($('#live-rows'),liveRows);
   $('#calendar-layout').hidden=listView; $('#month-results').hidden=!listView;
   $('#view-calendar').setAttribute('aria-pressed',String(!listView)); $('#view-list').setAttribute('aria-pressed',String(listView));
   renderMonthlyList($('#month-results'),shown,result,resultLimit,()=>{resultLimit+=50;render();},day=>{listView=false;selectedDay=day;render();});
@@ -117,7 +118,8 @@ $('#query-form').addEventListener('submit',async event=>{
   const boats=orderedBoats(candidate).filter(b=>candidate.selectedUids.includes(b.uid) && (tier==='all' || tierFor(candidate,b.uid)===tier));
   if(!boats.length) {say('조회할 선박을 한 척 이상 선택하세요.');return;}
   if(!navigator.onLine) {say('오프라인입니다. 저장 자료 검색을 이용하세요.');return;}
-  liveController=new AbortController(); setBusy(true); $('#stop-query').hidden=false;liveRows=[];
+  liveController=new AbortController(); setBusy(true); $('#stop-query').hidden=false;liveRows=[];liveMonth=month;
+  $('#live-diagnostics').hidden=true;$('#diagnostic-text').hidden=true;
   $('#live-progress').textContent=`${boats.length}척 직접 조회 시작 · 결과는 선박별로 확인합니다.`;
   try {
     const result=await collectMonth(directProvider,boats,month,liveController.signal,(rows,total)=>{
@@ -129,7 +131,12 @@ $('#query-form').addEventListener('submit',async event=>{
     const status=`${result.cancelled ? '조회 취소' : result.stopped ? '조회 중단' : '조회 완료'} · 성공 ${ok}척 · 실패/미지원 ${failed}척 · 미조회 ${unattempted}척`;
     $('#live-progress').textContent=status; say(status+' · 실패한 선박의 기존 자료는 보존했습니다.');
   } catch(error) {say(`조회 결과를 반영하지 못했습니다. ${error instanceof Error ? error.message : '기존 자료를 유지합니다.'}`);}
-  finally {liveController=null;$('#stop-query').hidden=true;setBusy(false);render();}
+  finally {liveController=null;$('#stop-query').hidden=true;setBusy(false);render();if(liveRows.some(row=>row.result.status!=='ALLOWED_READABLE')) $<HTMLDetailsElement>('#live-diagnostics').open=true;}
+});
+$('#copy-diagnostics').addEventListener('click',async()=>{
+  const report=diagnosticReport(liveRows,liveMonth), fallback=$<HTMLTextAreaElement>('#diagnostic-text');
+  try {await navigator.clipboard.writeText(report);say('조회 진단을 복사했습니다. 오류 확인에 이 내용을 사용할 수 있습니다.');}
+  catch {fallback.value=report;fallback.hidden=false;fallback.focus();fallback.select();say('아래 진단 내용을 길게 눌러 복사하세요.');}
 });
 $('#stop-query').addEventListener('click',()=>{liveController?.abort();});
 $('#query-mode').addEventListener('change',()=>{$('#query-submit').textContent=$<HTMLSelectElement>('#query-mode').value==='direct' ? '실시간 월 조회':'저장 자료 검색';});
