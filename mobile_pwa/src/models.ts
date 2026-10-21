@@ -3,7 +3,7 @@ export const TIERS = ['tier1', 'tier2', 'tier3', 'other'] as const;
 export type Tier = typeof TIERS[number];
 export type Filter = Tier | 'all';
 export const LABELS: Record<Filter, string> = { all: '전체', tier1: '1티어', tier2: '2티어', tier3: '3티어', other: '기타' };
-export type GateStatus = 'UNVERIFIED' | 'ALLOWED_READABLE' | 'CORS_DENIED' | 'AUTH_OR_COOKIE_BLOCKED' | 'ACCESS_RESTRICTED' | 'PARSER_UNSUPPORTED' | 'PERMISSION_DENIED';
+export type GateStatus = 'UNVERIFIED' | 'ALLOWED_READABLE' | 'CORS_DENIED' | 'AUTH_OR_COOKIE_BLOCKED' | 'ACCESS_RESTRICTED' | 'PARSER_UNSUPPORTED' | 'PERMISSION_DENIED' | 'HTTP_ERROR' | 'NETWORK_OR_CORS' | 'TIMEOUT' | 'UNSUPPORTED_SOURCE' | 'CANCELLED';
 export type DisplayStatus = 'AVAILABLE' | 'UNKNOWN' | 'STALE' | 'BLOCKED' | 'UNVERIFIED' | 'FULL' | 'DEMO';
 export interface Boat { uid: string; name: string; port: string; url: string }
 export interface Observation {
@@ -12,7 +12,7 @@ export interface Observation {
   source: 'imported' | 'fixture' | 'direct';
   species?: string; price?: number | null;
 }
-export interface MonthCheck { uid: string; month: string; requiredPeople: number; observedAt: string }
+export interface MonthCheck { uid: string; month: string; requiredPeople: number; observedAt: string; source?: 'direct' }
 export interface Failure { uid: string; month: string; observedAt: string | null; status: 'UNKNOWN' | 'BLOCKED'; code: string }
 export interface AppState {
   schema: 1; boats: Boat[]; tiers: Record<Tier, string[]>; events: Observation[];

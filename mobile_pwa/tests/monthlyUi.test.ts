@@ -7,7 +7,10 @@ import { defaultFleet } from '../src/defaultFleet';
 test('month query form, people filter, list/day views and empty month work end to end',async()=>{
   const fleet=defaultFleet();fleet.month='2026-10'; await saveState(fleet);
   document.body.innerHTML='<div id="app"></div>';
+  const network=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',network);
   await import('../src/main');
+  expect(network).not.toHaveBeenCalled();
+  (document.querySelector('#query-mode') as HTMLSelectElement).value='saved';
   const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
   const count=()=>Number((el('#summary').textContent || '').match(/(\d+)개 출조/)?.[1]);
   expect(document.querySelector('h1')?.textContent).toBe('월별 예약 조회');

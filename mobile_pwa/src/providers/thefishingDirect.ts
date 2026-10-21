@@ -1,11 +1,80 @@
-import { LIVE_GATE, type AvailabilityProvider, type ProviderResult } from '../provider';
-import { officialDetail } from '../models';
+import { classifyProbe, type AvailabilityProvider, type ProviderResult } from '../provider';
+import { officialDetail, type Boat } from '../models';
+import { calendarEndpoint, discoverCalendar, parseCalendar, securityDocument } from './thefishingParser';
 
-/** Intentionally has no network transport. Importing evidence cannot enable live collection. */
+export class ReadError extends Error {
+  constructor(readonly result:ProviderResult) {super(result.message);}
+}
+const fail=(status:ProviderResult['status'],message:string,stop=false,extra:Partial<ProviderResult>={}):ProviderResult=>({status,message,events:[],stop,...extra});
+export function waitFor(ms:number,signal:AbortSignal):Promise<void> {
+  signal.throwIfAborted();
+  return new Promise((resolve,reject)=>{
+    const abort=()=>{clearTimeout(timer);reject(new DOMException('취소되었습니다.','AbortError'));};
+    const timer=setTimeout(()=>{signal.removeEventListener('abort',abort);resolve();},Math.max(0,ms));
+    signal.addEventListener('abort',abort,{once:true});
+  });
+}
 export class TheFishingDirect implements AvailabilityProvider {
-  validateDetail(url: string): boolean { return !!officialDetail(url); }
-  async readMonth(_month: string, signal: AbortSignal): Promise<ProviderResult> {
-    if (signal.aborted) throw new DOMException('취소되었습니다.', 'AbortError');
-    return { status: LIVE_GATE, events: [], message: '운영자 허가와 실제 모바일 검증이 없어 실시간 조회를 사용하지 않습니다.' };
+  private lastRequest=0;
+  private running=false;
+  private blockedUntil=0;
+  private cache=new Map<string,ProviderResult>();
+  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000) {}
+  validateDetail(url:string):boolean {return !!officialDetail(url);}
+  private async html(url:string,stage:'detail'|'calendar',signal:AbortSignal,body?:URLSearchParams):Promise<string> {
+    if(stage==='detail' ? !officialDetail(url) : !calendarEndpoint(url)) throw new Error('허용되지 않은 주소입니다.');
+    await waitFor(this.lastRequest+this.gapMs-Date.now(),signal);
+    signal.throwIfAborted();
+    const controller=new AbortController(), abort=()=>controller.abort();
+    signal.addEventListener('abort',abort,{once:true});
+    const timer=setTimeout(()=>controller.abort(),this.timeoutMs); this.lastRequest=Date.now();
+    try {
+      const response=await this.request(url,{method:body ? 'POST':'GET',body,mode:'cors',credentials:'omit',redirect:'error',cache:'no-store',referrerPolicy:'no-referrer',signal:controller.signal,
+        headers:body ? {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','X-Requested-With':'XMLHttpRequest'} : undefined});
+      if(response.type==='opaque' || response.type==='opaqueredirect') throw new ReadError(fail('NETWORK_OR_CORS','응답 본문을 읽을 수 없습니다. CORS 또는 네트워크 조건을 확인하세요.',true,{stage}));
+      if(response.status!==200) {
+        const status=classifyProbe({status:response.status});
+        throw new ReadError(fail(status,`HTTP ${response.status} · ${stage==='detail' ? '선박 상세':'월 달력'} 조회 실패${response.status===404 ? ' (주소 없음 또는 접근 응답)':''}`,status==='ACCESS_RESTRICTED' || status==='AUTH_OR_COOKIE_BLOCKED',{httpStatus:response.status,stage}));
+      }
+      const contentType=response.headers.get('content-type') || '';
+      if(contentType && !/text\/(html|plain)|application\/xhtml\+xml/i.test(contentType)) throw new ReadError(fail('PARSER_UNSUPPORTED','달력 HTML 응답이 아닙니다.',false,{stage}));
+      const bytes=await response.arrayBuffer();
+      if(bytes.byteLength>2_000_000) throw new ReadError(fail('PARSER_UNSUPPORTED','달력 응답이 허용 크기를 초과했습니다.',false,{stage}));
+      const prefix=new TextDecoder().decode(bytes.slice(0,4096));
+      const encoding=(contentType.match(/charset\s*=\s*["']?([\w-]+)/i)?.[1] || prefix.match(/<meta[^>]+charset\s*=\s*["']?([\w-]+)/i)?.[1] || 'utf-8').toLowerCase();
+      const charset=['euc-kr','cp949','windows-949','ks_c_5601-1987'].includes(encoding) ? 'euc-kr' : ['utf-8','utf8'].includes(encoding) ? 'utf-8' : '';
+      if(!charset) throw new ReadError(fail('PARSER_UNSUPPORTED','지원하지 않는 응답 문자 인코딩입니다.',false,{stage}));
+      const html=new TextDecoder(charset).decode(bytes);
+      if(securityDocument(html)) throw new ReadError(fail('ACCESS_RESTRICTED','사이트가 보안 확인 또는 접근 제한 화면을 반환했습니다.',true,{stage}));
+      return html;
+    } catch(error) {
+      if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
+      if(error instanceof ReadError) throw error;
+      throw new ReadError(fail(controller.signal.aborted ? 'TIMEOUT':'NETWORK_OR_CORS',controller.signal.aborted ? '조회 응답 시간이 초과되었습니다.' : '브라우저에서 응답을 읽지 못했습니다. CORS·네트워크·리디렉션 중 정확한 원인은 확인되지 않았습니다.',true,{stage}));
+    } finally {clearTimeout(timer);signal.removeEventListener('abort',abort);}
+  }
+  async readMonth(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
+    signal.throwIfAborted();
+    if(!officialDetail(boat.url,boat.uid)) return fail('UNSUPPORTED_SOURCE','이 선박은 직접 조회를 지원하지 않습니다. 공식 페이지를 이용하세요.');
+    if(!/^20\d\d-(0[1-9]|1[0-2])$/.test(month)) return fail('PARSER_UNSUPPORTED','조회 월을 확인하세요.');
+    if(this.running) return fail('UNVERIFIED','이미 조회 중입니다.',true);
+    if(this.blockedUntil>Date.now()) return fail('ACCESS_RESTRICTED','접근 제한 응답으로 조회를 중단했습니다. 10분 뒤 다시 시도할 수 있습니다.',true);
+    const key=`${boat.uid}:${month}`, cached=this.cache.get(key);
+    if(cached?.observedAt && Date.now()-Date.parse(cached.observedAt)<600_000) return {...structuredClone(cached),cached:true,message:'10분 이내 직접 조회 결과를 재사용했습니다.'};
+    this.running=true;
+    try {
+      const detail=await this.html(boat.url,'detail',signal);
+      const {endpoint,st_uid,pa_uid}=discoverCalendar(detail,boat);
+      const html=await this.html(endpoint,'calendar',signal,new URLSearchParams({date6:month.replace('-',''),st_uid,pa_uid}));
+      signal.throwIfAborted(); const observedAt=new Date().toISOString();
+      const events=await parseCalendar(html,boat,month,observedAt); signal.throwIfAborted();
+      const result:ProviderResult={status:'ALLOWED_READABLE',events,observedAt,message:`${events.length}개 출조 상품을 직접 조회했습니다.`};
+      this.cache.set(key,structuredClone(result)); return result;
+    } catch(error) {
+      if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
+      const result=error instanceof ReadError ? error.result : fail('PARSER_UNSUPPORTED',error instanceof Error ? error.message : '달력 응답을 해석하지 못했습니다.');
+      if(result.status==='ACCESS_RESTRICTED') this.blockedUntil=Date.now()+600_000;
+      return result;
+    } finally {this.running=false;}
   }
 }

@@ -6,7 +6,8 @@ import { orderedBoats, moveBoat, removeBoat, tierFor } from './tierStore';
 import { renderCalendar } from './calendarView';
 import { el, renderDay, sourceLink } from './dayView';
 import { fixtureState } from './providers/fixtures';
-import { LIVE_ENABLED } from './provider';
+import { TheFishingDirect } from './providers/thefishingDirect';
+import { collectMonth, applyLiveResults, type LiveRow } from './liveQuery';
 import { initializeFleet, applyDefaultFleet } from './defaultFleet';
 import { renderSourceAccess } from './sourceAccess';
 import { initializeMonthlyArchive } from './monthlyArchive';
@@ -17,9 +18,9 @@ const root = document.querySelector<HTMLDivElement>('#app')!;
 root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">≈</span><span>THEFISHING<small>선박별 예약 가능 일정</small></span></div><div class="hero-row"><div><p class="eyebrow">출조할 월과 인원을 선택하세요</p><h1>월별 예약 조회</h1><p>선택한 선박의 출조 일정과 잔여석을 날짜별로.</p></div><span id="connectivity"></span></div></div></header>
 <main><div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="cancel" hidden>가져오기 취소</button><button id="undo" hidden>변경 되돌리기</button></div>
 
-<section class="calendar-shell" aria-label="월별 예약 조회"><div class="section-heading"><div><p class="eyebrow dark">월별 출조 일정 · 잔여석</p><h2 id="month-label"></h2></div><span class="badge status-stale">PC 조회 결과 기준</span></div>
-<form id="query-form" class="query-controls"><div class="month-controls"><button id="prev" type="button" aria-label="이전 달">‹</button><label class="sr-only" for="month">조회 월</label><input id="month" type="month" min="2000-01" max="2099-12" required><button id="next" type="button" aria-label="다음 달">›</button></div><label class="people-label">출조 인원<input id="people" type="number" min="1" max="100" step="1" required></label><button class="primary" type="submit">월별 조회</button></form>
-<p class="query-source">실시간 연결 안 됨 · PC에서 조회한 월별 출조 상품을 검색합니다. 이전 잔여석은 현재 예약 가능 여부를 보장하지 않습니다.</p>
+<section class="calendar-shell" aria-label="월별 예약 조회"><div class="section-heading"><div><p class="eyebrow dark">월별 출조 일정 · 잔여석</p><h2 id="month-label"></h2></div><span id="source-badge" class="badge status-stale">조회 대기</span></div>
+<form id="query-form" class="query-controls"><div class="month-controls"><button id="prev" type="button" aria-label="이전 달">‹</button><label class="sr-only" for="month">조회 월</label><input id="month" type="month" min="2000-01" max="2099-12" required><button id="next" type="button" aria-label="다음 달">›</button></div><label class="people-label">출조 인원<input id="people" type="number" min="1" max="100" step="1" required></label><label class="mode-label">조회 방식<select id="query-mode"><option value="direct">브라우저 직접 조회</option><option value="saved">저장 자료 검색</option></select></label><button id="query-submit" class="primary" type="submit">실시간 월 조회</button><button id="stop-query" type="button" hidden>조회 취소</button></form>
+<p class="query-source">조회 버튼을 누르면 이 기기의 브라우저에서 월별 예약 정보를 직접 요청합니다. 성공한 선박만 갱신하며, 저장 자료와 조회 실패는 구분해서 표시합니다.</p><p id="live-progress" role="status" aria-live="polite"></p><details id="live-diagnostics" hidden><summary>선박별 조회 결과</summary><div id="live-rows"></div></details>
 <div id="archive-months" class="archive-months" aria-label="자료가 있는 월"></div><div id="query-status" class="query-status" role="status"></div>
 <div class="filters"><div id="tabs" class="tier-tabs" role="group" aria-label="선박 티어"></div><label class="search-label"><span class="sr-only">선박 또는 어종 검색</span><input id="search" type="search" placeholder="선박 · 항구 · 어종 검색"></label></div>
 <div class="result-toolbar"><label><input id="matching-only" type="checkbox" checked> 조회 당시 인원 충족 일정만</label><div class="view-tabs" role="group" aria-label="결과 보기"><button id="view-calendar" aria-pressed="true">달력</button><button id="view-list" aria-pressed="false">월 전체 목록</button></div></div>
@@ -28,18 +29,20 @@ root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand
 <details class="data-tools"><summary>PC 조회 결과 가져오기 · 백업</summary><section class="data-bar" aria-label="조회 자료 관리"><div><strong>PC 조회 자료 · 선박 설정</strong><p>PC의 monthly_availability_cache.json을 가져오면 월별 조회 결과를 갱신할 수 있습니다. 설정과 가져온 자료는 이 기기에 저장됩니다.</p></div><div class="actions"><label class="button primary">PC 조회 결과 가져오기<input id="import" type="file" accept=".json,application/json" multiple></label><button id="export">백업 저장</button><button id="demo">예시 둘러보기</button><button id="restore-fleet">PC 선박 목록 적용</button></div></section>
 </details>
 <section id="fleet-section" class="fleet-section"><div class="section-heading"><div><p class="eyebrow dark">기기별 설정</p><h2>내 선박 관리</h2></div><button id="add-toggle">+ 선박 추가</button></div><p class="muted">조회할 선박을 선택하고 티어와 순서를 바꾸세요. 다른 기기와 자동으로 동기화되지 않습니다.</p><form id="boat-form" class="boat-form" hidden><label>선박 UID<input name="uid" inputmode="numeric" required maxlength="80" placeholder="실제 선박의 숫자 UID"></label><label>선박 이름<input name="name" required maxlength="100"></label><label>항구<input name="port" maxlength="100"></label><label class="url-field">공식 상세 URL (선택)<input name="url" type="url" placeholder="https://thefishing.kr/reservation/list.php?uid=…"></label><label>티어<select name="tier"><option value="tier1">1티어</option><option value="tier2">2티어</option><option value="tier3">3티어</option><option value="other">기타</option></select></label><div class="actions"><button type="submit" class="primary">선박 저장</button><button type="button" id="edit-cancel">닫기</button></div></form><div class="fleet-tools"><label>목록 검색<input id="fleet-search" type="search" placeholder="이름 또는 UID"></label><span id="fleet-count"></span><button id="select-all">전체 선택</button><button id="select-none">전체 해제</button></div><div id="boats"></div></section>
-<details class="about"><summary>자료 상태와 오프라인 사용 안내</summary><p><strong>실시간 조회: 미검증 · 비활성화</strong></p><p>운영자 허가와 실제 Android·iOS 교차 출처 검증이 없어 외부 사이트를 자동 조회하지 않습니다. 가져온 좌석은 이전 자료이며, 알 수 없는 값은 마감으로 표시하지 않습니다.</p><p>한 번 열린 화면과 저장 자료는 오프라인에서 다시 볼 수 있습니다. 브라우저 저장소를 지우면 자료가 사라지므로 백업을 보관하세요. 앱을 닫은 상태의 자동 새로고침은 제공하지 않습니다.</p><p>관리 기능은 이 기기의 설정입니다. 중앙 관리자 계정과 기기 간 자동 동기화는 없습니다. 공식 페이지 링크는 새 탭에서 열립니다.</p></details></main><footer>월별 예약 조회 · 조회 자료와 기준 시각 표시<span>예약·로그인·결제 기능 없음</span></footer>`;
+<details class="about"><summary>자료 상태와 오프라인 사용 안내</summary><p><strong>브라우저 직접 조회 · 수동 실행</strong></p><p>더피싱 상세 페이지와 월 달력 응답을 이 기기에서 직접 읽습니다. 사이트의 CORS·네트워크 조건에 따라 실패할 수 있습니다. 404·접근 제한·응답 해석 실패를 구분하며, 실패를 예약 마감으로 표시하지 않습니다. PC 오류는 모바일의 조회 가능 여부를 결정하지 않습니다. 10분 이내 성공 결과는 재사용합니다.</p><p>한 번 열린 화면과 저장 자료는 오프라인에서 다시 볼 수 있습니다. 브라우저 저장소를 지우면 자료가 사라지므로 백업을 보관하세요. 앱을 닫은 상태의 자동 새로고침은 제공하지 않습니다.</p><p>관리 기능은 이 기기의 설정입니다. 중앙 관리자 계정과 기기 간 자동 동기화는 없습니다. 공식 페이지 링크는 새 탭에서 열립니다.</p></details></main><footer>월별 예약 조회 · 조회 자료와 기준 시각 표시<span>예약·로그인·결제 기능 없음</span></footer>`;
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 let state = emptyState(), tier: Filter = 'all', search = '', fleetSearch = '', demo = false;
 let selectedDay = `${state.month}-01`, busy = false, editing: string | null = null;
 let sourceBoat = '', matchingOnly=true, listView=false, resultLimit=50;
 let importController: AbortController | null = null, undoState: AppState | null = null;
+let liveController:AbortController|null=null; const directProvider=new TheFishingDirect();
+let liveRows:LiveRow[]=[];
 const form = $<HTMLFormElement>('#boat-form');
 const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
 const say = (value: string) => { $('#message').textContent = value; };
 const active = () => demo ? {...fixtureState(state.month),requiredPeople:state.requiredPeople} : state;
-function connection() { $('#connectivity').textContent = navigator.onLine ? '● 온라인 · 실시간 조회 미연결' : '○ 오프라인 · 이전 조회 결과 열람'; }
-function setBusy(value: boolean) { busy = value; root.setAttribute('aria-busy', String(value)); root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input,button,select').forEach(n => { if (n.id !== 'cancel') n.disabled = value; }); }
+function connection() { $('#connectivity').textContent = navigator.onLine ? '● 온라인 · 직접 조회 가능 여부는 응답으로 확인' : '○ 오프라인 · 이전 조회 결과 열람'; }
+function setBusy(value: boolean) { busy = value; root.setAttribute('aria-busy', String(value)); root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input,button,select').forEach(n => { if (n.id !== 'cancel' && n.id!=='stop-query') n.disabled = value; }); }
 async function commit(candidate: AppState, message: string): Promise<boolean> {
   if (busy) return false; setBusy(true);
   try { await saveState(candidate); state = candidate; undoState = null; $('#undo').hidden = true; say(message); return true; }
@@ -72,13 +75,17 @@ function render() {
   $<HTMLInputElement>('#month').value = state.month; $<HTMLInputElement>('#people').value=String(state.requiredPeople); $('#month-label').textContent = `${state.month.slice(0, 4)}년 ${Number(state.month.slice(5))}월`;
   $('#summary').textContent = `${LABELS[tier]} · ${shown.requiredPeople}명 · ${result.boats.length}척 대상 · ${result.days.length}일 / ${records.length}개 출조 일정`;
   $('#query-status').replaceChildren();
-  $('#query-status').append(el('strong',demo ? '예시 조회 결과' : `${result.checkedCount}척의 이전 조회 자료 · ${result.missingBoats.length}척 미확인`),el('p',result.latest ? `자료 기준 ${new Date(result.latest).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})} · 현재 잔여석은 공식 페이지에서 확인하세요.` : '이 월의 조회 자료가 없습니다. 자료가 있는 월을 선택하거나 PC 조회 결과를 가져오세요.'));
+  const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && c.source==='direct' && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
+  $('#source-badge').textContent=demo ? '예시 자료' : fresh ? `최근 직접 조회 ${fresh}척` : '이전 자료 · 실시간 미확인';
+  $('#query-status').append(el('strong',demo ? '예시 조회 결과' : `최근 직접 조회 ${fresh}척 · 이전 자료 ${Math.max(0,result.checkedCount-fresh)}척 · 미확인 ${result.missingBoats.length}척`),el('p',result.latest ? `자료 기준 ${new Date(result.latest).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})} · 현재 잔여석은 공식 페이지에서 확인하세요.` : '이 월의 조회 자료가 없습니다. 자료가 있는 월을 선택하거나 PC 조회 결과를 가져오세요.'));
   if (result.missingBoats.length) { const missing=el('details'); missing.append(el('summary',`미확인 선박 ${result.missingBoats.length}척 보기`),el('p',result.missingBoats.map(b=>b.name).join(' · '))); $('#query-status').append(missing); }
   if (result.failures.length) $('#query-status').append(el('p',`${result.failures.length}척에 수집 실패 이력이 있습니다. 현재 예약 가능 여부는 확인되지 않았습니다.`,'notice'));
   $('#archive-months').replaceChildren();
   for (const month of [...new Set([...state.events.map(e=>e.date.slice(0,7)),...(state.monthChecks || []).map(c=>c.month)])].sort()) {
     const b=el('button',`${month.slice(0,4)}년 ${Number(month.slice(5))}월 자료`); b.setAttribute('aria-pressed',String(month===state.month)); b.addEventListener('click',()=>{void setMonth(month);}); $('#archive-months').append(b);
   }
+  $('#live-diagnostics').hidden=!liveRows.length; $('#live-rows').replaceChildren();
+  for(const row of liveRows) $('#live-rows').append(el('p',`${row.boat.name} · ${row.result.message}`,row.result.status==='ALLOWED_READABLE' ? 'live-ok':'live-failure'));
   $('#calendar-layout').hidden=listView; $('#month-results').hidden=!listView;
   $('#view-calendar').setAttribute('aria-pressed',String(!listView)); $('#view-list').setAttribute('aria-pressed',String(listView));
   renderMonthlyList($('#month-results'),shown,result,resultLimit,()=>{resultLimit+=50;render();},day=>{listView=false;selectedDay=day;render();});
@@ -105,10 +112,27 @@ $('#query-form').addEventListener('submit',async event=>{
   event.preventDefault(); if (busy) return;
   const month=$<HTMLInputElement>('#month').value, requiredPeople=Number($<HTMLInputElement>('#people').value);
   try { queryMonth(state,{month,requiredPeople,tier,search,matchingOnly}); } catch (error) { say(error instanceof Error ? error.message : '조회 조건을 확인하세요.'); return; }
-  if (!state.selectedUids.length && !demo) { say('조회할 선박을 한 척 이상 선택하세요.'); return; }
   const candidate={...state,month,requiredPeople}; resultLimit=50; selectedDay=`${month}-01`;
-  await commit(candidate,'월별 조건 검색 완료 · PC에 저장된 이전 조회 결과입니다. 외부 사이트를 새로 조회하지 않았습니다.');
+  if(demo || $<HTMLSelectElement>('#query-mode').value==='saved') {await commit(candidate,'저장된 월별 자료를 조건 검색했습니다.');return;}
+  const boats=orderedBoats(candidate).filter(b=>candidate.selectedUids.includes(b.uid) && (tier==='all' || tierFor(candidate,b.uid)===tier));
+  if(!boats.length) {say('조회할 선박을 한 척 이상 선택하세요.');return;}
+  if(!navigator.onLine) {say('오프라인입니다. 저장 자료 검색을 이용하세요.');return;}
+  liveController=new AbortController(); setBusy(true); $('#stop-query').hidden=false;liveRows=[];
+  $('#live-progress').textContent=`${boats.length}척 직접 조회 시작 · 결과는 선박별로 확인합니다.`;
+  try {
+    const result=await collectMonth(directProvider,boats,month,liveController.signal,(rows,total)=>{
+      liveRows=rows; const last=rows.at(-1)!;
+      $('#live-progress').textContent=`${rows.length}/${total}척 확인 · ${last.boat.name} · ${last.result.message}`;
+    });
+    const updated=applyLiveResults(candidate,month,result.rows); await saveState(updated);state=updated;undoState=null;$('#undo').hidden=true;
+    const ok=result.rows.filter(r=>r.result.status==='ALLOWED_READABLE').length, failed=result.rows.length-ok, unattempted=result.total-result.rows.length;
+    const status=`${result.cancelled ? '조회 취소' : result.stopped ? '조회 중단' : '조회 완료'} · 성공 ${ok}척 · 실패/미지원 ${failed}척 · 미조회 ${unattempted}척`;
+    $('#live-progress').textContent=status; say(status+' · 실패한 선박의 기존 자료는 보존했습니다.');
+  } catch(error) {say(`조회 결과를 반영하지 못했습니다. ${error instanceof Error ? error.message : '기존 자료를 유지합니다.'}`);}
+  finally {liveController=null;$('#stop-query').hidden=true;setBusy(false);render();}
 });
+$('#stop-query').addEventListener('click',()=>{liveController?.abort();});
+$('#query-mode').addEventListener('change',()=>{$('#query-submit').textContent=$<HTMLSelectElement>('#query-mode').value==='direct' ? '실시간 월 조회':'저장 자료 검색';});
 $('#matching-only').addEventListener('change',event=>{matchingOnly=(event.currentTarget as HTMLInputElement).checked; resultLimit=50; render();});
 $('#view-calendar').addEventListener('click',()=>{listView=false;render();});
 $('#view-list').addEventListener('click',()=>{listView=true;render();});
@@ -137,5 +161,6 @@ $('#undo').addEventListener('click', async () => { if (undoState) await commit(u
 $('#restore-fleet').addEventListener('click', async () => { const previous=structuredClone(state); if (await commit(applyDefaultFleet(state), 'PC 선박 목록과 선택·티어를 적용했습니다. 기존 출조 기록은 유지합니다.')) { undoState=previous; $('#undo').hidden=false; } });
 window.addEventListener('online', connection); window.addEventListener('offline', connection);
 setBusy(true); try { const prepared=initializeFleet(await loadState()), archive=initializeMonthlyArchive(prepared.state); state=archive.state; if (prepared.changed || archive.changed) await saveState(state); if (prepared.seeded) say(`PC 선박 목록 승계 완료 · 전체 ${state.boats.length}척 · 선택 ${state.selectedUids.length}척. 티어와 순서를 유지했습니다.`); } catch { say('저장 자료를 읽거나 저장하지 못했습니다. PC 선박 목록 적용 또는 백업 JSON 가져오기를 이용하세요.'); } finally { setBusy(false); render(); }
-if (LIVE_ENABLED) throw new Error('This distribution must remain offline-only');
+// Refresh freshness labels while visible; this never makes a network request.
+setInterval(()=>{if(!busy && document.visibilityState==='visible') render();},60000);
 if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { say('오프라인 화면 저장에 실패했습니다. 연결된 상태에서 다시 열어 주세요.'); });

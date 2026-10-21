@@ -7,7 +7,7 @@ import { monthDays, visibleEvents } from '../src/calendarView';
 import { eventStatus, saveState, loadState } from '../src/availabilityStore';
 import { fixtureState } from '../src/providers/fixtures';
 import { TheFishingDirect } from '../src/providers/thefishingDirect';
-import { evidenceAllowsLive, classifyProbe, type AccessEvidence, LIVE_ENABLED } from '../src/provider';
+import { classifyProbe, LIVE_ENABLED } from '../src/provider';
 
 test('legacy four-tier order and independent selection round-trip', () => {
   const state = importData({boat_tiers: {tier1:['2','1','2'],tier2:['1','3'],tier3:['4'],other:['5']},selected_boat_uids:['3','2'],selected_year:2026,selected_month:9}).state;
@@ -67,10 +67,6 @@ test('export drops applicant secrets and redacts contact-shaped text', () => {
 test.each(['javascript:alert(1)','http://thefishing.kr/reservation/list.php?uid=1','https://evil.test/reservation/list.php?uid=1','https://thefishing.kr/reservation/list.php?uid=1&uid=2','https://thefishing.kr/reservation/list.php?uid=1#secret','https://user:pass@thefishing.kr/reservation/list.php?uid=1'])('reject unsafe official link %s',url=>expect(officialDetail(url)).toBe(''));
 test('invalid dates and timezone-less observations remain unknown',()=>{expect(dateOnly('2026-02-30')).toBeNull();expect(timestamp('2026-10-01T10:00:00')).toBeNull();});
 test('aborted storage preserves previously saved state',async()=>{const state=emptyState();await saveState(state);const signal=AbortSignal.abort();await expect(saveState(fixtureState('2026-10'),signal)).rejects.toThrow();expect(await loadState()).toEqual(state);});
-test('every evidence requirement and exact deployed origin is mandatory',()=>{
-  const e:AccessEvidence={origin:'https://app.example',writtenPermission:true,detailGetReadable:true,calendarPostReadable:true,preflightValid:true,credentialsValid:true,androidChrome:true,iosSafari:true,parserValidated:true};
-  expect(evidenceAllowsLive(e,e.origin)).toBe(true); for(const key of Object.keys(e).filter(k=>k!=='origin')) expect(evidenceAllowsLive({...e,[key]:false},e.origin)).toBe(false);
-  expect(evidenceAllowsLive(e,'https://another.example')).toBe(false);expect(LIVE_ENABLED).toBe(false);
-});
-test('disabled direct provider performs no network request',async()=>{const provider=new TheFishingDirect();expect((await provider.readMonth('2026-10',new AbortController().signal)).status).toBe('UNVERIFIED');await expect(provider.readMonth('2026-10',AbortSignal.abort())).rejects.toThrow();});
+test('manual direct-query feature is enabled without claiming source verification',()=>{expect(LIVE_ENABLED).toBe(true);expect(classifyProbe({})).toBe('UNVERIFIED');});
+
 test.each([[{},'UNVERIFIED'],[{status:403},'ACCESS_RESTRICTED'],[{status:429},'ACCESS_RESTRICTED'],[{status:401},'AUTH_OR_COOKIE_BLOCKED'],[{corsDeniedProven:true},'CORS_DENIED'],[{permissionDenied:true},'PERMISSION_DENIED'],[{status:200,bodyReadable:true,parserSupported:false},'PARSER_UNSUPPORTED'],[{status:200,bodyReadable:true,parserSupported:true},'ALLOWED_READABLE']] as const)('classifies evidence without guessing: %j',(e,status)=>expect(classifyProbe(e)).toBe(status));
