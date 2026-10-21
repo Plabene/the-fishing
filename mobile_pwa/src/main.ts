@@ -1,5 +1,5 @@
 import './style.css';
-import { emptyState, LABELS, TIERS, officialDetail, text, type AppState, type Filter, type Tier } from './models';
+import { emptyState, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier } from './models';
 import { importData, exportData } from './importLegacy';
 import { loadState, saveState } from './availabilityStore';
 import { orderedBoats, moveBoat, removeBoat, tierFor } from './tierStore';
@@ -7,11 +7,14 @@ import { renderCalendar, visibleEvents } from './calendarView';
 import { el, renderDay, sourceLink } from './dayView';
 import { fixtureState } from './providers/fixtures';
 import { LIVE_ENABLED } from './provider';
+import { initializeFleet, applyDefaultFleet } from './defaultFleet';
+import { renderSourceAccess } from './sourceAccess';
 const root = document.querySelector<HTMLDivElement>('#app')!;
 // Only static markup is inserted here. All imported content uses textContent/value.
 root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">≈</span><span>THEFISHING<small>나의 출조 노트</small></span></div><div class="hero-row"><div><p class="eyebrow">기록을 모으고, 다음 출조를 준비하세요</p><h1>내 출조 달력</h1><p>내 선박, 내 순서. 보관한 기록을 한눈에.</p></div><span id="connectivity"></span></div></div></header>
-<main><section class="data-bar" aria-label="자료 관리"><div><strong>이 기기에만 보관합니다</strong><p>PC에서 저장한 선박 목록·설정·월별 캐시 JSON을 가져오세요.</p></div><div class="actions"><label class="button primary">JSON 가져오기<input id="import" type="file" accept=".json,application/json" multiple></label><button id="export">백업 저장</button><button id="demo">예시 둘러보기</button></div></section>
-<div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="cancel" hidden>가져오기 취소</button><button id="undo" hidden>삭제 되돌리기</button></div>
+<main><section class="data-bar" aria-label="자료 관리"><div><strong>내 변경사항은 이 기기에 저장합니다</strong><p>PC 선박 목록과 선택·티어를 기본으로 제공합니다. 출조 기록은 JSON으로 가져올 수 있습니다.</p></div><div class="actions"><label class="button primary">JSON 가져오기<input id="import" type="file" accept=".json,application/json" multiple></label><button id="export">백업 저장</button><button id="demo">예시 둘러보기</button><button id="restore-fleet">PC 선박 목록 적용</button></div></section>
+<div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="cancel" hidden>가져오기 취소</button><button id="undo" hidden>변경 되돌리기</button></div>
+<section id="source-access" class="source-access" aria-label="공식 예약 페이지 확인"></section>
 <section class="calendar-shell" aria-label="출조 달력"><div class="section-heading"><div><p class="eyebrow dark">나의 기록</p><h2 id="month-label"></h2></div><div class="month-controls"><button id="prev" aria-label="이전 달">‹</button><label class="sr-only" for="month">출조 월</label><input id="month" type="month" min="2000-01" max="2099-12"><button id="next" aria-label="다음 달">›</button></div></div>
 <div class="filters"><div id="tabs" class="tier-tabs" role="group" aria-label="선박 티어"></div><label class="search-label"><span class="sr-only">선박 또는 출조 검색</span><input id="search" type="search" placeholder="선박 · 항구 · 출조 검색"></label></div><p id="summary" class="summary"></p><div id="demo-banner" class="demo-banner" hidden>가상의 예시 자료입니다. 실제 선박·잔여석 정보가 아니며 내 자료에 저장되지 않습니다.</div><div class="calendar-grid-layout"><div><div id="calendar" class="calendar-grid" aria-label="월별 날짜"></div><p class="legend">숫자는 저장된 기록 수입니다. 이전 자료는 현재 예약 가능 여부를 보장하지 않습니다.</p><p id="last-observed" class="timestamp"></p></div><section id="day-view" class="day-view" aria-live="polite"></section></div></section>
 <section id="fleet-section" class="fleet-section"><div class="section-heading"><div><p class="eyebrow dark">기기별 설정</p><h2>내 선박 관리</h2></div><button id="add-toggle">+ 선박 추가</button></div><p class="muted">달력에 포함할 선박을 선택하고 티어와 순서를 바꾸세요. 다른 기기와 자동으로 동기화되지 않습니다.</p><form id="boat-form" class="boat-form" hidden><label>선박 UID<input name="uid" inputmode="numeric" required maxlength="80" placeholder="실제 선박의 숫자 UID"></label><label>선박 이름<input name="name" required maxlength="100"></label><label>항구<input name="port" maxlength="100"></label><label class="url-field">공식 상세 URL (선택)<input name="url" type="url" placeholder="https://thefishing.kr/reservation/list.php?uid=…"></label><label>티어<select name="tier"><option value="tier1">1티어</option><option value="tier2">2티어</option><option value="tier3">3티어</option><option value="other">기타</option></select></label><div class="actions"><button type="submit" class="primary">선박 저장</button><button type="button" id="edit-cancel">닫기</button></div></form><div class="fleet-tools"><label>목록 검색<input id="fleet-search" type="search" placeholder="이름 또는 UID"></label><span id="fleet-count"></span><button id="select-all">전체 선택</button><button id="select-none">전체 해제</button></div><div id="boats"></div></section>
@@ -19,6 +22,7 @@ root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 let state = emptyState(), tier: Filter = 'all', search = '', fleetSearch = '', demo = false;
 let selectedDay = `${state.month}-01`, busy = false, editing: string | null = null;
+let sourceBoat = '';
 let importController: AbortController | null = null, undoState: AppState | null = null;
 const form = $<HTMLFormElement>('#boat-form');
 const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
@@ -61,6 +65,8 @@ function render() {
   const times = records.flatMap(e => e.observedAt ? [e.observedAt] : []).sort((a, b) => Date.parse(b) - Date.parse(a));
   $('#last-observed').textContent = times[0] ? `이 달의 최근 관측 · ${new Date(times[0]).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}` : '관측 시각 · 확인된 자료 없음';
   $('#tabs').replaceChildren(); for (const t of ['all', ...TIERS] as Filter[]) { const b = el('button', LABELS[t]); b.setAttribute('aria-pressed', String(t === tier)); b.addEventListener('click', () => { tier = t; render(); }); $('#tabs').append(b); }
+  $('#source-access').hidden = demo;
+  renderSourceAccess($('#source-access'), state, sourceBoat, value => { sourceBoat=value; render(); });
   renderCalendar($('#calendar'), shown, tier, search, selectedDay, chooseDay); renderDay($('#day-view'), shown, selectedDay, tier, search); renderFleet(); connection();
 }
 $<HTMLInputElement>('#import').addEventListener('change', async event => {
@@ -86,8 +92,8 @@ function closeForm() { form.hidden = true; editing = null; form.reset(); field('
 $('#add-toggle').addEventListener('click', () => { closeForm(); form.hidden = false; field('uid').focus(); }); $('#edit-cancel').addEventListener('click', closeForm);
 form.addEventListener('submit', async event => {
   event.preventDefault(); if (busy) return;
-  const id = field('uid').value.trim(), name = text(field('name').value, 100), port = text(field('port').value, 100), raw = field('url').value.trim(), url = officialDetail(raw, id);
-  if ((!editing && !/^\d{1,20}$/.test(id)) || !name || (raw && !url)) { say('숫자 UID, 선박 이름, 같은 UID의 공식 HTTPS 상세 URL을 확인하세요.'); return; }
+  const id = field('uid').value.trim(), name = text(field('name').value, 100), port = text(field('port').value, 100), raw = field('url').value.trim(), url = reservationLink(raw, id);
+  if ((!editing && !/^\d{1,20}$/.test(id)) || !name || (raw && !url)) { say('숫자 UID, 선박 이름, 저장된 선박과 일치하는 공식 HTTPS URL을 확인하세요.'); return; }
   const c = structuredClone(state), index = c.boats.findIndex(b => b.uid === id);
   if (index >= 0 && !editing) { say('이미 등록한 UID입니다. 목록의 수정 버튼을 이용하세요.'); return; }
   if (index >= 0) c.boats[index] = { uid: id, name, port, url }; else { c.boats.push({ uid: id, name, port, url }); c.selectedUids.push(id); }
@@ -95,8 +101,9 @@ form.addEventListener('submit', async event => {
   if (await commit(c, '선박 정보를 저장했습니다.')) closeForm();
 });
 for (const [id, include] of [['select-all', true], ['select-none', false]] as const) $('#' + id).addEventListener('click', () => { const c = structuredClone(state); c.selectedUids = include ? c.boats.map(b => b.uid) : []; void commit(c, '달력 선박 선택을 저장했습니다.'); });
-$('#undo').addEventListener('click', async () => { if (undoState) await commit(undoState, '삭제를 되돌렸습니다.'); });
+$('#undo').addEventListener('click', async () => { if (undoState) await commit(undoState, '이전 상태로 되돌렸습니다.'); });
+$('#restore-fleet').addEventListener('click', async () => { const previous=structuredClone(state); if (await commit(applyDefaultFleet(state), 'PC 선박 목록과 선택·티어를 적용했습니다. 기존 출조 기록은 유지합니다.')) { undoState=previous; $('#undo').hidden=false; } });
 window.addEventListener('online', connection); window.addEventListener('offline', connection);
-setBusy(true); try { const saved = await loadState(); if (saved) state = importData(saved).state; } catch { say('저장 자료를 읽지 못했습니다. 백업 JSON을 가져올 수 있습니다.'); } finally { setBusy(false); render(); }
+setBusy(true); try { const prepared=initializeFleet(await loadState()); state=prepared.state; if (prepared.changed) await saveState(state); if (prepared.seeded) say(`PC 선박 목록 승계 완료 · 전체 ${state.boats.length}척 · 선택 ${state.selectedUids.length}척. 티어와 순서를 유지했습니다.`); } catch { say('저장 자료를 읽거나 저장하지 못했습니다. PC 선박 목록 적용 또는 백업 JSON 가져오기를 이용하세요.'); } finally { setBusy(false); render(); }
 if (LIVE_ENABLED) throw new Error('This distribution must remain offline-only');
 if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { say('오프라인 화면 저장에 실패했습니다. 연결된 상태에서 다시 열어 주세요.'); });

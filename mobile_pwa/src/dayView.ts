@@ -1,4 +1,4 @@
-import { LABELS, TIERS, officialDetail, type AppState, type DisplayStatus, type Filter } from './models';
+import { LABELS, TIERS, reservationLink, type AppState, type DisplayStatus, type Filter } from './models';
 import { eventStatus } from './availabilityStore';
 import { visibleEvents } from './calendarView';
 import { orderedBoats, tierFor } from './tierStore';
@@ -8,7 +8,7 @@ export function el<K extends keyof HTMLElementTagNameMap>(tag: K, text = '', cla
   const node = document.createElement(tag); node.textContent = text; node.className = className; return node;
 }
 export function sourceLink(url: string, id: string): HTMLAnchorElement | null {
-  const safe = officialDetail(url, id); if (!safe) return null;
+  const safe = reservationLink(url, id); if (!safe) return null;
   const link = el('a', '공식 페이지 ↗', 'source-link'); link.href = safe; link.target = '_blank'; link.rel = 'noopener noreferrer'; return link;
 }
 export function renderDay(target: HTMLElement, state: AppState, day: string, tier: Filter, search: string): void {

@@ -1,4 +1,4 @@
-import { type AppState, type Observation, type Failure, emptyState, text, uid, officialDetail, dateOnly, timestamp, TIERS } from './models';
+import { type AppState, type Observation, type Failure, emptyState, text, uid, reservationLink, dateOnly, timestamp, TIERS } from './models';
 import { normalizeTiers } from './tierStore';
 type Obj = Record<string, unknown>;
 const obj = (v: unknown): Obj => v && typeof v === 'object' && !Array.isArray(v) ? v as Obj : {};
@@ -9,12 +9,12 @@ export function importData(input: unknown, current = emptyState()): { state: App
   const bundled = !!root.catalog || !!root.preferences || !!root.snapshots;
   const catalog = obj(root.catalog || root); const prefs = obj(root.preferences || root);
   let recognized = backup || bundled;
-  if (backup) { Object.assign(state, emptyState()); }
+  if (backup) { Object.assign(state, emptyState()); delete state.fleetSeedVersion; if (typeof root.fleetSeedVersion === 'string' && /^[a-f0-9]{16}$/.test(root.fleetSeedVersion)) state.fleetSeedVersion = root.fleetSeedVersion; }
   const entries = backup ? arr(root.boats) : Object.values(obj(catalog.entries));
   for (const item of entries) {
     const b = obj(item); if (!('boat_uid' in b) && !backup) continue;
     recognized = true; const id = uid(b.uid ?? b.boat_uid); if (!id) { warnings.push('UID 없는 선박을 건너뛰었습니다.'); continue; }
-    const boat = { uid: id, name: text(b.name ?? b.boat_name) || `UID ${id}`, port: text(b.port ?? b.departure_port), url: officialDetail(b.url ?? b.reservation_url, id) };
+    const boat = { uid: id, name: text(b.name ?? b.boat_name) || `UID ${id}`, port: text(b.port ?? b.departure_port), url: reservationLink(b.url ?? b.reservation_url, id) };
     const index = state.boats.findIndex(v => v.uid === id);
     if (index >= 0) { warnings.push(`중복 UID ${id}: 마지막 선박 정보를 사용합니다.`); state.boats[index] = boat; } else state.boats.push(boat);
   }
@@ -42,7 +42,7 @@ export function importData(input: unknown, current = emptyState()): { state: App
     for (const item of arr(r.events)) {
       const e = obj(item); const id = uid(e.uid ?? e.boat_uid); const day = dateOnly(e.date);
       if (!id || !day) { warnings.push('유효하지 않은 관측 자료를 건너뛰었습니다.'); continue; }
-      if (!backup && !state.boats.some(b => b.uid === id)) state.boats.push({ uid: id, name: text(e.boat_name) || `UID ${id}`, port: text(e.departure_port), url: officialDetail(e.reservation_url, id) });
+      if (!backup && !state.boats.some(b => b.uid === id)) state.boats.push({ uid: id, name: text(e.boat_name) || `UID ${id}`, port: text(e.departure_port), url: reservationLink(e.reservation_url, id) });
       const seats = e.remaining ?? e.remaining_seats;
       const remaining = typeof seats === 'number' && Number.isInteger(seats) && seats >= 0 && seats <= 10000 ? seats : null;
       const source: Observation['source'] = backup && e.source === 'fixture' ? 'fixture' : 'imported';
