@@ -1,4 +1,17 @@
-## 2026-10-22 임시 API 종료와 본인 계정 전환 — 현재 상태
+## 2026-10-22 본인 계정 API 배포 — 현재 상태
+
+- 사용자가 Cloudflare OAuth 로그인과 계정 이메일 인증을 완료했습니다. 본인 계정에 Worker와 Durable Object를 배포했으며, 임시 계정을 다시 만들지 않았습니다.
+- API: https://thefishing-availability.thefishing-mobile-a.workers.dev
+- Worker 버전: `232d7a80-a796-463c-b180-3c4f41989ced`.
+- `/health`: HTTP 200, `service=thefishing-availability`, `schema=1`, `ready=true`. GitHub Pages 출처 `https://plabene.github.io`에 대한 CORS 헤더 확인.
+- 실제 월 조회: `2026-10-21T23:01:54.082Z` (2026-10-22 08:01:54 KST), UID 6130, 2026-10, HTTP 200, `ALLOWED_READABLE`, 출조 상품 5개, `source=api`.
+- 재조회에서 `cached=true`, 상품 수 5개와 동일 `observedAt`을 확인했습니다. 전체 선박의 성공 여부나 실제 휴대폰 화면 렌더링을 검증한 것은 아닙니다.
+- 웹앱 기본 API 주소를 위 주소로 변경했습니다. 이전 임시 주소는 자동 전환하고 사용자 지정 다른 주소·명시적 연결 해제·선박 목록·기존 조회 자료는 유지합니다.
+- 아래 임시 배포 종료·로그인 대기 기록은 과거 상태입니다. 현재 개발·배포 설명은 [조회 API 안내](availability_api/README_KO.md)를 따릅니다.
+
+---
+
+## 2026-10-22 임시 API 종료와 본인 계정 전환 — 이전 상태
 
 - GitHub Pages 배포 29e3ecf의 Actions 실행 39616428712가 성공했습니다. 배포 JS `index-CeaHjCus.js`까지 확인했습니다.
 - 이전 Cloudflare 임시 API 주소는 현재 DNS 주소 해석에 실패하여 사용할 수 없습니다. Wrangler도 본인 계정에 로그인되지 않은 상태입니다.
@@ -8,7 +21,7 @@
 
 ---
 
-## 2026-10-21 조회 API 전환 — 현재 상태
+## 2026-10-21 조회 API 전환 — 이전 상태
 
 사용자가 “조회 API 추가로 진행”을 명시적으로 선택하여 기존 서버 없는 구성에서 Cloudflare 조회 API를 사용하는 구성으로 변경했습니다. 아래 과거 진단의 API 승인 대기 및 오프라인 전용 기록은 현재 구성에 적용되지 않습니다.
 
