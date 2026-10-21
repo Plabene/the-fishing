@@ -1,0 +1,12 @@
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+const base = process.env.PWA_BASE || '/';
+const assets = (await readdir('dist/assets')).sort().map(file => `assets/${file}`);
+const icons = (await readdir('dist/icons')).sort().map(file => `icons/${file}`);
+const paths = ['index.html', 'manifest.webmanifest', ...icons, ...assets];
+const digest = createHash('sha256');
+for (const path of paths) digest.update(await readFile(`dist/${path}`));
+const template = await readFile('public/sw.js', 'utf8');
+digest.update(base).update(template);
+const cache = `thefishing-offline-${digest.digest('hex').slice(0, 16)}`;
+await writeFile('dist/sw.js', template.replace('__CACHE__', JSON.stringify(cache)).replace('__BASE__', JSON.stringify(base)).replace('__FILES__', JSON.stringify(paths)));
