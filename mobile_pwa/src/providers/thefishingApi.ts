@@ -9,7 +9,12 @@ export function apiOrigin(value:string):string {
   return url.origin;
 }
 export function loadApiOrigin():string {
-  try {const value=localStorage.getItem(key) ?? (import.meta.env.VITE_AVAILABILITY_API_URL || defaultEndpoint.url);return value ? apiOrigin(value):'';} catch {return '';}
+  try {
+    let saved=localStorage.getItem(key);
+    if(saved && defaultEndpoint.retiredUrls.includes(saved)) {localStorage.removeItem(key);saved=null;}
+    const value=saved ?? (import.meta.env.VITE_AVAILABILITY_API_URL || defaultEndpoint.url);
+    return value ? apiOrigin(value):'';
+  } catch {return '';}
 }
 export function saveApiOrigin(value:string):void {localStorage.setItem(key,apiOrigin(value));}
 export function clearApiOrigin():void {localStorage.setItem(key,'');}

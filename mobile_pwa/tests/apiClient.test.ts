@@ -3,12 +3,20 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { apiOrigin, checkApi, clearApiOrigin, loadApiOrigin, TheFishingApi, validateApiResult } from '../src/providers/thefishingApi';
 import { applyLiveResults } from '../src/liveQuery';
 import { emptyState } from '../src/models';
+import defaultEndpoint from '../src/data/apiEndpoint.json';
 const boat={uid:'6130',name:'테스트 선박',port:'항구',url:'https://thefishing.kr/reservation/list.php?uid=6130'};
 const valid=()=>{const observedAt=new Date().toISOString();return {status:'ALLOWED_READABLE',observedAt,cached:true,events:[{id:'direct-123456789012345678901234',uid:'6130',date:'2026-10-22',trip:'출조',remaining:4,price:100000,departure:'05:00',observedAt}]};};
 afterEach(()=>vi.unstubAllGlobals());
-test('default API is ready for use but an explicit disconnect persists across reloads',()=>{
-  localStorage.clear();expect(loadApiOrigin()).toBe('https://thefishing-availability.longing-bonobo.workers.dev');
+test('configured default is used but an explicit disconnect persists across reloads',()=>{
+  localStorage.clear();expect(loadApiOrigin()).toBe(defaultEndpoint.url);
   clearApiOrigin();expect(loadApiOrigin()).toBe('');localStorage.clear();
+});
+test('retired temporary endpoint migrates to the current default without overriding custom endpoints',()=>{
+  localStorage.setItem('thefishing-availability-api','https://thefishing-availability.longing-bonobo.workers.dev');
+  expect(loadApiOrigin()).toBe(defaultEndpoint.url);
+  expect(localStorage.getItem('thefishing-availability-api')).toBeNull();
+  localStorage.setItem('thefishing-availability-api','https://fishing.custom.workers.dev');
+  expect(loadApiOrigin()).toBe('https://fishing.custom.workers.dev');localStorage.clear();
 });
 test.each(['http://a.b.workers.dev','https://evil.test','https://127.0.0.1','https://a.b.workers.dev/path','https://u:p@a.b.workers.dev','https://a.b.workers.dev?token=1'])('API endpoint rejects unsafe or unconfigured URL %s',value=>expect(()=>apiOrigin(value)).toThrow());
 test('client calls only the configured API and normalizes verified results without sending cookies',async()=>{
