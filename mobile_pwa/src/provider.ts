@@ -2,7 +2,7 @@ import type { Boat, GateStatus, Observation } from './models';
 
 export interface ProviderResult {
   status:GateStatus; events:Observation[]; message:string; observedAt?:string;
-  httpStatus?:number; stage?:'detail'|'calendar'; stop?:boolean; cached?:boolean;
+  httpStatus?:number; stage?:'detail'|'calendar'|'api'; stop?:boolean; cached?:boolean; source?:'direct'|'api';
 }
 export interface AvailabilityProvider { readMonth(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> }
 // Available only from the explicit query button; startup never collects data.

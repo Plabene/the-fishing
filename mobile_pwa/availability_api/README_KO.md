@@ -1,0 +1,59 @@
+# 월별 예약 조회 API
+
+GitHub Pages 화면은 그대로 사용하고, Cloudflare Worker가 더피싱의 공개 월 달력을 읽어 검증한 JSON만 반환합니다. PC 상시 실행은 필요하지 않습니다.
+
+## 현재 연결
+
+- 웹앱: https://plabene.github.io/the-fishing/
+- API: https://thefishing-availability.longing-bonobo.workers.dev
+- 상태 확인: 위 API 주소의 `/health`
+
+2026-10-21 Cloudflare의 **60분 임시 계정**에 실제 배포했습니다. 운영자는 대화에 별도로 제공된 소유권 연결 링크를 만료 전에 열어 Cloudflare 계정으로 연결해야 계속 사용할 수 있습니다. 이 민감한 연결 링크는 공개 저장소에 저장하지 않습니다. 소유권 연결 전에는 영구 배포로 간주하지 않습니다. 임시 계정이 만료되면 아래 방법으로 본인 계정에 배포하고 새 주소를 연결합니다.
+
+실제 클라우드 API에서 UID 6130, 2026-10 조회가 성공하여 출조 상품 5개를 반환했습니다. CORS 응답 헤더, 재조회 캐시와 관측 시각 유지도 확인했습니다. 이 결과는 검증한 선박·월에 대한 결과이며 모든 선박의 조회 가능성을 보장하지 않습니다.
+
+## 사용
+
+기본 API 주소가 웹앱에 포함되어 있습니다. **조회 API 사용 → 실시간 월 조회**를 누르면 됩니다. API 주소가 바뀌었거나 다른 배포를 쓰려면 **조회 API 연결**에서 주소를 입력하고 **연결 확인 및 저장**을 누릅니다. 연결 확인은 `/health` 응답만 확인하며 원본 사이트 조회 성공 여부는 월 조회 결과로 판단합니다.
+
+API 주소는 이 기기에만 저장합니다. 기존 선박 목록·티어·조회 자료는 유지됩니다. API에는 선박 UID와 조회 월만 전송합니다. 클라이언트에는 Cloudflare 토큰·계정 비밀번호·쿠키를 넣지 않습니다.
+
+## 본인 계정 배포
+
+저장소 루트 `D:\the-fishing`에서 실행합니다.
+
+```powershell
+.\mobile.cmd exec wrangler login --device
+.\mobile.cmd run api:check
+.\mobile.cmd run api:deploy
+```
+
+로그인 화면은 사용자가 직접 승인합니다. API 토큰을 채팅이나 저장소에 붙여넣을 필요가 없습니다. 최초 배포 시 계정과 workers.dev 주소 설정을 요청할 수 있습니다. 생성된 `https://서비스명.계정명.workers.dev` 주소를 웹앱에 연결합니다. 모든 기기의 기본 주소를 바꾸려면 `src/data/apiEndpoint.json`의 `url`을 새 주소로 변경하고 GitHub에 반영합니다.
+
+Cloudflare의 요금·사용량 한도는 본인 계정에서 확인하세요. 이 프로젝트는 별도 유료 요금제나 결제를 신청하지 않습니다.
+
+GitHub Actions는 웹앱 테스트·API 빌드 검사·GitHub Pages 배포를 실행합니다. **Worker 소스 변경은 `api:deploy`로 별도 배포해야 합니다.** Cloudflare 계정 자격 증명은 GitHub에 추가하지 않았습니다.
+
+## 조회 범위와 실패 처리
+
+- API는 `/health`, `/v1/month?uid=숫자&month=YYYY-MM` GET만 제공합니다. 임의 URL·헤더·예약 폼을 중계하지 않습니다.
+- 원본 요청은 고정된 더피싱 상세 GET 및 발견·검증한 월 달력 POST만 수행합니다. 로그인·예약·결제·쿠키 전송이 없습니다. HTTP 리디렉션을 따르지 않습니다.
+- 브라우저 호출 출처는 `https://plabene.github.io`로 제한합니다. CORS는 사용자 인증 수단이 아니므로 서버 측에서도 전역 처리량을 제한합니다.
+- Durable Object 하나가 중복 요청을 합치고 동시에 한 선박만 수집합니다. 원본 요청 최소 1초 간격, 각 요청 10초 제한, 신규 월 조회 분당 최대 30건입니다. 혼잡하면 자동 반복 대신 중단 상태를 반환합니다.
+- 성공 자료는 10분 동안 공유 캐시로 재사용하며 원래 조회 시각을 유지합니다. 최대 256개 캐시만 보관하고 원본 HTML은 보관하지 않습니다.
+- 401/403/429·보안 화면에서는 10분간 중단합니다. 네트워크·시간 초과에서는 30초간 중단합니다. 동일 조건의 실패 결과는 최대 1분 재사용합니다. 실패를 빈 달력 성공으로 표시하지 않습니다.
+- 응답 선박·월·숫자 잔여석·관측 시각은 서버와 웹앱에서 검증합니다. 실패한 선박의 기존 기기 자료는 보존합니다.
+
+## 검증
+
+```powershell
+.\mobile.cmd test
+.\mobile.cmd run build
+.\mobile.cmd run api:check
+```
+
+실제 운영 조회는 테스트에서 자동 실행하지 않습니다. 자동 테스트는 HTTP 응답을 모의 처리합니다. 로컬 API가 필요하면 `api:dev`로 시작하며, 실제 원본 요청은 직접 `/v1/month`를 호출할 때만 실행됩니다.
+
+Cloudflare Worker에서는 `redirect: error`가 지원되지 않아 `manual`로 요청하고 모든 비-200 응답을 실패로 처리합니다. 이 차이는 회귀 테스트와 실제 배포 검증으로 확인했습니다.
+
+참고: [Cloudflare 임시 배포](https://developers.cloudflare.com/changelog/product/workers/3/), [Wrangler 로그인](https://developers.cloudflare.com/workers/wrangler/commands/general/), [Durable Objects](https://developers.cloudflare.com/durable-objects/get-started/).

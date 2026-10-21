@@ -13,12 +13,12 @@ test('default query button actually reads the month and persists verified result
   const detail=`<script>var data='date6='+date6+'&st_uid=981&pa_uid=6130';$.ajax({url:'../reservation/list.view.view.1.ajax.new.php'});</script>`;
   const network=vi.fn<typeof fetch>().mockResolvedValueOnce(new Response(detail,{headers:{'Content-Type':'text/html'}})).mockResolvedValueOnce(new Response(calendar,{headers:{'Content-Type':'text/html'}}));
   vi.stubGlobal('fetch',network);await import('../src/main');
-  expect(network).not.toHaveBeenCalled();expect((document.querySelector('#query-mode') as HTMLSelectElement).value).toBe('direct');
+  expect(network).not.toHaveBeenCalled();expect((document.querySelector('#query-mode') as HTMLSelectElement).value).toBe('api');(document.querySelector('#query-mode') as HTMLSelectElement).value='direct';
   document.querySelector('#query-form')!.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
   expect((document.querySelector('#stop-query') as HTMLElement).hidden).toBe(false);
   await vi.waitFor(()=>expect(document.querySelector('#live-progress')?.textContent).toContain('성공 1척'),{timeout:4000});
   expect(network).toHaveBeenCalledTimes(2);
-  expect(document.querySelector('#source-badge')?.textContent).toContain('최근 직접 조회 1척');
+  expect(document.querySelector('#source-badge')?.textContent).toContain('최근 조회 1척');
   expect(document.querySelector('#summary')?.textContent).toContain('17개 출조 일정');
   expect(document.querySelector('#live-rows')?.textContent).toContain('17개 출조 상품을 직접 조회했습니다');
   const saved=await loadState() as typeof state;expect(saved.events.filter(e=>e.date.startsWith('2026-09')).every(e=>e.source==='direct')).toBe(true);

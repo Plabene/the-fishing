@@ -21,7 +21,7 @@ export function applyLiveResults(current:AppState,month:string,rows:LiveRow[]):A
       state.events.push(...result.events);
       state.failures=state.failures.filter(f=>f.uid!==boat.uid || f.month!==month);
       state.monthChecks=(state.monthChecks || []).filter(c=>c.uid!==boat.uid || c.month!==month);
-      state.monthChecks.push({uid:boat.uid,month,requiredPeople:1,observedAt:result.observedAt,source:'direct'});
+      state.monthChecks.push({uid:boat.uid,month,requiredPeople:1,observedAt:result.observedAt,source:result.source==='api' ? 'api':'direct'});
     } else if(result.status!=='CANCELLED') {
       for(const check of state.monthChecks || []) if(check.uid===boat.uid && check.month===month) delete check.source;
       state.failures=state.failures.filter(f=>f.uid!==boat.uid || f.month!==month);

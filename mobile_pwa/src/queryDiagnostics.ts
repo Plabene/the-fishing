@@ -1,7 +1,7 @@
 import { el, sourceLink } from './dayView';
 import type { LiveRow } from './liveQuery';
 
-const stageLabel={detail:'선박 상세 요청',calendar:'월 달력 요청'};
+const stageLabel={detail:'선박 상세 요청',calendar:'월 달력 요청',api:'조회 API 연결'};
 export function diagnosticReport(rows:LiveRow[],month:string,now=new Date()):string {
   return [`월별 조회 진단 · ${now.toISOString()}`,`조회 월: ${month}`,...rows.map(({boat,result})=>[
     boat.name,`UID ${boat.uid}`,result.stage ? stageLabel[result.stage] : '조회 결과',result.status,

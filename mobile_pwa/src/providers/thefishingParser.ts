@@ -15,15 +15,17 @@ export function discoverCalendar(html:string,boat:Boat) {
   if(endpoints.length!==1) throw new Error('월 달력 주소가 여러 개여서 확정할 수 없습니다.');
   return {endpoint:endpoints[0],st_uid:data[1],pa_uid:data[2]};
 }
-function inert(html:string):DocumentFragment {
+function inert(html:string, dom:Document):DocumentFragment {
   // Detached template content never executes scripts or loads embedded resources.
-  const template=document.createElement('template'); template.innerHTML=html;
+  const template=dom.createElement('template'); template.innerHTML=html;
   template.content.querySelectorAll('script,style,iframe,object,embed,link,meta,img,svg').forEach(n=>n.remove());
   return template.content;
 }
 const clean=(v:string|null)=>text(v || '',2000).replace(/\s+/g,' ').trim();
-export function securityDocument(html:string):boolean {
-  return /비정상\s*(?:적인\s*)?접근|접근이\s*차단|access denied|captcha|robot verification|kuipernet|카이퍼넷/i.test(inert(html).textContent || '');
+export function securityDocument(html:string, dom:Document=globalThis.document):boolean {
+  const fragment=inert(html,dom);
+  const content=[...fragment.childNodes].map(node=>node.textContent || '').join(' ');
+  return /비정상\s*(?:적인\s*)?접근|접근이\s*차단|access denied|captcha|robot verification|kuipernet|카이퍼넷/i.test(content);
 }
 function remaining(value:string):number|null {
   const patterns=[/남은\s*(?:인원|자리)\s*[:：]?\s*(\d+)/,/잔여\s*(?:인원|좌석|자리)?\s*[:：]?\s*(\d+)\s*(?:석|명|자리)?/,/(\d+)\s*명\s*(?:예약\s*)?가능/,/예약\s*가능\s*(?:인원)?\s*[:：]?\s*(\d+)/];
@@ -40,8 +42,8 @@ async function identity(value:string) {
   const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));
   return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
 }
-export async function parseCalendar(html:string,boat:Boat,month:string,observedAt:string):Promise<Observation[]> {
-  const doc=inert(html), compact=month.replace('-','');
+export async function parseCalendar(html:string,boat:Boat,month:string,observedAt:string,dom:Document=globalThis.document):Promise<Observation[]> {
+  const doc=inert(html,dom), compact=month.replace('-','');
   const markers=[...doc.querySelectorAll('.re_mon .on,[data-month]')].map(n=>`${n.getAttribute('onclick') || ''} ${n.getAttribute('data-month') || ''}`);
   if(markers.length && !markers.some(v=>v.includes(compact) || v.includes(month))) throw new Error('응답의 월이 요청한 월과 다릅니다.');
   let monthEvidence=markers.some(v=>v.includes(compact) || v.includes(month));

@@ -11,3 +11,7 @@ Thumbs.db
 .sites-runtime/
 playwright-report/
 test-results/
+
+mobile_pwa/.wrangler/
+mobile_pwa/.worker-build/
+mobile_pwa/.dev.vars

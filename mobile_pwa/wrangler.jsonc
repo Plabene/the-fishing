@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "thefishing-availability",
+  "main": "availability_api/worker.ts",
+  "compatibility_date": "2026-10-21",
+  "workers_dev": true,
+  "vars": { "ALLOWED_ORIGIN": "https://plabene.github.io" },
+  "durable_objects": { "bindings": [{ "name": "MONTHLY", "class_name": "MonthlyCoordinator" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MonthlyCoordinator"] }],
+  "observability": { "enabled": false }
+}

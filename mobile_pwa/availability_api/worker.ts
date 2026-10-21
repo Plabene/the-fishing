@@ -1,0 +1,35 @@
+import type { DurableObjectNamespace, DurableObjectState, ExportedHandler } from '@cloudflare/workers-types';
+import { apiFailure, MonthlyService, validQuery, type Store } from './service';
+
+interface Env {MONTHLY:DurableObjectNamespace; ALLOWED_ORIGIN:string}
+const json=(value:unknown,status=200,headers:Record<string,string>={})=>Response.json(value,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers}});
+export class MonthlyCoordinator {
+  private service:MonthlyService;
+  constructor(ctx:DurableObjectState) {this.service=new MonthlyService(ctx.storage as unknown as Store);}
+  async fetch(request:Request):Promise<Response> {
+    const u=new URL(request.url);
+    try {return json(await this.service.query(u.searchParams.get('uid') || '',u.searchParams.get('month') || ''));}
+    catch {return json(apiFailure('API_UNAVAILABLE','조회 서버 처리에 실패했습니다. 잠시 후 다시 시도하세요.'),503);}
+  }
+}
+export async function handleRequest(request:Request,env:Env):Promise<Response> {
+  const url=new URL(request.url), origin=request.headers.get('Origin'), allowed=env.ALLOWED_ORIGIN;
+  // CORS restricts browser callers, not server callers; global budget is enforced in the coordinator.
+  if(!allowed || (origin && origin!==allowed)) return json(apiFailure('API_UNAVAILABLE','허용되지 않은 웹앱 출처입니다.'),403);
+  const headers:Record<string,string>={'Access-Control-Allow-Origin':allowed,'Vary':'Origin'};
+  if(request.method==='OPTIONS') {
+    if(request.headers.get('Access-Control-Request-Method')!=='GET' || request.headers.get('Access-Control-Request-Headers')) return json({},405,headers);
+    return new Response(null,{status:204,headers:{...headers,'Access-Control-Allow-Methods':'GET, OPTIONS','Access-Control-Max-Age':'600'}});
+  }
+  if(request.method!=='GET') return json(apiFailure('API_UNAVAILABLE','GET 요청만 지원합니다.'),405,headers);
+  if(url.pathname==='/health' && !url.search) return json({service:'thefishing-availability',schema:1,ready:!!env.MONTHLY},env.MONTHLY ? 200:503,headers);
+  if(url.pathname!=='/v1/month') return json(apiFailure('API_UNAVAILABLE','지원하지 않는 API 경로입니다.'),404,headers);
+  const uid=url.searchParams.get('uid') || '',month=url.searchParams.get('month') || '';
+  if(!validQuery(uid,month) || [...url.searchParams.keys()].some(k=>k!=='uid' && k!=='month') || url.searchParams.getAll('uid').length!==1 || url.searchParams.getAll('month').length!==1) return json(apiFailure('PARSER_UNSUPPORTED','조회 조건을 확인하세요.'),400,headers);
+  try {
+    const coordinator=env.MONTHLY.get(env.MONTHLY.idFromName('monthly-v1'));
+    const response=await coordinator.fetch(new Request(`https://coordinator/v1/month?uid=${uid}&month=${month}`) as never);
+    return new Response(await response.text(),{status:response.status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
+  } catch {return json(apiFailure('API_UNAVAILABLE','조회 서버에 연결하지 못했습니다.'),503,headers);}
+}
+export default {fetch:handleRequest} as unknown as ExportedHandler<Env>;

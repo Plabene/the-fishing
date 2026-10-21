@@ -1,3 +1,19 @@
+## 2026-10-21 조회 API 전환 — 현재 상태
+
+사용자가 “조회 API 추가로 진행”을 명시적으로 선택하여 기존 서버 없는 구성에서 Cloudflare 조회 API를 사용하는 구성으로 변경했습니다. 아래 과거 진단의 API 승인 대기 및 오프라인 전용 기록은 현재 구성에 적용되지 않습니다.
+
+- Cloudflare Worker와 전역 캐시/처리량/중단 상태를 보관하는 Durable Object 구현 및 임시 배포 완료.
+- API: https://thefishing-availability.longing-bonobo.workers.dev
+- 실제 클라우드 조회: 2026-10-21T14:18:32.577Z, UID 6130, 2026-10, 출조 상품 5개, ALLOWED_READABLE. 상세 GET과 달력 POST의 결과를 검증한 JSON만 반환.
+- 배포 출처 https://plabene.github.io에 대한 API CORS 헤더 확인. 재호출 시 캐시 재사용과 동일 observedAt 확인.
+- 기존 원본 서버의 CORS 제약은 그대로입니다. 브라우저는 새 API를 호출하므로 원본 응답에 대한 브라우저 CORS 실패 경로를 사용하지 않습니다.
+- Cloudflare 임시 계정은 생성 후 60분 한정입니다. 사용자에게 소유권 연결 링크를 전달했으며, 영구 계정 연결 완료는 아직 확인하지 않았습니다. 링크·자격 증명은 이 문서나 GitHub에 저장하지 않습니다.
+- 실제 휴대폰 렌더링은 브라우저 도구 비활성화로 미검증입니다. API 연결·조회 UI는 DOM 통합 테스트로 검증합니다.
+
+API 및 계정 연결 안내: [availability_api/README_KO.md](availability_api/README_KO.md).
+
+---
+
 ## 2026-10-21 추가 진단: 웹 직접 조회 실패
 
 사용자가 배포 웹페이지에서 조회 실패를 보고하여 실제 공개 선박 UID 6130을 한정해 확인했습니다.

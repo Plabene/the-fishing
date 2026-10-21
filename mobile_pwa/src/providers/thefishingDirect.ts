@@ -19,7 +19,7 @@ export class TheFishingDirect implements AvailabilityProvider {
   private running=false;
   private blockedUntil=0;
   private cache=new Map<string,ProviderResult>();
-  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000) {}
+  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document) {}
   validateDetail(url:string):boolean {return !!officialDetail(url);}
   private async html(url:string,stage:'detail'|'calendar',signal:AbortSignal,body?:URLSearchParams):Promise<string> {
     if(stage==='detail' ? !officialDetail(url) : !calendarEndpoint(url)) throw new Error('허용되지 않은 주소입니다.');
@@ -38,14 +38,21 @@ export class TheFishingDirect implements AvailabilityProvider {
       }
       const contentType=response.headers.get('content-type') || '';
       if(contentType && !/text\/(html|plain)|application\/xhtml\+xml/i.test(contentType)) throw new ReadError(fail('PARSER_UNSUPPORTED','달력 HTML 응답이 아닙니다.',false,{stage}));
-      const bytes=await response.arrayBuffer();
-      if(bytes.byteLength>2_000_000) throw new ReadError(fail('PARSER_UNSUPPORTED','달력 응답이 허용 크기를 초과했습니다.',false,{stage}));
+      const reader=response.body?.getReader(), chunks:Uint8Array[]=[];let size=0;
+      if(!reader) throw new ReadError(fail('PARSER_UNSUPPORTED','달력 응답 본문이 없습니다.',false,{stage}));
+      while(true) {
+        const chunk=await reader.read();if(chunk.done) break;
+        size+=chunk.value.byteLength;
+        if(size>2_000_000) {await reader.cancel();throw new ReadError(fail('PARSER_UNSUPPORTED','달력 응답이 허용 크기를 초과했습니다.',false,{stage}));}
+        chunks.push(chunk.value);
+      }
+      const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks) {bytes.set(chunk,offset);offset+=chunk.byteLength;}
       const prefix=new TextDecoder().decode(bytes.slice(0,4096));
       const encoding=(contentType.match(/charset\s*=\s*["']?([\w-]+)/i)?.[1] || prefix.match(/<meta[^>]+charset\s*=\s*["']?([\w-]+)/i)?.[1] || 'utf-8').toLowerCase();
       const charset=['euc-kr','cp949','windows-949','ks_c_5601-1987'].includes(encoding) ? 'euc-kr' : ['utf-8','utf8'].includes(encoding) ? 'utf-8' : '';
       if(!charset) throw new ReadError(fail('PARSER_UNSUPPORTED','지원하지 않는 응답 문자 인코딩입니다.',false,{stage}));
       const html=new TextDecoder(charset).decode(bytes);
-      if(securityDocument(html)) throw new ReadError(fail('ACCESS_RESTRICTED','사이트가 보안 확인 또는 접근 제한 화면을 반환했습니다.',true,{stage}));
+      if(securityDocument(html,this.dom)) throw new ReadError(fail('ACCESS_RESTRICTED','사이트가 보안 확인 또는 접근 제한 화면을 반환했습니다.',true,{stage}));
       return html;
     } catch(error) {
       if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
@@ -67,9 +74,11 @@ export class TheFishingDirect implements AvailabilityProvider {
       const {endpoint,st_uid,pa_uid}=discoverCalendar(detail,boat);
       const html=await this.html(endpoint,'calendar',signal,new URLSearchParams({date6:month.replace('-',''),st_uid,pa_uid}));
       signal.throwIfAborted(); const observedAt=new Date().toISOString();
-      const events=await parseCalendar(html,boat,month,observedAt); signal.throwIfAborted();
+      const events=await parseCalendar(html,boat,month,observedAt,this.dom); signal.throwIfAborted();
       const result:ProviderResult={status:'ALLOWED_READABLE',events,observedAt,message:`${events.length}개 출조 상품을 직접 조회했습니다.`};
-      this.cache.set(key,structuredClone(result)); return result;
+      this.cache.set(key,structuredClone(result));
+      while(this.cache.size>128) this.cache.delete(this.cache.keys().next().value!);
+      return result;
     } catch(error) {
       if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
       const result=error instanceof ReadError ? error.result : fail('PARSER_UNSUPPORTED',error instanceof Error ? error.message : '달력 응답을 해석하지 못했습니다.');

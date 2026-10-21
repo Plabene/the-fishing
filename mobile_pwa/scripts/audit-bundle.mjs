@@ -1,6 +1,6 @@
 import { readFile, readdir } from 'node:fs/promises';
 const html = await readFile('dist/index.html', 'utf8');
-const allowed="connect-src 'self' https://thefishing.kr/reservation/list.php https://thefishing.kr/reservation/list.view.view.1.ajax.php https://thefishing.kr/reservation/list.view.view.1.ajax.new.php;";
+const allowed="connect-src 'self' https://*.workers.dev https://thefishing.kr/reservation/list.php https://thefishing.kr/reservation/list.view.view.1.ajax.php https://thefishing.kr/reservation/list.view.view.1.ajax.new.php;";
 if (!html.includes(allowed)) throw new Error('Unexpected connection policy');
 for (const name of await readdir('dist/assets')) {
   if (!name.endsWith('.js')) continue;
