@@ -27,11 +27,27 @@ export function parseCatalogPage(html,page=1) {
   return {total,lastPage,boats};
 }
 export async function collectCatalog(readPage,onProgress=()=>{}) {
-  const first=parseCatalogPage(await readPage(1),1),boats=[...first.boats];
+  return collectCatalogPages(async page=>parseCatalogPage(await readPage(page),page),onProgress);
+}
+export function validateCatalogPage(value,page) {
+  if(!value || !Number.isInteger(value.total) || value.total<1 || value.total>5000 || !Number.isInteger(value.lastPage) || value.lastPage<page || value.lastPage>100 || !Array.isArray(value.boats) || !value.boats.length || value.boats.length>100) throw new Error('목록 API 응답 형식 오류');
+  const boats=value.boats.map(b=>{
+    if(!b || typeof b.uid!=='string' || !/^\d{1,10}$/.test(b.uid) || b.url!==`${CATALOG_URL}?uid=${b.uid}` || typeof b.name!=='string' || b.name.length>160 || typeof b.port!=='string' || b.port.length>160) throw new Error('목록 API 선박 정보 오류');
+    let region;
+    if(b.region) {
+      if(['sea','province','local'].some(k=>typeof b.region[k]!=='string' || b.region[k].length>60)) throw new Error('목록 API 지역 정보 오류');
+      region=Object.fromEntries(['sea','province','local'].map(k=>[k,clean(b.region[k])]));
+    }
+    return {uid:b.uid,name:clean(b.name),port:clean(b.port),url:b.url,...(region ? {region}:{})};
+  });
+  return {total:value.total,lastPage:value.lastPage,boats};
+}
+export async function collectCatalogPages(readPage,onProgress=()=>{}) {
+  const first=validateCatalogPage(await readPage(1),1),boats=[...first.boats];
   if(Math.ceil(first.total/first.boats.length)!==first.lastPage) throw new Error('전체 건수와 페이지 수가 맞지 않습니다.');
   onProgress(1,first.lastPage);
   for(let page=2;page<=first.lastPage;page++) {
-    const result=parseCatalogPage(await readPage(page),page);
+    const result=validateCatalogPage(await readPage(page),page);
     if(result.total!==first.total || result.lastPage!==first.lastPage || (page<first.lastPage && result.boats.length!==first.boats.length)) throw new Error('수집 중 목록 건수 또는 페이지가 변경됐습니다. 기존 목록을 유지합니다.');
     boats.push(...result.boats);onProgress(page,first.lastPage);
   }

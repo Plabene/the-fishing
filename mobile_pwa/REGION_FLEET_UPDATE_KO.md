@@ -9,7 +9,7 @@
 - `scripts/lib/catalog.mjs`, `scripts/update-fleet.mjs`: 광고를 제외한 공개 예약 목록 전체 페이지 수집, UID·URL·페이지·건수 검증, 중복 통합, 상충 필드 보류, 기존 선박 보존, 성공 후 원자적 파일 교체.
 - `.github/workflows/deploy.yml`: 월요일 06:17 KST 정기 실행과 `refresh_fleet` 수동 실행. 테스트·빌드 통과 후 봇 커밋과 Pages 배포를 같은 워크플로에서 실행.
 
-기존 API·조회 간격·새 잔여석 확인 방식은 수정하지 않았다. 목록 갱신에는 좌석·예약 내역을 수집하지 않는다.
+기존 월별 API·조회 간격·새 잔여석 확인 방식은 유지한다. 별도 `/v1/catalog?page=N` 목록 API를 추가했으며 목록 갱신에는 좌석·예약 내역을 수집하지 않는다.
 
 ## 실제 공개 목록 확인
 
@@ -19,8 +19,12 @@
 
 ## 검증
 
-로컬 자동 테스트 **27개 파일·181개 테스트 통과**. 지역별 API 요청 UID·달력 반영·월 변경·선택 범위, 지역 백업, 기존 개인 설정과 삭제 보존, 신규 미선택, 공개 목록 광고 제외·중복·충돌·부분 실패를 검증했다. 기존 새 잔여석·어종·물때·진행 시간 테스트도 함께 통과했다.
+로컬 자동 테스트 **28개 파일·187개 테스트 통과**. 지역별 API 요청 UID·달력 반영·월 변경·선택 범위, 지역 백업, 기존 개인 설정과 삭제 보존, 신규 미선택, 공개 목록 광고 제외·중복·충돌·부분 실패를 검증했다. 목록 API의 캐시 확인 시각 보존·순차 처리·중복 통합·오류 중단·지속 호출 한도·입력 검증도 확인했다. 기존 새 잔여석·어종·물때·진행 시간 테스트도 함께 통과했다.
 
-Pages 하위 경로 `/the-fishing/`의 TypeScript·Vite 빌드 및 번들 검사, Worker 배포 dry-run을 통과했다. 번들의 500kB 경고는 남아 있으며 API Worker 자체를 변경하거나 새로 배포하지 않았다. 실제 휴대폰의 화면·설치 동작은 이번에 직접 확인하지 않았다. 이 작업에서 속도 측정치를 새로 만들지 않았다.
+Pages 하위 경로 `/the-fishing/`의 TypeScript·Vite 빌드 및 번들 검사, Worker 배포 dry-run을 통과했다. 번들의 500kB 경고는 남아 있다. 목록 API를 포함한 Worker 버전 `de532909-ede2-45cc-b411-68a975e0b91f`를 배포했다. 실제 휴대폰의 화면·설치 동작은 이번에 직접 확인하지 않았다. 이 작업에서 속도 측정치를 새로 만들지 않았다.
+
+첫 웹 배포 [39749982178](https://github.com/Plabene/the-fishing/actions/runs/39749982178)은 성공했다. 원본 직접 연결로 목록을 갱신한 [39750012176](https://github.com/Plabene/the-fishing/actions/runs/39750012176)은 GitHub 실행 서버에서 TCP 연결 시간 초과(`UND_ERR_CONNECT_TIMEOUT`)로 중단됐고 목록 파일·배포는 변경하지 않았다. 이후 갱신을 기존 Cloudflare API의 목록 전용 경로로 연결했다. HTML·쿠키를 중계하지 않고 검증된 공개 필드만 전달한다.
+
+2026-10-22 18:12:22 KST 새 목록 API의 첫 페이지가 `OK`, 20개 항목, 총 676개 표시/34페이지로 응답했다. 18:12:32 KST 기존 월별 API의 UID 6130, 2026-10 조회는 출조 5개, `fresh=true`, `cached=false`로 성공했다. 목록 API의 메타데이터 캐시가 예약 좌석 캐시로 적용되지 않음을 해당 실제 조회에서도 확인했다.
 
 예약 실행은 GitHub의 지연·비활성 저장소 정책을 따른다. [예약 이벤트 문서](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)와 [GITHUB_TOKEN 이벤트 제한](https://docs.github.com/en/actions/concepts/security/github_token)에 따라 같은 워크플로 안에서 배포한다.

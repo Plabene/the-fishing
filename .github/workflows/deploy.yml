@@ -51,7 +51,7 @@ jobs:
 
       - name: Refresh public boat directory
         if: github.event_name == 'schedule' || inputs.refresh_fleet == true
-        run: node scripts/update-fleet.mjs --live
+        run: node scripts/update-fleet.mjs --live --api
 
       - name: Test app
         run: pnpm test

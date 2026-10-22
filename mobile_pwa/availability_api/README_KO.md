@@ -7,7 +7,7 @@ GitHub Pages 화면은 그대로 사용하고, Cloudflare Worker가 더피싱의
 - 웹앱: https://plabene.github.io/the-fishing/
 - API: https://thefishing-availability.thefishing-mobile-a.workers.dev
 - 상태 확인: https://thefishing-availability.thefishing-mobile-a.workers.dev/health
-- 배포: 2026-10-22 본인 Cloudflare 계정, 잔여석 매번 새 조회 Worker 버전 `5e366937-0c47-479d-b4ad-bf2f6ad18887`
+- 배포: 2026-10-22 본인 Cloudflare 계정, 선박 목록 API 추가 Worker 버전 `de532909-ede2-45cc-b411-68a975e0b91f`
 
 2026-10-21의 60분 임시 계정 배포는 종료됐습니다. 본인 계정의 OAuth 로그인과 이메일 인증을 완료한 뒤 새로 배포했습니다. 앱 기본 연결을 새 주소로 변경했고, 이전 임시 주소를 저장한 기기도 자동으로 전환합니다. 다른 사용자 지정 주소와 명시적인 연결 해제는 유지합니다.
 
@@ -18,6 +18,12 @@ GitHub Pages 화면은 그대로 사용하고, Cloudflare Worker가 더피싱의
 기본 API가 연결되어 있으므로 **조회 API 사용 → 실시간 월 조회**를 누릅니다. 과거에 직접 연결을 해제했거나 다른 배포를 쓰려면 **조회 API 연결**에서 주소를 입력하고 **연결 확인 및 저장**을 누릅니다. 연결 확인은 `/health` 응답만 확인하며 원본 사이트 조회 성공 여부는 월 조회 결과로 판단합니다.
 
 API 주소는 이 기기에만 저장합니다. 기존 선박 목록·티어·조회 자료는 유지됩니다. 예약 조회에는 선박 UID와 조회 월, 매번 새 조회를 요구하는 `fresh=1`, 물때 조회에는 조회 월만 전송합니다. 클라이언트에는 Cloudflare 토큰·공공데이터 인증키·계정 비밀번호·쿠키를 넣지 않습니다.
+
+## 공개 선박 목록
+
+`GET /v1/catalog?page=1`은 고정된 더피싱 공개 예약 목록의 해당 페이지에서 이름·UID·공식 URL·지역·항구만 반환합니다. 페이지는 1~100, 추가 매개변수·임의 URL·쿠키 전달은 지원하지 않습니다. GitHub Actions에서 원본 사이트로 직접 연결할 때 연결 시간 초과가 확인되어, 주간 목록 갱신은 이 API를 사용합니다.
+
+별도 `catalog-v1` Durable Object에서 순차 처리·진행 중 중복 통합·최소 1초 간격·하루 최대 100회 원본 요청을 적용합니다. 공개 목록 메타데이터만 24시간 저장하며 확인 시각을 유지합니다. **예약 잔여석은 이 캐시에 포함하지 않고 기존대로 매번 새 조회합니다.** HTTP 오류·리디렉션·형식 오류·시간 초과는 재시도 없이 10분 중단합니다. 원본 HTML과 연락처는 반환하지 않습니다. GitHub의 수집기는 다시 UID·공식 URL·건수·페이지·확인 시각을 검증한 후 목록에 병합합니다.
 
 ## 보령 물때
 
@@ -49,7 +55,7 @@ GitHub Actions는 웹앱 테스트·API 빌드 검사·GitHub Pages 배포를 �
 
 ## 조회 범위와 실패 처리
 
-- API는 `/health`, `/v1/month?uid=숫자&month=YYYY-MM`, `/v1/tides?month=YYYY-MM` GET만 제공합니다. 임의 URL·헤더·예약 폼을 중계하지 않습니다.
+- API는 `/health`, `/v1/month?uid=숫자&month=YYYY-MM`, `/v1/tides?month=YYYY-MM`, `/v1/catalog?page=숫자` GET만 제공합니다. 임의 URL·헤더·예약 폼을 중계하지 않습니다.
 - 원본 요청은 고정된 더피싱 상세 GET 및 발견·검증한 월 달력 POST만 수행합니다. 로그인·예약·결제·쿠키 전송이 없습니다. HTTP 리디렉션을 따르지 않습니다.
 - 브라우저 호출 출처는 `https://plabene.github.io`로 제한합니다. CORS는 사용자 인증 수단이 아니므로 서버 측에서도 전역 처리량을 제한합니다.
 - Durable Object 하나가 중복 요청을 합치고 최대 3척을 동시에 처리합니다. 원본 요청 시작 간격은 전체 방문자 합산 최소 1초, 각 요청은 10초 제한입니다. 신규 월 조회는 분당 최대 60건이며, 한도 갱신까지 5초 이내이면 잠시 기다려 긴 배치가 중간에 끊기지 않게 합니다. 대기는 최대 9건이며 초과 혼잡에서는 중단 상태를 반환합니다.
