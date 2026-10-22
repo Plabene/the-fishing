@@ -1,0 +1,21 @@
+.booking-options{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:18px}
+#reservation-filters{flex:1;min-width:0;border:1px solid #d9e3dd;border-radius:10px;background:#f8faf7}
+#reservation-filters>summary{padding:10px 12px;min-height:44px;cursor:pointer;font-size:13px;font-weight:650}
+#reservation-filter-summary{font-size:12px;font-weight:400;color:#526b61;overflow-wrap:anywhere}
+#reservation-filters[open]{flex-basis:100%;padding-bottom:12px}
+#reservation-filters>.filters{margin:4px 12px 12px}
+#reservation-filters>#species-filter{margin:12px}
+.matching-option{display:flex;align-items:center;gap:7px;font-size:12px;margin:12px}
+.matching-option input{width:18px;height:18px;accent-color:#176c60}
+.booking-options .view-tabs button{min-height:44px}
+.query-controls{margin-top:16px;margin-bottom:12px}
+#live-progress{flex-basis:100%;margin:0}
+#live-progress:empty{display:none}
+.secondary-panel{margin:12px 0;border:1px solid #dce5df;border-radius:10px;padding:0 14px;background:#f8faf7}
+.secondary-panel>summary{cursor:pointer;font-size:13px;font-weight:600;min-height:44px;padding:11px 0;color:#526b61}
+.secondary-panel[open]{padding-bottom:14px}
+.secondary-panel .tide-panel{margin:0}
+.secondary-panel .mode-label{margin-top:8px;max-width:320px}
+.day-tide-details{margin-top:16px;font-size:12px}
+.day-tide-details>summary{cursor:pointer;min-height:44px;padding:12px 0;color:#526b61}
+@media(max-width:620px){.booking-options{gap:8px}.booking-options .view-tabs{margin-left:auto}#reservation-filters{flex-basis:100%}.query-controls{margin-top:12px}.query-controls>.people-label{max-width:110px}}

@@ -19,7 +19,6 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
   target.replaceChildren();
   const events = (result?.events ?? visibleEvents(state, tier, search,matchingOnly)).filter(e => e.date === day);
   target.append(el('h2', `${Number(day.slice(5, 7))}월 ${Number(day.slice(8))}일 · ${events.length}개 출조 일정`));
-  renderDayTide(target,day,calculateTideMonth(state.month,state.tideDays || []));
   if (!events.length) target.append(el('p', '선택한 조건에 맞는 조회 결과가 없습니다. 미조회·자료 없음은 예약 마감을 뜻하지 않습니다.', 'empty'));
   const order = orderedBoats(state).map(b => b.uid);
   for (const t of TIERS) {
@@ -43,4 +42,6 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
   for (const failure of state.failures.filter(f => f.month === state.month && ids.has(f.uid) && (tier === 'all' || tierFor(state, f.uid) === tier))) {
     target.append(el('p', `${state.boats.find(b => b.uid === failure.uid)?.name || failure.uid} · ${failure.status === 'BLOCKED' ? '접근 제한' : '확인 불가'} · 최근 수집 실패 기록이 있습니다.`, 'notice'));
   }
+  const tideDetails=el('details','','day-tide-details');tideDetails.append(el('summary','이 날짜의 물때 상세'));
+  renderDayTide(tideDetails,day,calculateTideMonth(state.month,state.tideDays || []));target.append(tideDetails);
 }
