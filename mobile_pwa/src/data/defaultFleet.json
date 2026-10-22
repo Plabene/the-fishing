@@ -1,5 +1,5 @@
 {
-  "version": "906ed105f4eae23b",
+  "version": "8efb56f7993957af",
   "state": {
     "schema": 1,
     "boats": [
@@ -357,7 +357,7 @@
       },
       {
         "uid": "732",
-        "name": "제우스호 (양선장,사무장)",
+        "name": "제우스호 (양선장,사무장)[연락처 제외]",
         "port": "대천항",
         "url": "https://thefishing.kr/reservation/list.php?uid=732",
         "region": {
@@ -411,14 +411,36 @@
         }
       },
       {
+        "uid": "801",
+        "name": "영진호",
+        "port": "영흥도 진두항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=801",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "영흥도"
+        }
+      },
+      {
         "uid": "830",
-        "name": "뉴성령호 (성칠이선장)",
+        "name": "뉴성령호  (성칠이선장)",
         "port": "오천항",
         "url": "https://thefishing.kr/reservation/list.php?uid=830",
         "region": {
           "sea": "서해권",
           "province": "충청남도",
           "local": "보령시"
+        }
+      },
+      {
+        "uid": "838",
+        "name": "전투호(오전)",
+        "port": "오이도",
+        "url": "https://thefishing.kr/reservation/list.php?uid=838",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -488,6 +510,17 @@
         }
       },
       {
+        "uid": "933",
+        "name": "21금강호(종일배)",
+        "port": "영흥도 진두항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=933",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "영흥도"
+        }
+      },
+      {
         "uid": "977",
         "name": "마린스타호",
         "port": "영흥도 진두항",
@@ -503,6 +536,17 @@
         "name": "영동1호",
         "port": "영흥도 진두항",
         "url": "https://thefishing.kr/reservation/list.php?uid=981",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "영흥도"
+        }
+      },
+      {
+        "uid": "982",
+        "name": "모닝스타호",
+        "port": "영흥도 진두항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=982",
         "region": {
           "sea": "서해권",
           "province": "경기도",
@@ -584,6 +628,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "서천군"
+        }
+      },
+      {
+        "uid": "1264",
+        "name": "페라리호",
+        "port": "영흥도 진두항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=1264",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "영흥도"
         }
       },
       {
@@ -1038,6 +1093,17 @@
         }
       },
       {
+        "uid": "1765",
+        "name": "히트호",
+        "port": "인천남항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=1765",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "1818",
         "name": "블루피싱호",
         "port": "안흥항",
@@ -1141,6 +1207,17 @@
         "name": "레인보우",
         "port": "전곡항",
         "url": "https://thefishing.kr/reservation/list.php?uid=1910",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "화성시"
+        }
+      },
+      {
+        "uid": "1925",
+        "name": "스타피싱",
+        "port": "전곡항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=1925",
         "region": {
           "sea": "서해권",
           "province": "경기도",
@@ -1390,6 +1467,28 @@
         }
       },
       {
+        "uid": "2212",
+        "name": "뉴신명호",
+        "port": "전곡항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=2212",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "화성시"
+        }
+      },
+      {
+        "uid": "2242",
+        "name": "공지",
+        "port": "오천항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=2242",
+        "region": {
+          "sea": "서해권",
+          "province": "충청남도",
+          "local": "보령시"
+        }
+      },
+      {
         "uid": "2283",
         "name": "뉴 찬 스 호",
         "port": "오천항",
@@ -1409,6 +1508,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "당진시"
+        }
+      },
+      {
+        "uid": "2309",
+        "name": "이글스호",
+        "port": "비응항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=2309",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "군산"
         }
       },
       {
@@ -1951,6 +2061,17 @@
         }
       },
       {
+        "uid": "3015",
+        "name": "UID 3015 · 이름 미확인",
+        "port": "전곡항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3015",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "화성시"
+        }
+      },
+      {
         "uid": "3018",
         "name": "좌대예약",
         "port": "안면도",
@@ -1970,6 +2091,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "안면도"
+        }
+      },
+      {
+        "uid": "3060",
+        "name": "드래곤호",
+        "port": "인천남항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3060",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -2424,6 +2556,17 @@
         }
       },
       {
+        "uid": "3403",
+        "name": "[2026신조선] 마린스타 1호",
+        "port": "만석부두",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3403",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "3404",
         "name": "[2025신조선] 마린스타 3호",
         "port": "만석부두",
@@ -2754,6 +2897,17 @@
         }
       },
       {
+        "uid": "3617",
+        "name": "씨헌터호(선비입금우선순마감)농협 이영광 523071-52-097361",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3617",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
+        }
+      },
+      {
         "uid": "3632",
         "name": "태풍호",
         "port": "신진도항",
@@ -2809,8 +2963,19 @@
         }
       },
       {
+        "uid": "3696",
+        "name": "2시간 쭈꾸미체험낚시-1",
+        "port": "백사장항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3696",
+        "region": {
+          "sea": "서해권",
+          "province": "충청남도",
+          "local": "안면도"
+        }
+      },
+      {
         "uid": "3697",
-        "name": "H3 2시간 쭈꾸미체험낚시",
+        "name": "2시간 쭈꾸미체험낚시-7",
         "port": "백사장항",
         "url": "https://thefishing.kr/reservation/list.php?uid=3697",
         "region": {
@@ -2828,6 +2993,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "안면도"
+        }
+      },
+      {
+        "uid": "3701",
+        "name": "수복호",
+        "port": "평택항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3701",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "평택시"
         }
       },
       {
@@ -2949,6 +3125,28 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "태안"
+        }
+      },
+      {
+        "uid": "3766",
+        "name": "스타피싱",
+        "port": "전곡항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3766",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "화성시"
+        }
+      },
+      {
+        "uid": "3770",
+        "name": "뉴바다로호",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3770",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -3436,6 +3634,28 @@
         }
       },
       {
+        "uid": "4246",
+        "name": "몬스터호 (오전배)",
+        "port": "오이도",
+        "url": "https://thefishing.kr/reservation/list.php?uid=4246",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
+        "uid": "4247",
+        "name": "몬스터호 (오후배)",
+        "port": "오이도",
+        "url": "https://thefishing.kr/reservation/list.php?uid=4247",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "4255",
         "name": "아쿠아호",
         "port": "비응항",
@@ -3477,6 +3697,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "서천군"
+        }
+      },
+      {
+        "uid": "4327",
+        "name": "신조선 한바다호(오전)",
+        "port": "궁평항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=4327",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "화성시"
         }
       },
       {
@@ -3524,6 +3755,17 @@
         }
       },
       {
+        "uid": "4431",
+        "name": "돌핀호",
+        "port": "전곡항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=4431",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "화성시"
+        }
+      },
+      {
         "uid": "4443",
         "name": "헌터호",
         "port": "삼길포",
@@ -3546,6 +3788,17 @@
         }
       },
       {
+        "uid": "4465",
+        "name": "모비딕호",
+        "port": "인천남항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=4465",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "4519",
         "name": "백호",
         "port": "영흥도 진두항",
@@ -3558,7 +3811,7 @@
       },
       {
         "uid": "4576",
-        "name": "카즈미호",
+        "name": "카즈미호 ([연락처 제외])",
         "port": "오천항",
         "url": "https://thefishing.kr/reservation/list.php?uid=4576",
         "region": {
@@ -3649,6 +3902,17 @@
         "name": "NO.1 넘버원호",
         "port": "",
         "url": "https://thefishing.kr/reservation/list.php?uid=4651",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
+        }
+      },
+      {
+        "uid": "4652",
+        "name": "NO.2 넘버2호",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=4652",
         "region": {
           "sea": "서해권",
           "province": "전라북도",
@@ -3829,6 +4093,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "태안"
+        }
+      },
+      {
+        "uid": "4753",
+        "name": "원도권돌문어 (1호)또는(2,3호)유동적 오전6시30분~오후2시",
+        "port": "삼천포항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=4753",
+        "region": {
+          "sea": "남해권",
+          "province": "경상남도",
+          "local": "사천"
         }
       },
       {
@@ -4283,6 +4558,17 @@
         }
       },
       {
+        "uid": "5187",
+        "name": "해성호",
+        "port": "서망항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5187",
+        "region": {
+          "sea": "남해권",
+          "province": "전라남도",
+          "local": "진도,해남"
+        }
+      },
+      {
         "uid": "5205",
         "name": "하하호호 오전",
         "port": "인천남항",
@@ -4368,6 +4654,17 @@
           "sea": "서해권",
           "province": "경기도",
           "local": "영흥도"
+        }
+      },
+      {
+        "uid": "5302",
+        "name": "고강_호",
+        "port": "거잠포",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5302",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -4712,6 +5009,17 @@
         }
       },
       {
+        "uid": "5436",
+        "name": "대박 1 호",
+        "port": "격포항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5436",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
+        }
+      },
+      {
         "uid": "5437",
         "name": "대박 2 호",
         "port": "격포항",
@@ -4779,7 +5087,7 @@
       },
       {
         "uid": "5471",
-        "name": "슈퍼스타 (도니선장,사니사무장)",
+        "name": "슈퍼스타 (도니선장,사니사무장)[연락처 제외]",
         "port": "대천항",
         "url": "https://thefishing.kr/reservation/list.php?uid=5471",
         "region": {
@@ -4848,6 +5156,28 @@
         "name": "카이저호 (야간)",
         "port": "",
         "url": "https://thefishing.kr/reservation/list.php?uid=5554",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
+        }
+      },
+      {
+        "uid": "5556",
+        "name": "넘버원2호(야간)",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5556",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
+        }
+      },
+      {
+        "uid": "5557",
+        "name": "넘버원3호(야간)",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5557",
         "region": {
           "sea": "서해권",
           "province": "전라북도",
@@ -5042,6 +5372,17 @@
         }
       },
       {
+        "uid": "5725",
+        "name": "욜로호",
+        "port": "연안부두",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5725",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "5727",
         "name": "미성피싱호",
         "port": "홍원항",
@@ -5086,6 +5427,17 @@
         }
       },
       {
+        "uid": "5735",
+        "name": "창현호",
+        "port": "통영",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5735",
+        "region": {
+          "sea": "남해권",
+          "province": "경상남도",
+          "local": "통영"
+        }
+      },
+      {
         "uid": "5738",
         "name": "해복호[자리추첨]",
         "port": "영목항",
@@ -5105,6 +5457,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "보령시"
+        }
+      },
+      {
+        "uid": "5755",
+        "name": "일출호(쭈꾸미+광따) 4/1-4/17",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5755",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -5427,6 +5790,17 @@
         }
       },
       {
+        "uid": "5886",
+        "name": "일출호(대광어+갑오징어) 6/10~6/14",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5886",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "5891",
         "name": "바다호",
         "port": "삼길포",
@@ -5714,7 +6088,7 @@
       },
       {
         "uid": "6004",
-        "name": "등대호 쭈구미,갑오징어 (06시 출항 15시 입항)",
+        "name": "등대호 쭈구미,갑오징어 (06시30 출항 15시 입항)",
         "port": "인천",
         "url": "https://thefishing.kr/reservation/list.php?uid=6004",
         "region": {
@@ -5966,6 +6340,17 @@
         }
       },
       {
+        "uid": "6083",
+        "name": "뉴금강호(야간 돌문어)",
+        "port": "삼천포항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6083",
+        "region": {
+          "sea": "남해권",
+          "province": "경상남도",
+          "local": "사천"
+        }
+      },
+      {
         "uid": "6085",
         "name": "은용호",
         "port": "당진시",
@@ -6007,6 +6392,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "서천군"
+        }
+      },
+      {
+        "uid": "6113",
+        "name": "오전배",
+        "port": "오이도",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6113",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -6164,6 +6560,17 @@
         }
       },
       {
+        "uid": "6144",
+        "name": "일출호(알쭈꾸미) 3/14~3/31",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6144",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "6145",
         "name": "일출호(다잡어+백조기) 7/1~8/31",
         "port": "",
@@ -6205,6 +6612,17 @@
           "sea": "서해권",
           "province": "경기도",
           "local": "인천"
+        }
+      },
+      {
+        "uid": "6149",
+        "name": "팀누리호",
+        "port": "영흥도 진두항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6149",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "영흥도"
         }
       },
       {
@@ -6505,6 +6923,17 @@
         }
       },
       {
+        "uid": "6232",
+        "name": "스모키호",
+        "port": "인천남항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6232",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "6244",
         "name": "드래곤호(블루피싱)",
         "port": "",
@@ -6524,6 +6953,23 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "당진시"
+        }
+      },
+      {
+        "uid": "6246",
+        "name": "오전체험(7시~12시)",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6246"
+      },
+      {
+        "uid": "6247",
+        "name": "오후체험(13시~17시)",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6247",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
         }
       },
       {
@@ -6714,6 +7160,17 @@
         }
       },
       {
+        "uid": "6337",
+        "name": "협력선사",
+        "port": "인천남항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6337",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "6343",
         "name": "타이밍호 박주호(16인승)",
         "port": "무창포항",
@@ -6722,6 +7179,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "보령시"
+        }
+      },
+      {
+        "uid": "6345",
+        "name": "남부스타호 (야간)",
+        "port": "",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6345",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
         }
       },
       {
@@ -6770,7 +7238,7 @@
       },
       {
         "uid": "6356",
-        "name": "몬스터호(처리선장)",
+        "name": "몬스터호(처리선장)[연락처 제외]",
         "port": "대천항",
         "url": "https://thefishing.kr/reservation/list.php?uid=6356",
         "region": {
@@ -6799,6 +7267,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "보령시"
+        }
+      },
+      {
+        "uid": "6362",
+        "name": "로또호",
+        "port": "인천남항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6362",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -6881,12 +7360,34 @@
       {
         "uid": "6387",
         "name": "협력선단",
-        "port": "",
+        "port": "영흥도 진두항",
         "url": "https://thefishing.kr/reservation/list.php?uid=6387",
         "region": {
-          "sea": "남해권",
-          "province": "전라남도",
-          "local": "목포"
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "영흥도"
+        }
+      },
+      {
+        "uid": "6392",
+        "name": "2시간 쭈꾸미체험낚시77",
+        "port": "백사장항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6392",
+        "region": {
+          "sea": "서해권",
+          "province": "충청남도",
+          "local": "안면도"
+        }
+      },
+      {
+        "uid": "6394",
+        "name": "댓길이호",
+        "port": "무창포항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6394",
+        "region": {
+          "sea": "서해권",
+          "province": "충청남도",
+          "local": "보령시"
         }
       },
       {
@@ -6898,6 +7399,17 @@
           "sea": "남해권",
           "province": "경상남도",
           "local": "사천"
+        }
+      },
+      {
+        "uid": "6398",
+        "name": "마성호",
+        "port": "오천항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6398",
+        "region": {
+          "sea": "서해권",
+          "province": "충청남도",
+          "local": "보령시"
         }
       },
       {
@@ -7157,13 +7669,14 @@
     "failures": []
   },
   "catalog": {
-    "checkedAt": "2026-10-22T08:33:56.516Z",
+    "checkedAt": "2026-10-22T09:12:22.525Z",
+    "completedAt": "2026-10-22T09:15:56.258Z",
     "source": "https://thefishing.kr/reservation/list.php",
-    "listed": 427,
+    "listed": 426,
     "listedCards": 676,
-    "duplicates": 249,
-    "conflicts": 0,
+    "duplicates": 250,
+    "conflicts": 3,
     "pages": 34,
-    "retained": 207
+    "retained": 255
   }
 }
