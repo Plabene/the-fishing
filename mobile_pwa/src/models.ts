@@ -10,7 +10,7 @@ export interface Observation {
   id: string; uid: string; date: string; trip: string; port: string; departure: string;
   remaining: number | null; verified: boolean; observedAt: string | null;
   source: 'imported' | 'fixture' | 'direct' | 'api';
-  species?: string; price?: number | null;
+  species?: string; speciesKey?: string; price?: number | null;
 }
 export interface MonthCheck { uid: string; month: string; requiredPeople: number; observedAt: string; source?: 'direct' | 'api' }
 export interface Failure { uid: string; month: string; observedAt: string | null; status: 'UNKNOWN' | 'BLOCKED'; code: string }
@@ -18,6 +18,7 @@ export interface AppState {
   schema: 1; boats: Boat[]; tiers: Record<Tier, string[]>; events: Observation[];
   failures: Failure[]; month: string; requiredPeople: number; selectedUids: string[]; fleetSeedVersion?: string;
   monthlyArchiveVersion?: string; monthChecks?: MonthCheck[];
+  selectedSpecies?: string; excludedSpeciesKeys?: string[];
 }
 export function localMonth(now = new Date()): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).format(now);

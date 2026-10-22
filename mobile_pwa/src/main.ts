@@ -15,6 +15,8 @@ import { initializeMonthlyArchive } from './monthlyArchive';
 import { queryMonth } from './monthlyQuery';
 import { renderMonthlyList } from './monthlyView';
 import { diagnosticReport, renderDiagnostics } from './queryDiagnostics';
+import { renderSpeciesFilter } from './speciesFilter';
+import { eventSpecies } from './species';
 const root = document.querySelector<HTMLDivElement>('#app')!;
 // Only static markup is inserted here. All imported content uses textContent/value.
 root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">≈</span><span>THEFISHING<small>선박별 예약 가능 일정</small></span></div><div class="hero-row"><div><p class="eyebrow">출조할 월과 인원을 선택하세요</p><h1>월별 예약 조회</h1><p>선택한 선박의 출조 일정과 잔여석을 날짜별로.</p></div><span id="connectivity"></span></div></div></header>
@@ -25,6 +27,7 @@ root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand
 <p class="query-source">조회 API가 원본 월 달력을 읽고 공개 일정·잔여석만 전달합니다. 성공한 선박만 갱신하며, 10분 이내 조회 결과는 재사용합니다.</p><details id="api-settings" class="api-settings"><summary>조회 API 연결 · <span id="api-state">연결 안 됨</span></summary><form id="api-form"><label>배포된 API 주소<input id="api-url" type="url" required placeholder="https://서비스명.계정명.workers.dev" autocomplete="off"></label><button type="submit">연결 확인 및 저장</button><button id="api-clear" type="button">연결 해제</button></form><p>API 주소는 이 기기에 저장됩니다. 계정 비밀번호나 토큰은 입력하지 않습니다. 연결 확인은 API 접속 확인이며, 실제 잔여석은 월 조회 결과로 확인합니다.</p><a href="https://github.com/Plabene/the-fishing/blob/main/mobile_pwa/availability_api/README_KO.md" target="_blank" rel="noopener noreferrer">API 배포 안내 ↗</a></details><p id="live-progress" role="status" aria-live="polite"></p><details id="live-diagnostics" hidden><summary>선박별 조회 결과</summary><div id="live-rows"></div><button id="copy-diagnostics" type="button">조회 진단 복사</button><textarea id="diagnostic-text" readonly hidden aria-label="조회 진단 내용"></textarea></details>
 <div id="archive-months" class="archive-months" aria-label="자료가 있는 월"></div><div id="query-status" class="query-status" role="status"></div>
 <div class="filters"><div id="tabs" class="tier-tabs" role="group" aria-label="선박 티어"></div><label class="search-label"><span class="sr-only">선박 또는 어종 검색</span><input id="search" type="search" placeholder="선박 · 항구 · 어종 검색"></label></div>
+<section id="species-filter" aria-label="어종 필터"></section>
 <div class="result-toolbar"><label><input id="matching-only" type="checkbox" checked> 조회 당시 인원 충족 일정만</label><div class="view-tabs" role="group" aria-label="결과 보기"><button id="view-calendar" aria-pressed="true">달력</button><button id="view-list" aria-pressed="false">월 전체 목록</button></div></div>
 <p id="summary" class="summary"></p><div id="demo-banner" class="demo-banner" hidden>가상의 예시 자료입니다. 실제 선박·잔여석 정보가 아니며 내 자료에 저장되지 않습니다.</div><div id="calendar-layout" class="calendar-grid-layout"><div><div id="calendar" class="calendar-grid" aria-label="월별 날짜"></div><p class="legend">날짜별 숫자는 조회 조건에 맞는 출조 상품 수입니다. 한 선박에 여러 상품이 있을 수 있습니다. 이전 잔여석은 현재 예약 가능 여부를 보장하지 않습니다.</p><p id="last-observed" class="timestamp"></p></div><section id="day-view" class="day-view" aria-live="polite"></section></div><section id="month-results" aria-label="월 전체 조회 결과" hidden></section></section>
 <section id="source-access" class="source-access" aria-label="공식 예약 페이지 확인"></section>
@@ -40,6 +43,7 @@ let importController: AbortController | null = null, undoState: AppState | null 
 let liveController:AbortController|null=null; const directProvider=new TheFishingDirect();
 let liveRows:LiveRow[]=[], liveMonth=state.month;
 let configuredApi=loadApiOrigin();
+let apiProvider=new TheFishingApi(configuredApi), lastFleetState:AppState|null=null;
 function renderApiSettings() {
   $<HTMLInputElement>('#api-url').value=configuredApi;
   $('#api-state').textContent=configuredApi ? new URL(configuredApi).hostname : '연결 안 됨';
@@ -49,7 +53,7 @@ renderApiSettings();
 const form = $<HTMLFormElement>('#boat-form');
 const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
 const say = (value: string) => { $('#message').textContent = value; };
-const active = () => demo ? {...fixtureState(state.month),requiredPeople:state.requiredPeople} : state;
+const active = () => demo ? {...fixtureState(state.month),requiredPeople:state.requiredPeople,selectedSpecies:state.selectedSpecies,excludedSpeciesKeys:state.excludedSpeciesKeys} : state;
 function connection() { $('#connectivity').textContent = navigator.onLine ? '● 온라인 · 월별 조회 준비' : '○ 오프라인 · 이전 조회 결과 열람'; }
 function setBusy(value: boolean) { busy = value; root.setAttribute('aria-busy', String(value)); root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input,button,select').forEach(n => { if (n.id !== 'cancel' && n.id!=='stop-query') n.disabled = value; }); }
 async function commit(candidate: AppState, message: string): Promise<boolean> {
@@ -58,7 +62,7 @@ async function commit(candidate: AppState, message: string): Promise<boolean> {
   catch { say('기기에 저장하지 못했습니다. 저장 공간을 확인하거나 백업을 내려받으세요. 변경은 적용되지 않았습니다.'); return false; }
   finally { setBusy(false); render(); }
 }
-function chooseDay(day: string) { selectedDay = day; renderCalendar($('#calendar'), active(), tier, search, day, chooseDay,matchingOnly); renderDay($('#day-view'), active(), day, tier, search,matchingOnly); }
+function chooseDay(day: string) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result); }
 function renderFleet() {
   const target = $('#boats'); target.replaceChildren();
   const boats = orderedBoats(state).filter(b => `${b.name} ${b.uid} ${b.port}`.toLowerCase().includes(fleetSearch.toLowerCase()));
@@ -83,6 +87,11 @@ function render() {
   if (!selectedDay.startsWith(state.month)) selectedDay = records[0]?.date || `${state.month}-01`;
   $<HTMLInputElement>('#month').value = state.month; $<HTMLInputElement>('#people').value=String(state.requiredPeople); $('#month-label').textContent = `${state.month.slice(0, 4)}년 ${Number(state.month.slice(5))}월`;
   $('#summary').textContent = `${LABELS[tier]} · ${shown.requiredPeople}명 · ${result.boats.length}척 대상 · ${result.days.length}일 / ${records.length}개 출조 일정`;
+  const panelOpen=$<HTMLDetailsElement>('#species-panel')?.open || false;
+  renderSpeciesFilter($('#species-filter'),result.speciesCounts,state.selectedSpecies || 'all',state.excludedSpeciesKeys || [],(selectedSpecies,excludedSpeciesKeys)=>{
+    resultLimit=50;void commit({...state,selectedSpecies,excludedSpeciesKeys},'어종 필터를 적용했습니다. 원본 조회 결과는 유지합니다.');
+  },[...new Set(shown.events.map(eventSpecies))]);
+  $<HTMLDetailsElement>('#species-panel').open=panelOpen;
   $('#query-status').replaceChildren();
   const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && (c.source==='direct' || c.source==='api') && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
   $('#source-badge').textContent=demo ? '예시 자료' : fresh ? `최근 조회 ${fresh}척` : '이전 자료 · 실시간 미확인';
@@ -97,14 +106,16 @@ function render() {
   renderDiagnostics($('#live-rows'),liveRows);
   $('#calendar-layout').hidden=listView; $('#month-results').hidden=!listView;
   $('#view-calendar').setAttribute('aria-pressed',String(!listView)); $('#view-list').setAttribute('aria-pressed',String(listView));
-  renderMonthlyList($('#month-results'),shown,result,resultLimit,()=>{resultLimit+=50;render();},day=>{listView=false;selectedDay=day;render();});
+  if(listView) renderMonthlyList($('#month-results'),shown,result,resultLimit,()=>{resultLimit+=50;render();},day=>{listView=false;selectedDay=day;render();});
   $('#demo-banner').hidden = !demo; $('#demo').textContent = demo ? '실제 조회 자료로 돌아가기' : '예시 둘러보기'; $('#fleet-section').hidden = demo;
   const times = records.flatMap(e => e.observedAt ? [e.observedAt] : []).sort((a, b) => Date.parse(b) - Date.parse(a));
   $('#last-observed').textContent = times[0] ? `이 달의 최근 관측 · ${new Date(times[0]).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}` : '관측 시각 · 확인된 자료 없음';
   $('#tabs').replaceChildren(); for (const t of ['all', ...TIERS] as Filter[]) { const b = el('button', LABELS[t]); b.setAttribute('aria-pressed', String(t === tier)); b.addEventListener('click', () => { tier = t; render(); }); $('#tabs').append(b); }
   $('#source-access').hidden = demo;
   renderSourceAccess($('#source-access'), state, sourceBoat, value => { sourceBoat=value; render(); });
-  renderCalendar($('#calendar'), shown, tier, search, selectedDay, chooseDay,matchingOnly); renderDay($('#day-view'), shown, selectedDay, tier, search,matchingOnly); renderFleet(); connection();
+  if(!listView) {renderCalendar($('#calendar'), shown, tier, search, selectedDay, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, selectedDay, tier, search,matchingOnly,result);}
+  if(!lastFleetState || lastFleetState.boats!==state.boats || lastFleetState.tiers!==state.tiers || lastFleetState.selectedUids!==state.selectedUids) renderFleet();
+  lastFleetState=state; connection();
 }
 $<HTMLInputElement>('#import').addEventListener('change', async event => {
   const input = event.currentTarget as HTMLInputElement, files = [...(input.files || [])]; if (!files.length || busy) return;
@@ -128,7 +139,8 @@ $('#query-form').addEventListener('submit',async event=>{
   if(!navigator.onLine) {say('오프라인입니다. 저장 자료 검색을 이용하세요.');return;}
   const useApi=$<HTMLSelectElement>('#query-mode').value==='api';
   if(useApi && !configuredApi) {say('조회 API를 먼저 연결하세요. API 주소를 입력하고 연결 확인 및 저장을 누르세요.');$<HTMLDetailsElement>('#api-settings').open=true;$<HTMLInputElement>('#api-url').focus();return;}
-  const provider=useApi ? new TheFishingApi(configuredApi):directProvider;
+  const provider=useApi ? apiProvider:directProvider;
+  const started=performance.now();
   liveController=new AbortController(); setBusy(true); $('#stop-query').hidden=false;liveRows=[];liveMonth=month;
   $('#live-diagnostics').hidden=true;$('#diagnostic-text').hidden=true;
   $('#live-progress').textContent=`${boats.length}척 ${useApi ? 'API':'직접'} 조회 시작 · 결과는 선박별로 확인합니다.`;
@@ -136,10 +148,10 @@ $('#query-form').addEventListener('submit',async event=>{
     const result=await collectMonth(provider,boats,month,liveController.signal,(rows,total)=>{
       liveRows=rows; const last=rows.at(-1)!;
       $('#live-progress').textContent=`${rows.length}/${total}척 확인 · ${last.boat.name} · ${last.result.message}`;
-    });
+    },useApi ? 3:1);
     const updated=applyLiveResults(candidate,month,result.rows); await saveState(updated);state=updated;undoState=null;$('#undo').hidden=true;
     const ok=result.rows.filter(r=>r.result.status==='ALLOWED_READABLE').length, failed=result.rows.length-ok, unattempted=result.total-result.rows.length;
-    const status=`${result.cancelled ? '조회 취소' : result.stopped ? '조회 중단' : '조회 완료'} · 성공 ${ok}척 · 실패/미지원 ${failed}척 · 미조회 ${unattempted}척`;
+    const status=`${result.cancelled ? '조회 취소' : result.stopped ? '조회 중단' : '조회 완료'} · 성공 ${ok}척 · 실패/미지원 ${failed}척 · 미조회 ${unattempted}척 · ${((performance.now()-started)/1000).toFixed(1)}초`;
     $('#live-progress').textContent=status; say(status+' · 실패한 선박의 기존 자료는 보존했습니다.');
   } catch(error) {say(`조회 결과를 반영하지 못했습니다. ${error instanceof Error ? error.message : '기존 자료를 유지합니다.'}`);}
   finally {liveController=null;$('#stop-query').hidden=true;setBusy(false);render();if(liveRows.some(row=>row.result.status!=='ALLOWED_READABLE')) $<HTMLDetailsElement>('#live-diagnostics').open=true;}
@@ -153,7 +165,7 @@ $('#stop-query').addEventListener('click',()=>{liveController?.abort();});
 $('#query-mode').addEventListener('change',()=>{$('#query-submit').textContent=$<HTMLSelectElement>('#query-mode').value==='saved' ? '저장 자료 검색':'실시간 월 조회';});
 $('#api-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy) return;setBusy(true);
-  try {const origin=await checkApi($<HTMLInputElement>('#api-url').value);saveApiOrigin(origin);configuredApi=origin;renderApiSettings();say('조회 API 연결을 확인했습니다. 월과 인원을 선택하고 실시간 월 조회를 누르세요.');}
+  try {const origin=await checkApi($<HTMLInputElement>('#api-url').value);saveApiOrigin(origin);configuredApi=origin;apiProvider=new TheFishingApi(origin);renderApiSettings();say('조회 API 연결을 확인했습니다. 월과 인원을 선택하고 실시간 월 조회를 누르세요.');}
   catch(error) {say(`API를 연결하지 못했습니다. ${error instanceof Error ? error.message:''}`);}
   finally {setBusy(false);}
 });
@@ -164,7 +176,7 @@ $('#view-list').addEventListener('click',()=>{listView=true;render();});
 $('#cancel').addEventListener('click', () => importController?.abort());
 $('#export').addEventListener('click', () => { const url = URL.createObjectURL(new Blob([exportData(state)], { type: 'application/json' })); const a = el('a'); a.href = url; a.download = 'thefishing-offline-backup.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); say('자료를 백업했습니다. 예시 자료는 포함하지 않습니다.'); });
 $('#demo').addEventListener('click', () => { demo = !demo; selectedDay = `${state.month}-${demo ? '09' : '01'}`; render(); });
-async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)) return; const c = structuredClone(state); c.month = value; resultLimit=50; await commit(c, '조회 월을 변경했습니다. PC 조회 자료를 기준으로 표시합니다.'); }
+async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)) return; const c = structuredClone(state); c.month = value; resultLimit=50; await commit(c, '조회 월을 변경했습니다. 이 월의 저장 자료에 어종 필터를 적용합니다. 최신 자료는 실시간 월 조회를 누르세요.'); }
 $<HTMLInputElement>('#month').addEventListener('change', e => { void setMonth((e.currentTarget as HTMLInputElement).value); });
 for (const [id, offset] of [['prev', -1], ['next', 1]] as const) $('#' + id).addEventListener('click', () => { const [y, m] = state.month.split('-').map(Number); void setMonth(new Date(Date.UTC(y, m - 1 + offset)).toISOString().slice(0, 7)); });
 $<HTMLInputElement>('#search').addEventListener('input', e => { search = (e.currentTarget as HTMLInputElement).value.trim(); render(); });

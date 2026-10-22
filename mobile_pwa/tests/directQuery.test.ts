@@ -74,7 +74,8 @@ test('CORS/network ambiguity and security HTML stop batch; neither becomes a COR
 test('timeout and cancellation abort requests without retry',async()=>{
   const network=vi.fn<typeof fetch>().mockImplementation((_url,init)=>new Promise((_resolve,reject)=>init?.signal?.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true})));
   const p=new TheFishingDirect(network,0,15);expect((await p.readMonth(boat,'2026-09',new AbortController().signal)).status).toBe('TIMEOUT');
-  const c=new AbortController(), pending=p.readMonth(boat,'2026-09',c.signal);c.abort();await expect(pending).rejects.toThrow();
+  expect((await p.readMonth(boat,'2026-10',new AbortController().signal)).status).toBe('TIMEOUT');
+  const c=new AbortController(), pending=new TheFishingDirect(network,0,15).readMonth(boat,'2026-09',c.signal);c.abort();await expect(pending).rejects.toThrow();
   expect(network).toHaveBeenCalledTimes(1);
 });
 test('partial batch updates only successful boats, preserves failed/unattempted history and honors stop/cancel',async()=>{

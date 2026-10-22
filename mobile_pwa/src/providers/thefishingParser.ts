@@ -1,4 +1,5 @@
 import { dateOnly, officialDetail, text, type Boat, type Observation } from '../models';
+import { speciesKey, speciesLabel } from '../species';
 
 const paths=new Set(['/reservation/list.view.view.1.ajax.php','/reservation/list.view.view.1.ajax.new.php']);
 export function calendarEndpoint(value:string):string {
@@ -60,7 +61,8 @@ export async function parseCalendar(html:string,boat:Boat,month:string,observedA
     if(url.searchParams.get('PA_N_UID')!==boat.uid) throw new Error('달력 상품의 선박 UID가 요청과 다릅니다.');
     const date=dateOnly(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6)}`); if(!date || !date.startsWith(month+'-')) continue;
     monthEvidence=true;
-    candidates.set(`${date}:${url.href}`,{date,action:url.href,scope});
+    const key=`${date}:${url.href}`,previous=candidates.get(key);
+    if(!previous || scope.querySelectorAll('.schedule2 li').length>previous.scope.querySelectorAll('.schedule2 li').length) candidates.set(key,{date,action:url.href,scope});
   }
   if(!monthEvidence || (datedActions>0 && !candidates.size) || !doc.querySelector('table,.re_status,.dayline')) throw new Error('요청한 월의 달력 응답인지 확인할 수 없습니다.');
   const events:Observation[]=[], seen=new Set<string>();
@@ -72,11 +74,13 @@ export async function parseCalendar(html:string,boat:Boat,month:string,observedA
       const optionText=clean(option.textContent), clone=option.cloneNode(true) as Element;
       const amounts=[...new Set([...optionText.matchAll(/(?:\d{1,3}(?:,\d{3})+|\d+)\s*원|\d{1,3}(?:,\d{3})+/g)].map(m=>Number(m[0].replace(/[^0-9]/g,''))).filter(n=>n<=100000000))];
       const price=amounts.length===1 ? amounts[0] : null;
-      clone.querySelectorAll('.fc_g,.ico_d,.price,[class*="price"],a').forEach(n=>n.remove());
+      // PC parser retains product link text; removing all anchors can erase the trip name.
+      clone.querySelectorAll('.fc_g,.ico_d,.price,[class*="price"],.re_btn2,.schedule').forEach(n=>n.remove());
+      if(!options.length) clone.querySelectorAll('a,p').forEach(n=>n.remove());
       const trip=text(clean(clone.textContent).replace(/(?:대인|소인|대|소)?\s*\d{1,3}(?:,\d{3})+\s*원?/g,'').replace(/남은\s*인원\s*\d+\s*명/g,'')) || '기본 출조';
       const time=departure(optionText)||departure(value), key=JSON.stringify([boat.uid,date,action,trip,price,time]);
       if(seen.has(key)) continue; seen.add(key);
-      events.push({id:`direct-${await identity(key)}`,uid:boat.uid,date,trip,port:boat.port,departure:time,remaining:seats,price,verified:true,observedAt,source:'direct'});
+      events.push({id:`direct-${await identity(key)}`,uid:boat.uid,date,trip,speciesKey:speciesKey(trip),species:speciesLabel(trip),port:boat.port,departure:time,remaining:seats,price,verified:true,observedAt,source:'direct'});
     }
   }
   return events;

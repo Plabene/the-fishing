@@ -1,6 +1,7 @@
 import { dateOnly, officialDetail, text, timestamp, type Boat, type Observation } from '../models';
 import type { AvailabilityProvider, ProviderResult } from '../provider';
 import defaultEndpoint from '../data/apiEndpoint.json';
+import { speciesKey, speciesLabel } from '../species';
 
 const key='thefishing-availability-api';
 export function apiOrigin(value:string):string {
@@ -51,17 +52,30 @@ export function validateApiResult(value:unknown,boat:Boat,month:string):Provider
     if(count!==null && (!Number.isInteger(count) || Number(count)<0 || Number(count)>10000)) throw new Error('잔여석을 확인할 수 없습니다.');
     if(row.price!==null && row.price!==undefined && (!Number.isInteger(row.price) || Number(row.price)<0 || Number(row.price)>100000000)) throw new Error('요금을 확인할 수 없습니다.');
     const departure=typeof row.departure==='string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(row.departure) ? row.departure:'';
-    return {id:row.id,uid:boat.uid,date,trip:text(row.trip),port:boat.port,departure,remaining:count as number|null,price:row.price==null ? null:Number(row.price),observedAt,verified:true,source:'api'};
+    const trip=text(row.trip), species=speciesKey(text(row.speciesKey) || text(row.species) || trip);
+    return {id:row.id,uid:boat.uid,date,trip,speciesKey:species,species:speciesLabel(species),port:boat.port,departure,remaining:count as number|null,price:row.price==null ? null:Number(row.price),observedAt,verified:true,source:'api'};
   });
   return {status:'ALLOWED_READABLE',message:`${events.length}개 출조 상품을 API로 확인했습니다.${data.cached===true ? ' (10분 이내 저장 응답)':''}`,events,observedAt,source:'api',cached:data.cached===true};
 }
 export class TheFishingApi implements AvailabilityProvider {
+  private cache=new Map<string,ProviderResult>();
+  private pending=new Map<string,Promise<ProviderResult>>();
   constructor(private origin:string,private request:typeof fetch=(...args)=>fetch(...args)) {if(origin) this.origin=apiOrigin(origin);}
   async readMonth(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
     if(!this.origin) return failure('조회 API를 먼저 연결하세요.','API_NOT_CONFIGURED');
     if(!officialDetail(boat.url,boat.uid)) return {...failure('이 선박은 API 조회를 지원하지 않습니다. 공식 페이지를 이용하세요.','UNSUPPORTED_SOURCE'),stop:false};
     if(!/^20\d\d-(0[1-9]|1[0-2])$/.test(month)) return failure('조회 월을 확인하세요.','PARSER_UNSUPPORTED');
     signal.throwIfAborted();
+    const key=`${boat.uid}:${month}`,cached=this.cache.get(key);
+    if(cached?.observedAt && Date.now()-Date.parse(cached.observedAt)<600000) return {...structuredClone(cached),cached:true,message:'10분 이내 조회 결과를 이 기기에서 재사용했습니다.'};
+    const existing=this.pending.get(key);if(existing) {const result=await existing;signal.throwIfAborted();return structuredClone(result);}
+    const pending=this.read(boat,month,signal).then(result=>{
+      if(result.status==='ALLOWED_READABLE') {this.cache.set(key,structuredClone(result));while(this.cache.size>256) this.cache.delete(this.cache.keys().next().value!);}
+      return result;
+    }).finally(()=>this.pending.delete(key));
+    this.pending.set(key,pending);return pending;
+  }
+  private async read(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
     try {
       const combined=AbortSignal.any([signal,AbortSignal.timeout(30000)]);
       return validateApiResult(await requestJson(this.request,`${this.origin}/v1/month?uid=${boat.uid}&month=${month}`,combined),boat,month);

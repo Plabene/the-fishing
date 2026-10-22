@@ -1,6 +1,8 @@
 import { classifyProbe, type AvailabilityProvider, type ProviderResult } from '../provider';
 import { officialDetail, type Boat } from '../models';
 import { calendarEndpoint, discoverCalendar, parseCalendar, securityDocument } from './thefishingParser';
+export interface CalendarMetadata {endpoint:string;st_uid:string;pa_uid:string;expires:number}
+export interface MetadataCache {get(uid:string):Promise<CalendarMetadata|undefined>;put(uid:string,value:CalendarMetadata):Promise<void>;delete(uid:string):Promise<void>}
 
 export class ReadError extends Error {
   constructor(readonly result:ProviderResult) {super(result.message);}
@@ -16,18 +18,30 @@ export function waitFor(ms:number,signal:AbortSignal):Promise<void> {
 }
 export class TheFishingDirect implements AvailabilityProvider {
   private lastRequest=0;
-  private running=false;
+  private running=new Set<string>();
+  private admission:Promise<void>=Promise.resolve();
   private blockedUntil=0;
+  private blockResult:ProviderResult|undefined;
   private cache=new Map<string,ProviderResult>();
-  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document) {}
+  private metadata=new Map<string,CalendarMetadata>();
+  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document,private metadataCache?:MetadataCache) {}
+  private async admit(signal:AbortSignal) {
+    const previous=this.admission;let release!:()=>void;this.admission=new Promise<void>(resolve=>{release=resolve;});
+    await previous;
+    try {
+      await waitFor(this.lastRequest+this.gapMs-Date.now(),signal);
+      if(this.blockedUntil>Date.now() && this.blockResult) throw new ReadError(this.blockResult);
+      signal.throwIfAborted();this.lastRequest=Date.now();
+    } finally {release();}
+  }
   validateDetail(url:string):boolean {return !!officialDetail(url);}
   private async html(url:string,stage:'detail'|'calendar',signal:AbortSignal,body?:URLSearchParams):Promise<string> {
     if(stage==='detail' ? !officialDetail(url) : !calendarEndpoint(url)) throw new Error('허용되지 않은 주소입니다.');
-    await waitFor(this.lastRequest+this.gapMs-Date.now(),signal);
+    await this.admit(signal);
     signal.throwIfAborted();
     const controller=new AbortController(), abort=()=>controller.abort();
     signal.addEventListener('abort',abort,{once:true});
-    const timer=setTimeout(()=>controller.abort(),this.timeoutMs); this.lastRequest=Date.now();
+    const timer=setTimeout(()=>controller.abort(),this.timeoutMs);
     try {
       const response=await this.request(url,{method:body ? 'POST':'GET',body,mode:'cors',credentials:'omit',redirect:'error',cache:'no-store',referrerPolicy:'no-referrer',signal:controller.signal,
         headers:body ? {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','X-Requested-With':'XMLHttpRequest'} : undefined});
@@ -64,14 +78,20 @@ export class TheFishingDirect implements AvailabilityProvider {
     signal.throwIfAborted();
     if(!officialDetail(boat.url,boat.uid)) return fail('UNSUPPORTED_SOURCE','이 선박은 직접 조회를 지원하지 않습니다. 공식 페이지를 이용하세요.');
     if(!/^20\d\d-(0[1-9]|1[0-2])$/.test(month)) return fail('PARSER_UNSUPPORTED','조회 월을 확인하세요.');
-    if(this.running) return fail('UNVERIFIED','이미 조회 중입니다.',true);
-    if(this.blockedUntil>Date.now()) return fail('ACCESS_RESTRICTED','접근 제한 응답으로 조회를 중단했습니다. 10분 뒤 다시 시도할 수 있습니다.',true);
     const key=`${boat.uid}:${month}`, cached=this.cache.get(key);
+    if(this.running.has(key)) return fail('UNVERIFIED','이미 조회 중입니다.',true);
+    if(this.blockedUntil>Date.now() && this.blockResult) return this.blockResult;
     if(cached?.observedAt && Date.now()-Date.parse(cached.observedAt)<600_000) return {...structuredClone(cached),cached:true,message:'10분 이내 직접 조회 결과를 재사용했습니다.'};
-    this.running=true;
+    this.running.add(key);
     try {
-      const detail=await this.html(boat.url,'detail',signal);
-      const {endpoint,st_uid,pa_uid}=discoverCalendar(detail,boat);
+      let metadata=this.metadata.get(boat.uid) || await this.metadataCache?.get(boat.uid);
+      if(!metadata || metadata.expires<=Date.now() || metadata.pa_uid!==boat.uid || !/^\d+$/.test(metadata.st_uid)) {
+        const detail=await this.html(boat.url,'detail',signal);
+        metadata={...discoverCalendar(detail,boat),expires:Date.now()+3600000};
+        await this.metadataCache?.put(boat.uid,metadata);
+      }
+      const {endpoint,st_uid,pa_uid}=metadata;calendarEndpoint(endpoint);
+      this.metadata.set(boat.uid,metadata);while(this.metadata.size>256) this.metadata.delete(this.metadata.keys().next().value!);
       const html=await this.html(endpoint,'calendar',signal,new URLSearchParams({date6:month.replace('-',''),st_uid,pa_uid}));
       signal.throwIfAborted(); const observedAt=new Date().toISOString();
       const events=await parseCalendar(html,boat,month,observedAt,this.dom); signal.throwIfAborted();
@@ -82,8 +102,11 @@ export class TheFishingDirect implements AvailabilityProvider {
     } catch(error) {
       if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
       const result=error instanceof ReadError ? error.result : fail('PARSER_UNSUPPORTED',error instanceof Error ? error.message : '달력 응답을 해석하지 못했습니다.');
-      if(result.status==='ACCESS_RESTRICTED') this.blockedUntil=Date.now()+600_000;
+      if(['ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED','NETWORK_OR_CORS','TIMEOUT'].includes(result.status)) {
+        this.blockedUntil=Date.now()+(['ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED'].includes(result.status) ? 600000:30000);this.blockResult={...result,stop:true};
+      }
+      this.metadata.delete(boat.uid);await this.metadataCache?.delete(boat.uid);
       return result;
-    } finally {this.running=false;}
+    } finally {this.running.delete(key);}
   }
 }

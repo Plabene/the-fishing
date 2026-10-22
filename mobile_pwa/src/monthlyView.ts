@@ -3,6 +3,7 @@ import { LABELS, type AppState } from './models';
 import { tierFor } from './tierStore';
 import { eventStatus } from './availabilityStore';
 import { queryMonth } from './monthlyQuery';
+import { speciesBadge } from './species';
 
 export function renderMonthlyList(target:HTMLElement,state:AppState,result:ReturnType<typeof queryMonth>,limit:number,onMore:()=>void,onDay:(date:string)=>void) {
   target.replaceChildren();
@@ -19,7 +20,7 @@ export function renderMonthlyList(target:HTMLElement,state:AppState,result:Retur
     }
     const boat=state.boats.find(b=>b.uid===event.uid), row=el('article','','monthly-result');
     const info=el('div'), status=eventStatus(event,state);
-    info.append(el('span',LABELS[tierFor(state,event.uid)],'result-tier'),el('h3',boat?.name || event.uid),el('p',event.trip || '출조명 미표시'),el('p',`${event.port || boat?.port || '항구 미표시'} · ${event.departure || '시간 미표시'}`,'muted'));
+    info.append(el('span',LABELS[tierFor(state,event.uid)],'result-tier'),el('h3',boat?.name || event.uid),speciesBadge(event),el('p',event.trip || '출조명 미표시'),el('p',`${event.port || boat?.port || '항구 미표시'} · ${event.departure || '시간 미표시'}`,'muted'));
     const detail=el('div','','result-detail');
     detail.append(el('strong',event.remaining===null ? '잔여석 미확인' : `조회 당시 ${event.remaining}석`),el('span',STATUS_LABELS[status],`badge status-${status.toLowerCase()}`));
     if (event.price!==undefined && event.price!==null) detail.append(el('span',`${event.price.toLocaleString('ko-KR')}원`,'muted'));

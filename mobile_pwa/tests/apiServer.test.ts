@@ -41,21 +41,38 @@ test('persistent success cache survives coordinator replacement and retains obse
   const again=await new MonthlyService(store,{readMonth}).query('6130','2026-09');
   expect(again.cached).toBe(true);expect(again.observedAt).toBe(result.observedAt);expect(readMonth).toHaveBeenCalledTimes(1);
 });
-test('simultaneous duplicate requests share work and another boat receives a busy result',async()=>{
-  let resolve!:(value:ProviderResult)=>void;
-  const readMonth=vi.fn(()=>new Promise<ProviderResult>(r=>{resolve=r;}));
+test('validated metadata persists across coordinator replacement while monthly data is fetched separately',async()=>{
+  const store=new MemoryStore(),calls:string[]=[];
+  const request=vi.fn<typeof fetch>(async(_input,init)=>{
+    calls.push(init?.method || 'GET');
+    if(init?.method!=='POST') return new Response(detail);
+    const compact=(init.body as URLSearchParams).get('date6')!;
+    return new Response(`<div data-month="${compact.slice(0,4)}-${compact.slice(4)}"></div><table></table>`);
+  });
+  vi.stubGlobal('fetch',request);
+  try {
+    expect((await new MonthlyService(store).query('6130','2026-10')).status).toBe('ALLOWED_READABLE');
+    expect((await new MonthlyService(store).query('6130','2026-11')).status).toBe('ALLOWED_READABLE');
+    expect(calls).toEqual(['GET','POST','POST']);
+  } finally {vi.unstubAllGlobals();}
+});
+test('duplicates share work while three different boats overlap and a fourth waits',async()=>{
+  const resolvers:Array<(value:ProviderResult)=>void>=[];
+  const readMonth=vi.fn(()=>new Promise<ProviderResult>(r=>{resolvers.push(r);}));
   const service=new MonthlyService(new MemoryStore(),{readMonth});
   const a=service.query('1','2026-10'),b=service.query('1','2026-10');
-  expect((await service.query('2','2026-10')).status).toBe('API_BUSY');
-  await vi.waitFor(()=>expect(readMonth).toHaveBeenCalledTimes(1));resolve(success());
+  const others=['2','3','4'].map(uid=>service.query(uid,'2026-10'));
+  await vi.waitFor(()=>expect(readMonth).toHaveBeenCalledTimes(3));resolvers[0](success());
+  await vi.waitFor(()=>expect(readMonth).toHaveBeenCalledTimes(4));resolvers.slice(1).forEach(resolve=>resolve(success()));
   expect(await a).toEqual(await b);
+  expect((await Promise.all(others)).every(r=>r.status==='ALLOWED_READABLE')).toBe(true);
 });
 test('access restriction cooldown and request budget are persistent across instances',async()=>{
   const store=new MemoryStore(),readMonth=vi.fn().mockResolvedValue({status:'ACCESS_RESTRICTED',events:[],message:'403',httpStatus:403,stop:true});
   await new MonthlyService(store,{readMonth}).query('1','2026-10');
   const blocked=await new MonthlyService(store,{readMonth}).query('2','2026-10');
   expect(blocked.status).toBe('ACCESS_RESTRICTED');expect(readMonth).toHaveBeenCalledTimes(1);
-  await store.put('limits',{windowStart:Date.now(),count:30,blockedUntil:0});
+  await store.put('limits',{windowStart:Date.now(),count:60,blockedUntil:0});
   expect((await new MonthlyService(store,{readMonth}).query('3','2026-10')).status).toBe('API_BUSY');expect(readMonth).toHaveBeenCalledTimes(1);
 });
 test('HTTP gateway allows the deployment origin and exact GET query only',async()=>{

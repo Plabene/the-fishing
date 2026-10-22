@@ -1,0 +1,12 @@
+#species-filter{border:1px solid #d6dfd9;border-radius:12px;padding:14px;margin:12px 0;background:#fafcf9}
+.species-controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap}
+.species-controls label{display:grid;gap:6px;font-weight:700;flex:1;min-width:160px;max-width:360px}
+.species-controls select{max-width:100%;min-height:42px}
+.species-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.species-panels h3{font-size:14px;margin:0 0 8px}
+.species-chips{display:flex;flex-wrap:wrap;align-content:start;gap:7px}
+.species-chip{min-height:36px;font-size:12px;color:#17202a;border:1px solid #64748b;border-radius:8px;padding:6px 9px;max-width:100%;overflow-wrap:anywhere}
+.species-badge{display:inline-block;color:#17202a;border:1px solid #64748b;border-radius:6px;padding:4px 7px;margin:4px 0;font-size:12px;font-weight:600;max-width:100%;overflow-wrap:anywhere}
+.calendar-boat{color:#17202a;padding:2px 4px;border-radius:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#species-panel summary{cursor:pointer;font-weight:600;min-height:28px}
+@media(max-width:600px){.species-panels{grid-template-columns:1fr}.species-controls{gap:8px}.species-chip{min-height:42px}.calendar-boat{padding:2px;font-size:10px}}
