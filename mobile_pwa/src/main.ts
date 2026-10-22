@@ -60,7 +60,7 @@ let liveController:AbortController|null=null; const directProvider=new TheFishin
 let liveRows:LiveRow[]=[], liveMonth=state.month;
 let livePreview:AppState|null=null;
 let configuredApi=loadApiOrigin();
-let apiProvider=new TheFishingApi(configuredApi), lastFleetState:AppState|null=null;
+let apiProvider=new TheFishingApi(configuredApi), lastFleetKey='';
 function renderApiSettings() {
   $<HTMLInputElement>('#api-url').value=configuredApi;
   $('#api-state').textContent=configuredApi ? new URL(configuredApi).hostname : '연결 안 됨';
@@ -152,8 +152,10 @@ function render() {
   $('#source-access').hidden = demo;
   renderSourceAccess($('#source-access'), state, sourceBoat, value => { sourceBoat=value; render(); });
   renderResults(shown,result);
-  if(!lastFleetState || lastFleetState.boats!==state.boats || lastFleetState.tiers!==state.tiers || lastFleetState.selectedUids!==state.selectedUids || lastFleetState.selectedRegion!==state.selectedRegion || lastFleetState.selectedPlatform!==state.selectedPlatform) renderFleet();
-  lastFleetState=state; connection();if(busy) setBusy(true);
+  // Saves clone state. Compare fleet values so a month/tide change doesn't rebuild every row.
+  const fleetKey=JSON.stringify([state.boats,state.tiers,state.selectedUids,state.selectedRegion,state.selectedPlatform]);
+  if(lastFleetKey!==fleetKey) {renderFleet();lastFleetKey=fleetKey;}
+  connection();if(busy) setBusy(true);
 }
 $<HTMLInputElement>('#import').addEventListener('change', async event => {
   const input = event.currentTarget as HTMLInputElement, files = [...(input.files || [])]; if (!files.length || busy) return;

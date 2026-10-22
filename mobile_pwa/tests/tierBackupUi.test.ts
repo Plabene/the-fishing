@@ -16,6 +16,8 @@ test('the complete fleet is usable, platform filters keep every match, and tier 
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'),{timeout:10000});await settle();
     expect(document.querySelectorAll('.boat-row')).toHaveLength(state.boats.length);expect(el('#boats').textContent).not.toContain('200척만');
+    const firstRow=el('.boat-row'),month=el('#month') as HTMLInputElement;
+    month.value='2027-05';month.dispatchEvent(new Event('change'));await settle();expect(el('.boat-row')).toBe(firstRow);
     const last=orderedBoats(state).at(-1)!,row=()=>el(`.boat-row[data-uid="${last.uid}"]`);
     const select=row().querySelector('select')!;select.value='tier1';select.dispatchEvent(new Event('change'));await settle();
     expect((await loadState() as AppState).tiers.tier1).toContain(last.uid);
