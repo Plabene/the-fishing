@@ -66,6 +66,22 @@ test('validated metadata persists across coordinator replacement while monthly d
     expect(calls).toEqual(['GET','POST','POST']);
   } finally {vi.unstubAllGlobals();}
 });
+
+test('server reuses validated calendar addresses after two hours but refreshes them after one day',async()=>{
+  let now=Date.now();vi.spyOn(Date,'now').mockImplementation(()=>now);
+  const metadata=new Map(),cache={get:async(uid:string)=>metadata.get(uid),put:async(uid:string,value:unknown)=>{metadata.set(uid,value);},delete:async(uid:string)=>{metadata.delete(uid);}};
+  const methods:string[]=[],request=vi.fn<typeof fetch>(async(_input,init)=>{
+    now+=1001;methods.push(init?.method || 'GET');if(init?.method!=='POST') return new Response(detail);
+    const compact=(init.body as URLSearchParams).get('date6')!;return new Response(`<div data-month="${compact.slice(0,4)}-${compact.slice(4)}"></div><table></table>`);
+  });
+  vi.stubGlobal('fetch',request);
+  try {
+    const boat={uid:'6130',name:'',port:'',url:'https://thefishing.kr/reservation/list.php?uid=6130'},signal=new AbortController().signal;
+    expect((await sourceProvider(cache).readMonth(boat,'2026-10',signal)).status).toBe('ALLOWED_READABLE');
+    now+=2*3600000;expect((await sourceProvider(cache).readMonth(boat,'2026-11',signal)).status).toBe('ALLOWED_READABLE');expect(methods).toEqual(['GET','POST','POST']);
+    now+=24*3600000;expect((await sourceProvider(cache).readMonth(boat,'2026-12',signal)).status).toBe('ALLOWED_READABLE');expect(methods).toEqual(['GET','POST','POST','GET','POST']);
+  } finally {vi.unstubAllGlobals();vi.restoreAllMocks();}
+});
 test('duplicates share work while three different boats overlap and a fourth waits',async()=>{
   const resolvers:Array<(value:ProviderResult)=>void>=[];
   const readMonth=vi.fn(()=>new Promise<ProviderResult>(r=>{resolvers.push(r);}));

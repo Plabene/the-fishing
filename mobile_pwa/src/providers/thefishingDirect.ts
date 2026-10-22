@@ -24,7 +24,7 @@ export class TheFishingDirect implements AvailabilityProvider {
   private blockResult:ProviderResult|undefined;
   private cache=new Map<string,ProviderResult>();
   private metadata=new Map<string,CalendarMetadata>();
-  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document,private metadataCache?:MetadataCache) {}
+  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document,private metadataCache?:MetadataCache,private metadataTtlMs=3600000) {}
   private async admit(signal:AbortSignal) {
     const previous=this.admission;let release!:()=>void;this.admission=new Promise<void>(resolve=>{release=resolve;});
     await previous;
@@ -87,7 +87,7 @@ export class TheFishingDirect implements AvailabilityProvider {
       let metadata=this.metadata.get(boat.uid) || await this.metadataCache?.get(boat.uid);
       if(!metadata || metadata.expires<=Date.now() || metadata.pa_uid!==boat.uid || !/^\d+$/.test(metadata.st_uid)) {
         const detail=await this.html(boat.url,'detail',signal);
-        metadata={...discoverCalendar(detail,boat),expires:Date.now()+3600000};
+        metadata={...discoverCalendar(detail,boat),expires:Date.now()+this.metadataTtlMs};
         await this.metadataCache?.put(boat.uid,metadata);
       }
       const {endpoint,st_uid,pa_uid}=metadata;calendarEndpoint(endpoint);

@@ -13,7 +13,7 @@ export function eventStatus(event: Observation, state: AppState, now = Date.now(
   return event.remaining >= state.requiredPeople ? 'AVAILABLE' : 'FULL';
 }
 const DB = 'thefishing-mobile-a';
-function database(): Promise<IDBDatabase> {
+export function database(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB, 1);
     request.onupgradeneeded = () => request.result.createObjectStore('local');

@@ -16,7 +16,7 @@ class Serial {
 export function sourceProvider(metadata?:MetadataCache):AvailabilityProvider {
   const dom=parseHTML('<!doctype html><html><body></body></html>').document as unknown as Document;
   // Workers support manual/follow redirects. Never follow: the provider rejects every non-200 response.
-  return new TheFishingDirect((input,init)=>fetch(input,{...init,redirect:'manual'}),1000,10000,dom,metadata);
+  return new TheFishingDirect((input,init)=>fetch(input,{...init,redirect:'manual'}),1000,10000,dom,metadata,24*3600000);
 }
 export const apiFailure=(status:ProviderResult['status'],message:string):ProviderResult=>({status,message,events:[],stop:true,source:'api',stage:'api'});
 export function validQuery(uid:string,month:string):boolean {return /^\d{1,10}$/.test(uid) && /^20\d\d-(0[1-9]|1[0-2])$/.test(month);}

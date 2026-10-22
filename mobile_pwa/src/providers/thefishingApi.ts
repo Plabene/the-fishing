@@ -2,6 +2,8 @@ import { dateOnly, officialDetail, text, timestamp, type Boat, type Observation 
 import type { AvailabilityProvider, ProviderResult } from '../provider';
 import defaultEndpoint from '../data/apiEndpoint.json';
 import { eventSpecies, speciesLabel } from '../species';
+import { persistentApiCache,type ApiResponseCache } from '../apiResponseCache';
+import { FRESH_MS } from '../availabilityStore';
 
 const key='thefishing-availability-api';
 export function apiOrigin(value:string):string {
@@ -60,20 +62,33 @@ export function validateApiResult(value:unknown,boat:Boat,month:string):Provider
 export class TheFishingApi implements AvailabilityProvider {
   private cache=new Map<string,ProviderResult>();
   private pending=new Map<string,Promise<ProviderResult>>();
-  constructor(private origin:string,private request:typeof fetch=(...args)=>fetch(...args)) {if(origin) this.origin=apiOrigin(origin);}
+  constructor(private origin:string,private request:typeof fetch=(...args)=>fetch(...args),private storage:ApiResponseCache=persistentApiCache) {if(origin) this.origin=apiOrigin(origin);}
   async readMonth(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
     if(!this.origin) return failure('조회 API를 먼저 연결하세요.','API_NOT_CONFIGURED');
     if(!officialDetail(boat.url,boat.uid)) return {...failure('이 선박은 API 조회를 지원하지 않습니다. 공식 페이지를 이용하세요.','UNSUPPORTED_SOURCE'),stop:false};
     if(!/^20\d\d-(0[1-9]|1[0-2])$/.test(month)) return failure('조회 월을 확인하세요.','PARSER_UNSUPPORTED');
     signal.throwIfAborted();
     const key=`${boat.uid}:${month}`,cached=this.cache.get(key);
-    if(cached?.observedAt && Date.now()-Date.parse(cached.observedAt)<600000) return {...structuredClone(cached),cached:true,message:'10분 이내 조회 결과를 이 기기에서 재사용했습니다.'};
+    if(cached?.observedAt && Date.now()-Date.parse(cached.observedAt)<FRESH_MS) return {...validateApiResult(cached,boat,month),cached:true,message:'10분 이내 조회 결과를 이 기기에서 재사용했습니다.'};
     const existing=this.pending.get(key);if(existing) {const result=await existing;signal.throwIfAborted();return structuredClone(result);}
-    const pending=this.read(boat,month,signal).then(result=>{
+    const pending=this.readStoredOrNetwork(boat,month,signal).then(result=>{
       if(result.status==='ALLOWED_READABLE') {this.cache.set(key,structuredClone(result));while(this.cache.size>256) this.cache.delete(this.cache.keys().next().value!);}
       return result;
     }).finally(()=>this.pending.delete(key));
     this.pending.set(key,pending);return pending;
+  }
+  private async readStoredOrNetwork(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
+    const key=`${this.origin}|${boat.uid}|${month}`;
+    try {
+      const stored=await this.storage.get(key),result=validateApiResult(stored,boat,month);
+      signal.throwIfAborted();
+      if(result.status==='ALLOWED_READABLE' && result.observedAt && Date.now()-Date.parse(result.observedAt)<FRESH_MS)
+        return {...result,cached:true,message:'10분 이내 조회 결과를 이 기기에서 재사용했습니다.'};
+    } catch { /* Expired, invalid or unavailable local cache falls back to the API. */ }
+    signal.throwIfAborted();
+    const result=await this.read(boat,month,signal);
+    if(result.status==='ALLOWED_READABLE') try {await this.storage.put(key,result);} catch { /* Reading remains usable when device storage is full. */ }
+    return result;
   }
   private async read(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
     try {
