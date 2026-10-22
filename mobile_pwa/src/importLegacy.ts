@@ -2,6 +2,7 @@ import { type AppState, type Observation, type Failure, emptyState, text, uid, r
 import { normalizeTiers } from './tierStore';
 import { eventSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
 import { mergeTideDays } from './tides';
+import { readRegion,readRegionFilter } from './regions';
 type Obj = Record<string, unknown>;
 const obj = (v: unknown): Obj => v && typeof v === 'object' && !Array.isArray(v) ? v as Obj : {};
 const arr = (v: unknown): unknown[] => Array.isArray(v) ? v : [];
@@ -12,14 +13,15 @@ export function importData(input: unknown, current = emptyState()): { state: App
   const catalog = obj(root.catalog || root); const prefs = obj(root.preferences || root);
   let recognized = backup || bundled;
   if (backup) {
-    Object.assign(state, emptyState()); delete state.fleetSeedVersion; delete state.monthlyArchiveVersion; delete state.monthChecks; delete state.selectedSpecies; delete state.excludedSpeciesKeys; delete state.tideDays;
+    Object.assign(state, emptyState()); delete state.fleetSeedVersion; delete state.monthlyArchiveVersion; delete state.monthChecks; delete state.selectedSpecies; delete state.excludedSpeciesKeys; delete state.tideDays;delete state.selectedRegion;delete state.fleetBaseline;
     for (const key of ['fleetSeedVersion','monthlyArchiveVersion'] as const) if (typeof root[key] === 'string' && /^[a-f0-9]{16}$/.test(root[key])) state[key] = root[key];
   }
   const entries = backup ? arr(root.boats) : Object.values(obj(catalog.entries));
   for (const item of entries) {
     const b = obj(item); if (!('boat_uid' in b) && !backup) continue;
     recognized = true; const id = uid(b.uid ?? b.boat_uid); if (!id) { warnings.push('UID 없는 선박을 건너뛰었습니다.'); continue; }
-    const boat = { uid: id, name: text(b.name ?? b.boat_name) || `UID ${id}`, port: text(b.port ?? b.departure_port), url: reservationLink(b.url ?? b.reservation_url, id) };
+    const region=readRegion(b.region ?? {sea:b.jurisdiction_label,province:b.province_label,local:b.local_area_label});
+    const boat = { uid: id, name: text(b.name ?? b.boat_name) || `UID ${id}`, port: text(b.port ?? b.departure_port), url: reservationLink(b.url ?? b.reservation_url, id),...(region ? {region}:{}) };
     const index = state.boats.findIndex(v => v.uid === id);
     if (index >= 0) { warnings.push(`중복 UID ${id}: 마지막 선박 정보를 사용합니다.`); state.boats[index] = boat; } else state.boats.push(boat);
   }
@@ -37,6 +39,10 @@ export function importData(input: unknown, current = emptyState()): { state: App
   const excluded=backup ? root.excludedSpeciesKeys:prefs.excluded_species_keys;
   if(Array.isArray(excluded)) state.excludedSpeciesKeys=[...new Set(excluded.filter(v=>typeof v==='string').slice(0,200).map(speciesFilterKey).filter((key):key is string=>key!==null))];
   if(backup && Array.isArray(root.tideDays)) state.tideDays=mergeTideDays(root.tideDays);
+  if(backup && root.selectedRegion) state.selectedRegion=readRegionFilter(root.selectedRegion);
+  if(backup && Array.isArray(root.fleetBaseline)) state.fleetBaseline=root.fleetBaseline.slice(0,10000).flatMap(value=>{
+    const b=obj(value),id=uid(b.uid),region=readRegion(b.region);return id ? [{uid:id,name:text(b.name),port:text(b.port),url:reservationLink(b.url,id),...(region ? {region}:{})}]:[];
+  });
   function readResult(value: unknown, observed?: unknown) {
     const r = obj(value); if (!Array.isArray(r.events)) return;
     recognized = true; const query = obj(r.query);

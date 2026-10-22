@@ -22,7 +22,8 @@ function add(row, id, extra = false) {
   if (!extra && (url.hostname !== 'thefishing.kr' || url.pathname !== '/reservation/list.php' || url.search !== `?uid=${id}`)) throw new Error('Unexpected native boat URL');
   if (extra && !['thefishing.kr', 'teamhanpro.com', 'nurifishing.sunsang24.com', 'doublek.sunsang24.com'].includes(url.hostname)) throw new Error('Review new external source before including it');
   if ([...url.searchParams.keys()].some(key => !['uid', 'mid'].includes(key))) throw new Error('Unexpected query fields');
-  boats.set(id, {uid:id, name:clean(row.boat_name).slice(0,160), port:clean(row.departure_port).slice(0,160), url:url.href});
+  const region={sea:clean(row.jurisdiction_label).slice(0,60),province:clean(row.province_label).slice(0,60),local:clean(row.local_area_label).slice(0,60)};
+  boats.set(id, {uid:id, name:clean(row.boat_name).slice(0,160), port:clean(row.departure_port).slice(0,160), url:url.href,...(Object.values(region).some(Boolean) ? {region}:{})});
   if (extra) extraLinks[id] = url.href;
 }
 for (const row of Object.values(catalog.entries)) add(row, row.boat_uid);

@@ -4,9 +4,17 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      refresh_fleet:
+        description: Refresh the complete public boat directory before deploying
+        type: boolean
+        default: false
+  schedule:
+    # Monday 06:17 Asia/Seoul (Sunday 21:17 UTC).
+    - cron: '17 21 * * 0'
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -41,6 +49,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Refresh public boat directory
+        if: github.event_name == 'schedule' || inputs.refresh_fleet == true
+        run: node scripts/update-fleet.mjs --live
+
       - name: Test app
         run: pnpm test
 
@@ -55,6 +67,18 @@ jobs:
         env:
           PWA_BASE: ${{ steps.pages.outputs.base_path }}/
         run: pnpm run build
+
+      - name: Save verified catalog to GitHub
+        if: github.event_name == 'schedule' || inputs.refresh_fleet == true
+        run: |
+          git add src/data/defaultFleet.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Update verified public boat directory'
+            git push origin HEAD:main
+          fi
+      # GITHUB_TOKEN pushes do not start another Pages build; deploy this tested checkout here.
 
       - name: Upload built app
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5

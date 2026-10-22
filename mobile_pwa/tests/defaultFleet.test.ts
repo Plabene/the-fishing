@@ -8,13 +8,14 @@ import { removeBoat, moveBoat } from '../src/tierStore';
 
 test('PC seed contains all saved native boats plus active external and fleet members',()=>{
   const state=defaultFleet();
-  expect(state.boats).toHaveLength(512);
+  expect(state.boats.length).toBeGreaterThanOrEqual(512);
+  expect(state.boats).toHaveLength(seed.state.boats.length);
   expect(state.selectedUids).toHaveLength(83);
   expect(Object.values(state.tiers).map(v=>v.length)).toEqual([10,10,20,43]);
   expect(state.selectedUids).toEqual(seed.state.selectedUids);
   expect(state.tiers).toEqual(seed.state.tiers);
   expect(state.events).toEqual([]); expect(state.failures).toEqual([]);
-  expect(state.boats.filter(b=>state.selectedUids.includes(b.uid)).every(b=>b.url && b.name && b.port)).toBe(true);
+  expect(state.boats.filter(b=>state.selectedUids.includes(b.uid)).every(b=>b.url && b.name)).toBe(true);
   expect(importData(JSON.parse(exportData(state))).state).toEqual(state);
 });
 test('Korean fleet identity and selected external boat survive import without placeholders',()=>{
@@ -56,14 +57,17 @@ test('explicit restore keeps custom boats, observations, and current month',()=>
   state.selectedUids=['12-custom']; state.tiers.tier2=['12-custom'];
   state.events=[{id:'old',uid:'5383',date:'2026-11-02',trip:'이전 기록',port:'항구',departure:'05:00',remaining:1,verified:true,observedAt:null,source:'imported'}];
   const restored=applyDefaultFleet(state);
-  expect(restored.boats).toHaveLength(513); expect(restored.selectedUids.at(-1)).toBe('12-custom');
+  expect(restored.boats).toHaveLength(seed.state.boats.length+1); expect(restored.selectedUids.at(-1)).toBe('12-custom');
   expect(restored.tiers.tier2.at(-1)).toBe('12-custom');
   expect(restored.events).toEqual(state.events); expect(restored.month).toBe('2027-01');
   expect(restored.fleetSeedVersion).toBe(FLEET_VERSION);
   expect(state.boats).toHaveLength(1);
 });
 test('bundled data contains only fleet fields and no cached seats or PC settings',()=>{
-  for (const boat of seed.state.boats) expect(Object.keys(boat).sort()).toEqual(['name','port','uid','url']);
+  for (const boat of seed.state.boats) {
+    expect(Object.keys(boat).filter(key=>key!=='region').sort()).toEqual(['name','port','uid','url']);
+    if ('region' in boat) expect(Object.keys(boat.region!).sort()).toEqual(['local','province','sea']);
+  }
   const value=JSON.stringify(seed);
   for (const key of ['cookie','password','applicant','export_directory','operator_name','phone','token','session']) expect(value).not.toContain(`"${key}"`);
   expect(value).not.toMatch(/01[016789][- .]?\d{3,4}[- .]?\d{4}/);

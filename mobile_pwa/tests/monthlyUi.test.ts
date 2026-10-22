@@ -14,7 +14,7 @@ test('month query form, people filter, list/day views and empty month work end t
   const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
   const count=()=>Number((el('#summary').textContent || '').match(/(\d+)개 출조/)?.[1]);
   expect(document.querySelector('h1')?.textContent).toBe('월별 예약 조회');
-  expect(el('#fleet-count').textContent).toContain('83척 선택 / 전체 512척');
+  expect(el('#fleet-count').textContent).toContain(`83척 선택 / 전체 ${fleet.boats.length}척`);
   const baseline=count(); expect(baseline).toBeGreaterThan(0);
   expect(el('#query-status').textContent).toContain('2026. 10. 1.');
   const people=el('#people') as HTMLInputElement; people.value='20';

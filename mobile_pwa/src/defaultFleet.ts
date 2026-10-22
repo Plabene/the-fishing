@@ -1,18 +1,39 @@
 import seed from './data/defaultFleet.json';
+import legacy from './data/legacyFleet.json';
 import { importData } from './importLegacy';
-import { TIERS, type AppState } from './models';
+import { TIERS, type AppState,type Boat } from './models';
 
 export const FLEET_VERSION = seed.version;
 export function defaultFleet(): AppState {
-  return {...importData(seed.state).state, fleetSeedVersion:FLEET_VERSION};
+  const state=importData(seed.state).state;
+  return {...state,fleetSeedVersion:FLEET_VERSION,fleetBaseline:structuredClone(state.boats)};
+}
+export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,baseline:Boat[]):AppState {
+  const state=structuredClone(current),previous=new Map(baseline.map(b=>[b.uid,b])),incoming=new Map(boats.map(b=>[b.uid,b]));
+  const existing=new Set(state.boats.map(b=>b.uid));
+  for(const boat of state.boats) {
+    const next=incoming.get(boat.uid),old=previous.get(boat.uid);if(!next) continue;
+    const originalPort=boat.port;
+    if(old) for(const field of ['name','port','url'] as const) if(boat[field]===old[field]) boat[field]=next[field];
+    if(old ? JSON.stringify(boat.region)===JSON.stringify(old.region) && originalPort===old.port : !boat.region && originalPort===next.port) {
+      if(next.region) boat.region=structuredClone(next.region);else delete boat.region;
+    }
+  }
+  // Newly discovered boats start unselected. Missing catalog entries never erase personal boats.
+  for(const boat of boats) if(!existing.has(boat.uid) && !previous.has(boat.uid)) state.boats.push(structuredClone(boat));
+  state.fleetBaseline=structuredClone(boats);state.fleetSeedVersion=version;return state;
 }
 export function initializeFleet(saved: unknown): {state:AppState; seeded:boolean; changed:boolean} {
   if (!saved) return {state:defaultFleet(), seeded:true, changed:true};
-  const state = importData(saved).state;
+  let state = importData(saved).state;
   if (!state.fleetSeedVersion && !state.boats.length && !state.events.length && !state.failures.length)
     return {state:defaultFleet(), seeded:true, changed:true};
-  const changed = !state.fleetSeedVersion;
-  if (changed) state.fleetSeedVersion = FLEET_VERSION;
+  const changed=state.fleetSeedVersion!==FLEET_VERSION || !state.fleetBaseline;
+  if(changed) {
+    const defaults=defaultFleet();
+    const baseline=state.fleetBaseline || (state.fleetSeedVersion===legacy.version ? legacy.boats:defaults.boats);
+    state=mergeFleetCatalog(state,defaults.boats,FLEET_VERSION,baseline);
+  }
   return {state, seeded:false, changed};
 }
 /** Explicit restore replaces the PC fleet's order while retaining custom boats and observations. */
@@ -25,5 +46,6 @@ export function applyDefaultFleet(current: AppState): AppState {
   state.selectedUids = [...defaults.selectedUids,...state.selectedUids.filter(id=>extra.has(id))];
   state.requiredPeople = defaults.requiredPeople;
   state.fleetSeedVersion = FLEET_VERSION;
+  state.fleetBaseline=structuredClone(defaults.boats);
   return state;
 }

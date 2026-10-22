@@ -1,12 +1,13 @@
 import sourceLinks from './data/sourceLinks.json';
 import type { TideDay } from './tides';
+import type {BoatRegion,RegionFilter} from './regions';
 export const TIERS = ['tier1', 'tier2', 'tier3', 'other'] as const;
 export type Tier = typeof TIERS[number];
 export type Filter = Tier | 'all';
 export const LABELS: Record<Filter, string> = { all: '전체', tier1: '1티어', tier2: '2티어', tier3: '3티어', other: '기타' };
 export type GateStatus = 'UNVERIFIED' | 'ALLOWED_READABLE' | 'CORS_DENIED' | 'AUTH_OR_COOKIE_BLOCKED' | 'ACCESS_RESTRICTED' | 'PARSER_UNSUPPORTED' | 'PERMISSION_DENIED' | 'HTTP_ERROR' | 'NETWORK_OR_CORS' | 'TIMEOUT' | 'UNSUPPORTED_SOURCE' | 'CANCELLED' | 'API_UNAVAILABLE' | 'API_BUSY' | 'API_NOT_CONFIGURED';
 export type DisplayStatus = 'AVAILABLE' | 'UNKNOWN' | 'STALE' | 'BLOCKED' | 'UNVERIFIED' | 'FULL' | 'DEMO';
-export interface Boat { uid: string; name: string; port: string; url: string }
+export interface Boat { uid: string; name: string; port: string; url: string; region?:BoatRegion }
 export interface Observation {
   id: string; uid: string; date: string; trip: string; port: string; departure: string;
   remaining: number | null; verified: boolean; observedAt: string | null;
@@ -22,6 +23,9 @@ export interface AppState {
   // Legacy backups may contain one string; arrays select any matching species, [] selects none.
   selectedSpecies?: string | string[]; excludedSpeciesKeys?: string[];
   tideDays?: TideDay[];
+  selectedRegion?:RegionFilter;
+  // Last published catalog, used to preserve personal edits and deliberately deleted boats.
+  fleetBaseline?:Boat[];
 }
 export function localMonth(now = new Date()): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).format(now);

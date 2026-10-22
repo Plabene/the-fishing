@@ -2,6 +2,7 @@ import { type AppState, type Filter, type Observation } from './models';
 import { orderedBoats, tierFor } from './tierStore';
 import { eventStatus } from './availabilityStore';
 import { eventSpecies, matchesSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
+import { matchesRegion } from './regions';
 
 export interface MonthQuery { month:string; requiredPeople:number; tier:Filter; search:string; matchingOnly:boolean; species?:string|string[]; excludedSpeciesKeys?:string[] }
 export function validateQuery(query:MonthQuery):void {
@@ -12,7 +13,7 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   validateQuery(query);
   const context={...state,month:query.month,requiredPeople:query.requiredPeople};
   const selected=new Set(state.selectedUids);
-  const boats=orderedBoats(state).filter(b=>selected.has(b.uid) && (query.tier==='all' || tierFor(state,b.uid)===query.tier));
+  const boats=orderedBoats(state).filter(b=>selected.has(b.uid) && matchesRegion(b,state.selectedRegion) && (query.tier==='all' || tierFor(state,b.uid)===query.tier));
   const ids=new Set(boats.map(b=>b.uid)), order=new Map(boats.map((b,i)=>[b.uid,i]));
   const boatById=new Map(boats.map(b=>[b.uid,b]));
   const search=query.search.trim().toLocaleLowerCase();
