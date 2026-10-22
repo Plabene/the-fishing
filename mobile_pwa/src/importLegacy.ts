@@ -3,6 +3,7 @@ import { normalizeTiers } from './tierStore';
 import { eventSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
 import { mergeTideDays } from './tides';
 import { readRegion,readRegionFilter } from './regions';
+import {readPlatform} from './platforms';
 type Obj = Record<string, unknown>;
 const obj = (v: unknown): Obj => v && typeof v === 'object' && !Array.isArray(v) ? v as Obj : {};
 const arr = (v: unknown): unknown[] => Array.isArray(v) ? v : [];
@@ -40,6 +41,7 @@ export function importData(input: unknown, current = emptyState()): { state: App
   if(Array.isArray(excluded)) state.excludedSpeciesKeys=[...new Set(excluded.filter(v=>typeof v==='string').slice(0,200).map(speciesFilterKey).filter((key):key is string=>key!==null))];
   if(backup && Array.isArray(root.tideDays)) state.tideDays=mergeTideDays(root.tideDays);
   if(backup && root.selectedRegion) state.selectedRegion=readRegionFilter(root.selectedRegion);
+  if(backup) {delete state.selectedPlatform;if(root.selectedPlatform) state.selectedPlatform=readPlatform(root.selectedPlatform);}
   if(backup && Array.isArray(root.fleetBaseline)) state.fleetBaseline=root.fleetBaseline.slice(0,10000).flatMap(value=>{
     const b=obj(value),id=uid(b.uid),region=readRegion(b.region);return id ? [{uid:id,name:text(b.name),port:text(b.port),url:reservationLink(b.url,id),...(region ? {region}:{})}]:[];
   });
@@ -71,6 +73,9 @@ export function importData(input: unknown, current = emptyState()): { state: App
         remaining, verified: e.verified === true && source !== 'fixture', observedAt, source };
       event.speciesKey=eventSpecies({...event,speciesKey:text(e.speciesKey ?? e.species_key),species:text(e.species ?? e.species_label)});
       event.species=speciesLabel(event.speciesKey);
+      if(e.reservationStatus) event.reservationStatus=text(e.reservationStatus,40);
+      if(e.reservationStatusLabel) event.reservationStatusLabel=text(e.reservationStatusLabel,80);
+      const eventUrl=reservationLink(e.reservationUrl ?? e.reservation_url,id);if(eventUrl) event.reservationUrl=eventUrl;
       if ('price' in e || 'price_won' in e) {
         const price=e.price ?? e.price_won;
         event.price=typeof price==='number' && Number.isInteger(price) && price>=0 && price<=100000000 ? price : null;

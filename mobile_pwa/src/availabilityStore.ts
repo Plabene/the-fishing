@@ -6,9 +6,10 @@ export function eventStatus(event: Observation, state: AppState, now = Date.now(
   if (event.source === 'fixture') return 'DEMO';
   if (!event.verified) return 'UNVERIFIED';
   if (!event.observedAt || Date.parse(event.observedAt) > now + 60_000) return 'UNKNOWN';
-  if (event.remaining === null) return 'UNKNOWN';
+  if(event.remaining===null && !event.reservationStatus) return 'UNKNOWN';
   if (event.source === 'imported') return 'STALE';
   if (now - Date.parse(event.observedAt) > FRESH_MS) return 'STALE';
+  if(event.reservationStatus && event.reservationStatus!=='available') return event.reservationStatus==='unknown' ? 'UNKNOWN':'UNAVAILABLE';
   if (event.remaining === null) return 'UNKNOWN';
   return event.remaining >= state.requiredPeople ? 'AVAILABLE' : 'FULL';
 }

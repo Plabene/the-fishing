@@ -1,5 +1,7 @@
 # TheFishing 월별 예약 조회
 
+선상24 공개 선박 목록을 통합했습니다. 플랫폼 필터(전체/더피싱/선상24), 색상 태그, 공통 지역 검색과 공식 예약 페이지 연결을 제공합니다. 선상24 실시간 자동 조회는 이용 허가가 없어 비활성 상태이며, 기존 더피싱 실시간 조회는 유지합니다. 적용 기준·실제 검증·제한 사항은 [선상24 통합 기록](mobile_pwa/INTEGRATION_SUNSANG24_KO.md)에 정리했습니다.
+
 저장소: https://github.com/Plabene/the-fishing
 
 GitHub Pages: https://plabene.github.io/the-fishing/

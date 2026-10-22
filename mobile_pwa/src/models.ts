@@ -1,18 +1,20 @@
 import sourceLinks from './data/sourceLinks.json';
 import type { TideDay } from './tides';
 import type {BoatRegion,RegionFilter} from './regions';
+import {sunsangLink,type PlatformFilter} from './platforms';
 export const TIERS = ['tier1', 'tier2', 'tier3', 'other'] as const;
 export type Tier = typeof TIERS[number];
 export type Filter = Tier | 'all';
 export const LABELS: Record<Filter, string> = { all: '전체', tier1: '1티어', tier2: '2티어', tier3: '3티어', other: '기타' };
 export type GateStatus = 'UNVERIFIED' | 'ALLOWED_READABLE' | 'CORS_DENIED' | 'AUTH_OR_COOKIE_BLOCKED' | 'ACCESS_RESTRICTED' | 'PARSER_UNSUPPORTED' | 'PERMISSION_DENIED' | 'HTTP_ERROR' | 'NETWORK_OR_CORS' | 'TIMEOUT' | 'UNSUPPORTED_SOURCE' | 'CANCELLED' | 'API_UNAVAILABLE' | 'API_BUSY' | 'API_NOT_CONFIGURED';
-export type DisplayStatus = 'AVAILABLE' | 'UNKNOWN' | 'STALE' | 'BLOCKED' | 'UNVERIFIED' | 'FULL' | 'DEMO';
+export type DisplayStatus = 'AVAILABLE' | 'UNKNOWN' | 'STALE' | 'BLOCKED' | 'UNVERIFIED' | 'FULL' | 'DEMO' | 'UNAVAILABLE';
 export interface Boat { uid: string; name: string; port: string; url: string; region?:BoatRegion }
 export interface Observation {
   id: string; uid: string; date: string; trip: string; port: string; departure: string;
   remaining: number | null; verified: boolean; observedAt: string | null;
   source: 'imported' | 'fixture' | 'direct' | 'api';
   species?: string; speciesKey?: string; price?: number | null;
+  reservationStatus?:string; reservationStatusLabel?:string; reservationUrl?:string;
 }
 export interface MonthCheck { uid: string; month: string; requiredPeople: number; observedAt: string; source?: 'direct' | 'api' }
 export interface Failure { uid: string; month: string; observedAt: string | null; status: 'UNKNOWN' | 'BLOCKED'; code: string }
@@ -24,6 +26,7 @@ export interface AppState {
   selectedSpecies?: string | string[]; excludedSpeciesKeys?: string[];
   tideDays?: TideDay[];
   selectedRegion?:RegionFilter;
+  selectedPlatform?:PlatformFilter;
   // Last published catalog, used to preserve personal edits and deliberately deleted boats.
   fleetBaseline?:Boat[];
 }
@@ -56,6 +59,7 @@ export function officialDetail(value: unknown, expectedUid?: string): string {
 export function reservationLink(value: unknown, expectedUid: string): string {
   const direct = officialDetail(value, expectedUid);
   if (direct) return direct;
+  const sunsang=sunsangLink(value,expectedUid);if(sunsang) return sunsang;
   const registered = Object.hasOwn(sourceLinks, expectedUid) ? (sourceLinks as Record<string, string>)[expectedUid] : '';
   return registered && value === registered ? registered : '';
 }

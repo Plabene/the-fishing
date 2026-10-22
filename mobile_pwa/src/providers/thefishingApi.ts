@@ -1,4 +1,5 @@
-import { dateOnly, officialDetail, text, timestamp, type Boat, type Observation } from '../models';
+import { dateOnly, officialDetail, reservationLink, text, timestamp, type Boat, type Observation } from '../models';
+import {boatPlatform} from '../platforms';
 import type { AvailabilityProvider, ProviderResult } from '../provider';
 import defaultEndpoint from '../data/apiEndpoint.json';
 import { eventSpecies, speciesLabel } from '../species';
@@ -20,7 +21,7 @@ export function loadApiOrigin():string {
 export function saveApiOrigin(value:string):void {localStorage.setItem(key,apiOrigin(value));}
 export function clearApiOrigin():void {localStorage.setItem(key,'');}
 const failure=(message:string,status:ProviderResult['status']='API_UNAVAILABLE'):ProviderResult=>({status,message,events:[],stop:true,stage:'api',source:'api'});
-async function requestJson(request:typeof fetch,url:string,signal:AbortSignal):Promise<unknown> {
+export async function requestJson(request:typeof fetch,url:string,signal:AbortSignal):Promise<unknown> {
   const response=await request(url,{method:'GET',mode:'cors',credentials:'omit',redirect:'error',cache:'no-store',referrerPolicy:'no-referrer',signal});
   if(!response.ok) throw new Error(`조회 API HTTP ${response.status}`);
   if(!response.headers.get('content-type')?.includes('application/json')) throw new Error('조회 API의 JSON 응답이 아닙니다.');
@@ -32,7 +33,7 @@ export async function checkApi(value:string,request:typeof fetch=fetch):Promise<
   if(data?.service!=='thefishing-availability' || data.schema!==1 || data.ready!==true) throw new Error('호환되는 조회 API가 아닙니다.');
   return origin;
 }
-const accepted=new Set(['ALLOWED_READABLE','HTTP_ERROR','ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED','PARSER_UNSUPPORTED','UNSUPPORTED_SOURCE','NETWORK_OR_CORS','TIMEOUT','API_UNAVAILABLE','API_BUSY','UNVERIFIED']);
+const accepted=new Set(['ALLOWED_READABLE','HTTP_ERROR','ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED','PARSER_UNSUPPORTED','UNSUPPORTED_SOURCE','NETWORK_OR_CORS','TIMEOUT','API_UNAVAILABLE','API_BUSY','UNVERIFIED','PERMISSION_DENIED']);
 export function validateApiResult(value:unknown,boat:Boat,month:string):ProviderResult {
   if(!value || typeof value!=='object') throw new Error('올바르지 않은 조회 응답입니다.');
   const data=value as Record<string,unknown>;
@@ -46,14 +47,22 @@ export function validateApiResult(value:unknown,boat:Boat,month:string):Provider
   const events:Observation[]=data.events.map((item:unknown)=>{
     if(!item || typeof item!=='object') throw new Error('잘못된 출조 상품입니다.');
     const row=item as Record<string,unknown>,date=dateOnly(row.date);
-    if(row.uid!==boat.uid || !date?.startsWith(month+'-') || row.observedAt!==observedAt || typeof row.id!=='string' || !/^direct-[a-f0-9]{24}$/.test(row.id) || seen.has(row.id)) throw new Error('선박·월·상품 정보가 요청과 일치하지 않습니다.');
+    const sunsang=boatPlatform(boat)==='sunsang24';
+    if(row.uid!==boat.uid || !date?.startsWith(month+'-') || row.observedAt!==observedAt || typeof row.id!=='string' || !(sunsang ? /^sunsang24-(?:schedule-\d{1,20}|derived-[a-f0-9]{24})$/:/^direct-[a-f0-9]{24}$/).test(row.id) || seen.has(row.id)) throw new Error('선박·월·상품 정보가 요청과 일치하지 않습니다.');
     seen.add(row.id);
     const count=row.remaining;
     if(count!==null && (!Number.isInteger(count) || Number(count)<0 || Number(count)>10000)) throw new Error('잔여석을 확인할 수 없습니다.');
     if(row.price!==null && row.price!==undefined && (!Number.isInteger(row.price) || Number(row.price)<0 || Number(row.price)>100000000)) throw new Error('요금을 확인할 수 없습니다.');
     const departure=typeof row.departure==='string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(row.departure) ? row.departure:'';
     const trip=text(row.trip), species=eventSpecies({trip,speciesKey:text(row.speciesKey),species:text(row.species)});
-    return {id:row.id,uid:boat.uid,date,trip,speciesKey:species,species:speciesLabel(species),port:boat.port,departure,remaining:count as number|null,price:row.price==null ? null:Number(row.price),observedAt,verified:true,source:'api'};
+    const event:Observation={id:row.id,uid:boat.uid,date,trip,speciesKey:species,species:speciesLabel(species),port:boat.port,departure,remaining:count as number|null,price:row.price==null ? null:Number(row.price),observedAt,verified:true,source:'api'};
+    if(sunsang) {
+      const statuses=['available','closed','waitlist','maintenance','cancelled','weather','inactive','unknown'];
+      if(!statuses.includes(String(row.reservationStatus)) || typeof row.verified!=='boolean') throw new Error('선상24 예약 상태를 확인할 수 없습니다.');
+      event.reservationStatus=String(row.reservationStatus);event.reservationStatusLabel=text(row.reservationStatusLabel,80);event.verified=row.verified;
+      event.reservationUrl=reservationLink(row.reservationUrl,boat.uid);event.port=text(row.port) || boat.port;
+    }
+    return event;
   });
   return {status:'ALLOWED_READABLE',message:`${events.length}개 출조 상품을 API로 확인했습니다.`,events,observedAt,source:'api',cached:data.cached===true,fresh:data.fresh===true};
 }

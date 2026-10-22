@@ -2,10 +2,11 @@ import { el, sourceLink } from './dayView';
 import { orderedBoats, tierFor } from './tierStore';
 import { LABELS, TIERS, type AppState } from './models';
 import { matchesRegion } from './regions';
+import {matchesPlatform,boatPlatform,PLATFORM_LABELS} from './platforms';
 
 export function renderSourceAccess(target: HTMLElement, state: AppState, selectedUid: string, selectBoat:(uid:string)=>void): void {
   target.replaceChildren();
-  const boats = orderedBoats(state).filter(boat=>state.selectedUids.includes(boat.uid) && matchesRegion(boat,state.selectedRegion));
+  const boats = orderedBoats(state).filter(boat=>state.selectedUids.includes(boat.uid) && matchesPlatform(boat,state.selectedPlatform) && matchesRegion(boat,state.selectedRegion));
   const chosen = boats.find(boat=>boat.uid===selectedUid) || boats[0];
   const heading = el('div');
   heading.append(el('h2','공식 사이트에서 현재 잔여석 확인'),el('p','API 조회가 실패하거나 외부 사이트 선박인 경우 공식 예약 페이지에서 현재 상황을 확인하세요.'));
@@ -14,7 +15,7 @@ export function renderSourceAccess(target: HTMLElement, state: AppState, selecte
   for (const tier of TIERS) {
     const group = el('optgroup'); group.label=LABELS[tier];
     for (const boat of boats.filter(boat=>tierFor(state,boat.uid)===tier)) {
-      const option=el('option',boat.name); option.value=boat.uid; group.append(option);
+      const option=el('option',`[${PLATFORM_LABELS[boatPlatform(boat)]}] ${boat.name}`); option.value=boat.uid; group.append(option);
     }
     if (group.children.length) select.append(group);
   }

@@ -13,5 +13,5 @@ export function renderRegionFilter(target:HTMLElement,boats:Boat[],selected:Regi
     select.value=filter[key];select.addEventListener('change',()=>{const next={...filter,[key]:select.value};for(const child of REGION_FIELDS.slice(index+1)) next[child]='';onChange(next);});label.append(select);controls.append(label);
   }
   const reset=el('button','전체 지역');reset.type='button';reset.id='region-reset';reset.addEventListener('click',()=>onChange(emptyRegion()));controls.append(reset);
-  target.append(controls,el('p','PC·더피싱 사이트의 지역 분류를 따릅니다. 선택한 지역은 달력 조회와 내 선박 목록에 함께 적용됩니다.','muted'));
+  target.append(controls,el('p','두 플랫폼의 확인된 등록 지역을 통합합니다. ‘인근’ 구역은 실제 항구로 취급하지 않습니다. 지역 미확인 선박은 전체 또는 미확인에서 볼 수 있습니다.','muted'));
 }

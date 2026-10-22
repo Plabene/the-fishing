@@ -1,10 +1,11 @@
 import { el, sourceLink } from './dayView';
 import type { LiveRow } from './liveQuery';
+import {platformBadge,boatPlatform,PLATFORM_LABELS} from './platforms';
 
 const stageLabel={detail:'선박 상세 요청',calendar:'월 달력 요청',api:'조회 API 연결'};
 export function diagnosticReport(rows:LiveRow[],month:string,now=new Date()):string {
   return [`월별 조회 진단 · ${now.toISOString()}`,`조회 월: ${month}`,...rows.map(({boat,result})=>[
-    boat.name,`UID ${boat.uid}`,result.stage ? stageLabel[result.stage] : '조회 결과',result.status,
+    PLATFORM_LABELS[boatPlatform(boat)],boat.name,`UID ${boat.uid}`,result.stage ? stageLabel[result.stage] : '조회 결과',result.status,
     result.httpStatus ? `HTTP ${result.httpStatus}` : 'HTTP 상태 확인 불가',result.message,
   ].join(' · '))].join('\n');
 }
@@ -17,8 +18,9 @@ export function renderDiagnostics(target:HTMLElement,rows:LiveRow[]):void {
   }
   for(const {boat,result} of rows) {
     const row=el('div','','diagnostic-row');
+    row.append(platformBadge(boat));
     row.append(el('p',`${boat.name} · ${result.message}`,result.status==='ALLOWED_READABLE' ? 'live-ok':'live-failure'));
-    if(result.stage) row.append(el('small',`실패 단계: ${stageLabel[result.stage]}${result.httpStatus ? ` · HTTP ${result.httpStatus}` : ' · 브라우저에서 HTTP 상태 확인 불가'}`));
+    if(result.stage && !['PERMISSION_DENIED','UNSUPPORTED_SOURCE'].includes(result.status)) row.append(el('small',`실패 단계: ${stageLabel[result.stage]}${result.httpStatus ? ` · HTTP ${result.httpStatus}` : ' · HTTP 상태 확인 불가'}`));
     if(result.status!=='ALLOWED_READABLE') {
       const link=sourceLink(boat.url,boat.uid);
       if(link) {link.textContent=`${boat.name} 공식 달력 확인 ↗`;link.className='button';row.append(link);}

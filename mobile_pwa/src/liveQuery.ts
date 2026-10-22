@@ -1,19 +1,25 @@
 import type { AppState, Boat } from './models';
 import type { AvailabilityProvider, ProviderResult } from './provider';
+import {boatPlatform} from './platforms';
 export interface LiveRow {boat:Boat; result:ProviderResult}
 export async function collectMonth(provider:AvailabilityProvider,boats:Boat[],month:string,signal:AbortSignal,onProgress:(rows:LiveRow[],total:number)=>void=()=>{},concurrency=1) {
   const unique=[...new Map(boats.map(boat=>[boat.uid,boat])).values()],completed:Array<LiveRow|undefined>=new Array(unique.length);
-  let next=0,stopped=false,cancelled=false;
+  let next=0,stopped=false,cancelled=false;const stoppedPlatforms=new Set<string>();
   const rows=()=>completed.filter((row):row is LiveRow=>!!row);
   async function worker() {
-    while(next<unique.length && !stopped) {
+    while(next<unique.length) {
       if(signal.aborted) {cancelled=true;return;}
       const index=next++,boat=unique[index];
+      if(stoppedPlatforms.has(boatPlatform(boat))) continue;
       try {
         const result=await provider.readMonth(boat,month,signal);
-        completed[index]={boat,result};if(result.stop) stopped=true;
+        completed[index]={boat,result};if(result.stop) {stopped=true;stoppedPlatforms.add(boatPlatform(boat));}
         onProgress(rows(),unique.length);
-      } catch(error) {if(signal.aborted) {cancelled=true;return;} throw error;}
+      } catch(error) {
+        if(signal.aborted) {cancelled=true;return;}
+        completed[index]={boat,result:{status:'API_UNAVAILABLE',events:[],message:'이 플랫폼의 조회 처리에 실패했습니다.',source:'api',stop:true}};
+        stopped=true;stoppedPlatforms.add(boatPlatform(boat));onProgress(rows(),unique.length);
+      }
     }
   }
   await Promise.all(Array.from({length:Math.min(unique.length,Math.max(1,Math.min(3,Math.floor(concurrency)||1)))},worker));

@@ -1,11 +1,15 @@
 import seed from './data/defaultFleet.json';
 import legacy from './data/legacyFleet.json';
+import sunsang from './data/sunsang24Fleet.json';
+import {migrateRegionFilter} from './regions';
 import { importData } from './importLegacy';
 import { TIERS, type AppState,type Boat } from './models';
 
-export const FLEET_VERSION = seed.version;
+export const FLEET_VERSION = seed.version.slice(0,8)+sunsang.version.slice(0,8);
 export function defaultFleet(): AppState {
   const state=importData(seed.state).state;
+  const existing=new Set(state.boats.map(b=>b.uid));
+  state.boats.push(...sunsang.boats.filter(b=>!existing.has(b.uid)).map(b=>({uid:b.uid,name:b.name,port:b.port,url:b.url,region:{sea:b.sea,province:b.province,local:b.local}})));
   return {...state,fleetSeedVersion:FLEET_VERSION,fleetBaseline:structuredClone(state.boats)};
 }
 export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,baseline:Boat[]):AppState {
@@ -33,6 +37,7 @@ export function initializeFleet(saved: unknown): {state:AppState; seeded:boolean
     const defaults=defaultFleet();
     const baseline=state.fleetBaseline || (state.fleetSeedVersion===legacy.version ? legacy.boats:defaults.boats);
     state=mergeFleetCatalog(state,defaults.boats,FLEET_VERSION,baseline);
+    if(state.selectedRegion) state.selectedRegion=migrateRegionFilter(state.boats,state.selectedRegion);
   }
   return {state, seeded:false, changed};
 }

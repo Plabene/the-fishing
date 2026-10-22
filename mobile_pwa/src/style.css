@@ -2,3 +2,14 @@
 @import './css/species.css';
 @import './css/tides.css';
 @import './css/booking-layout.css';
+/* Provider identity stays visible beside vessel names in both result views. */
+.platform-tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.75rem;font-weight:700;line-height:1.4;white-space:nowrap;vertical-align:middle}
+.platform-thefishing{color:#075985;background:#e0f2fe;border:1px solid #7dd3fc}
+.platform-sunsang24{color:#6b21a8;background:#f3e8ff;border:1px solid #d8b4fe}
+.platform-external{color:#475569;background:#f1f5f9;border:1px solid #cbd5e1}
+.platform-control{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:1rem 0}
+.platform-control select{min-width:160px;padding:.6rem;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#0f172a}
+.location-evidence{font-size:.8rem;color:#64748b;margin:.4rem 0;line-height:1.5}
+.boat-selection{flex-wrap:wrap}
+.status-unavailable{color:#7c2d12;background:#ffedd5}
+.calendar-boat .platform-tag{font-size:.6rem;padding:0 3px;margin-right:3px}

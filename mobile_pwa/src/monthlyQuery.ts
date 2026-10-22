@@ -3,6 +3,7 @@ import { orderedBoats, tierFor } from './tierStore';
 import { eventStatus } from './availabilityStore';
 import { eventSpecies, matchesSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
 import { matchesRegion } from './regions';
+import {matchesPlatform} from './platforms';
 
 export interface MonthQuery { month:string; requiredPeople:number; tier:Filter; search:string; matchingOnly:boolean; species?:string|string[]; excludedSpeciesKeys?:string[] }
 export function validateQuery(query:MonthQuery):void {
@@ -13,7 +14,7 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   validateQuery(query);
   const context={...state,month:query.month,requiredPeople:query.requiredPeople};
   const selected=new Set(state.selectedUids);
-  const boats=orderedBoats(state).filter(b=>selected.has(b.uid) && matchesRegion(b,state.selectedRegion) && (query.tier==='all' || tierFor(state,b.uid)===query.tier));
+  const boats=orderedBoats(state).filter(b=>selected.has(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (query.tier==='all' || tierFor(state,b.uid)===query.tier));
   const ids=new Set(boats.map(b=>b.uid)), order=new Map(boats.map((b,i)=>[b.uid,i]));
   const boatById=new Map(boats.map(b=>[b.uid,b]));
   const search=query.search.trim().toLocaleLowerCase();
@@ -24,7 +25,7 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   }).sort((a,b)=>a.date.localeCompare(b.date) || order.get(a.uid)!-order.get(b.uid)! || a.departure.localeCompare(b.departure) || a.trip.localeCompare(b.trip));
   const meetsPeople=(e:Observation) => {
     const status=eventStatus(e,context,now);
-    return (e.verified || e.source==='fixture') && status!=='BLOCKED' && status!=='UNKNOWN' && status!=='UNVERIFIED' && e.remaining!==null && e.remaining>=query.requiredPeople;
+    return (!e.reservationStatus || e.reservationStatus==='available') && (e.verified || e.source==='fixture') && status!=='BLOCKED' && status!=='UNKNOWN' && status!=='UNVERIFIED' && e.remaining!==null && e.remaining>=query.requiredPeople;
   };
   const speciesCounts=new Map<string,number>();
   for(const e of raw) if(!query.matchingOnly || meetsPeople(e)) {const key=eventSpecies(e);speciesCounts.set(key,(speciesCounts.get(key) || 0)+1);}

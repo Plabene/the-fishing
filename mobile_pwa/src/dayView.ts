@@ -7,8 +7,9 @@ import type { queryMonth } from './monthlyQuery';
 import { calculateTideMonth } from './tides';
 import { renderDayTide } from './tideView';
 import {matchesRegion,regionLabel} from './regions';
+import {matchesPlatform,platformBadge} from './platforms';
 
-export const STATUS_LABELS: Record<DisplayStatus, string> = { AVAILABLE: '확인된 잔여석', UNKNOWN: '확인 불가', STALE: '이전 자료', BLOCKED: '접근 제한', UNVERIFIED: '미검증', FULL: '확인된 인원 미달', DEMO: '예시 자료' };
+export const STATUS_LABELS: Record<DisplayStatus, string> = { AVAILABLE: '확인된 잔여석', UNKNOWN: '확인 불가', STALE: '이전 자료', BLOCKED: '접근 제한', UNVERIFIED: '미검증', FULL: '확인된 인원 미달', DEMO: '예시 자료',UNAVAILABLE:'예약 가능 상태 아님' };
 export function el<K extends keyof HTMLElementTagNameMap>(tag: K, text = '', className = ''): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag); node.textContent = text; node.className = className; return node;
 }
@@ -29,17 +30,19 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
     for (const event of rows) {
       const boat = state.boats.find(b => b.uid === event.uid); const status = eventStatus(event, state);
       const card = el('article', '', 'event-card'); card.dataset.status = status;
+      if(boat) card.append(platformBadge(boat));
       card.append(el('span', STATUS_LABELS[status], `badge status-${status.toLowerCase()}`), el('h4', boat?.name || event.uid),
         speciesBadge(event), el('p', event.trip || '출조명 미표시'), el('p', `${boat ? regionLabel(boat)+' · ':''}${event.port || boat?.port || '항구 미표시'} · ${event.departure || '시간 미표시'}`, 'muted'),
         el('p', `조회 당시 잔여 ${event.remaining === null ? '미확인' : event.remaining + '석'}`, 'seats'),
         el('p', `관측 ${event.observedAt ? new Date(event.observedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '시각 미확인'}`, 'timestamp'));
       if (event.price!==undefined && event.price!==null) card.append(el('p',`${event.price.toLocaleString('ko-KR')}원 · 조회 당시 요금`,'muted'));
-      const link = boat && sourceLink(boat.url, boat.uid); if (link) card.append(link);
+      if(event.reservationStatusLabel) card.append(el('p',`원본 예약 상태 · ${event.reservationStatusLabel}`,'muted'));
+      const link = boat && sourceLink(event.reservationUrl || boat.url, boat.uid); if (link) card.append(link);
       group.append(card);
     }
     target.append(group);
   }
-  const ids = new Set(state.boats.filter(b=>state.selectedUids.includes(b.uid) && matchesRegion(b,state.selectedRegion)).map(b=>b.uid));
+  const ids = new Set(state.boats.filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion)).map(b=>b.uid));
   for (const failure of state.failures.filter(f => f.month === state.month && ids.has(f.uid) && (tier === 'all' || tierFor(state, f.uid) === tier))) {
     target.append(el('p', `${state.boats.find(b => b.uid === failure.uid)?.name || failure.uid} · ${failure.status === 'BLOCKED' ? '접근 제한' : '확인 불가'} · 최근 수집 실패 기록이 있습니다.`, 'notice'));
   }
