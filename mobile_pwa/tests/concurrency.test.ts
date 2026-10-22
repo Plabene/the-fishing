@@ -65,7 +65,7 @@ test('client deduplicates, caches successful reads and refetches after expiry wi
     const [a,b]=await Promise.all([client.readMonth(boat('1'),'2026-10',signal),client.readMonth(boat('1'),'2026-10',signal)]);
     expect(read).toHaveBeenCalledTimes(1);expect(a).toEqual(b);
     const cached=await client.readMonth(boat('1'),'2026-10',signal);expect(cached.cached).toBe(true);expect(cached.observedAt).toBe(a.observedAt);expect(read).toHaveBeenCalledTimes(1);
-    now+=600001;await client.readMonth(boat('1'),'2026-10',signal);expect(read).toHaveBeenCalledTimes(2);
+    now=Date.parse(a.observedAt!)+600001;await client.readMonth(boat('1'),'2026-10',signal);expect(read).toHaveBeenCalledTimes(2);
   } finally {vi.restoreAllMocks();}
 });
 test('a long batch waits briefly at the minute boundary instead of losing unattempted boats',async()=>{
