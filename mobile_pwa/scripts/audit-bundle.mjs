@@ -5,6 +5,7 @@ if (!html.includes(allowed)) throw new Error('Unexpected connection policy');
 for (const name of await readdir('dist/assets')) {
   if (!name.endsWith('.js')) continue;
   const source = await readFile(`dist/assets/${name}`, 'utf8');
+  if (/KHOA_TIDE_API_KEY|serviceKey/.test(source)) throw new Error('Tide credentials must stay on the server');
   if (/new\s+XMLHttpRequest|new\s+WebSocket|mode:["']no-cors["']|credentials:["']include["']/.test(source)) throw new Error('Unexpected transport or credential mode');
 }
 const worker=await readFile('dist/sw.js','utf8');

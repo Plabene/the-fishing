@@ -1,0 +1,13 @@
+.tide-panel{margin:12px 0;padding:14px;background:#f7f9fc;border:1px solid #d6dfe8;border-radius:12px}
+.tide-panel p{margin:6px 0}.tide-panel a{font-size:12px;color:#22526f}.tide-panel button{margin-top:10px}
+.tide-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:12px}.tide-legend span{padding:3px 7px;border-radius:5px}
+.tide-gold{background:#fff4b8;border:1px solid #8a5a00;color:#6d4700}.tide-silver{background:#e7eef5;border:1px solid #5f6772;color:#49525c}
+.calendar-day{min-height:108px}.calendar-tide{display:flex;flex-direction:column;font-size:10px;font-weight:500;line-height:1.5;margin:2px 0;color:#4e5f67}
+.calendar-day[aria-pressed=true] .calendar-tide{color:#fff}
+.calendar-day[data-tide-grade=gold]{box-shadow:inset 0 0 0 2px #8a5a00,inset 0 0 0 4px #d4a62a,inset 0 0 0 5px #ffd86a}
+.calendar-day[data-tide-grade=silver]{box-shadow:inset 0 0 0 2px #5f6772,inset 0 0 0 4px #a8b2bc,inset 0 0 0 5px #e7eef5}
+.calendar-day[aria-pressed=true]{outline:2px solid #176347;outline-offset:1px}
+.day-tide{border:1px solid #d6dfe8;border-radius:8px;padding:12px;margin:12px 0;background:white;overflow-wrap:anywhere}
+.day-tide h3{font-size:14px;margin:0 0 6px}.day-tide p{font-size:12px;margin:5px 0}
+.day-tide[data-tide-grade=gold]{border:2px solid #8a5a00}.day-tide[data-tide-grade=silver]{border:2px solid #5f6772}
+@media(max-width:600px){.calendar-tide{font-size:9px}.calendar-day{min-height:100px}.calendar-grid{gap:3px}.tide-panel{padding:11px}}

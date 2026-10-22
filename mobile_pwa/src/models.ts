@@ -1,4 +1,5 @@
 import sourceLinks from './data/sourceLinks.json';
+import type { TideDay } from './tides';
 export const TIERS = ['tier1', 'tier2', 'tier3', 'other'] as const;
 export type Tier = typeof TIERS[number];
 export type Filter = Tier | 'all';
@@ -20,6 +21,7 @@ export interface AppState {
   monthlyArchiveVersion?: string; monthChecks?: MonthCheck[];
   // Legacy backups may contain one string; arrays select any matching species, [] selects none.
   selectedSpecies?: string | string[]; excludedSpeciesKeys?: string[];
+  tideDays?: TideDay[];
 }
 export function localMonth(now = new Date()): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).format(now);

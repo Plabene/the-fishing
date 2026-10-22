@@ -1,6 +1,7 @@
 import { type AppState, type Observation, type Failure, emptyState, text, uid, reservationLink, dateOnly, timestamp, TIERS } from './models';
 import { normalizeTiers } from './tierStore';
 import { eventSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
+import { mergeTideDays } from './tides';
 type Obj = Record<string, unknown>;
 const obj = (v: unknown): Obj => v && typeof v === 'object' && !Array.isArray(v) ? v as Obj : {};
 const arr = (v: unknown): unknown[] => Array.isArray(v) ? v : [];
@@ -11,7 +12,7 @@ export function importData(input: unknown, current = emptyState()): { state: App
   const catalog = obj(root.catalog || root); const prefs = obj(root.preferences || root);
   let recognized = backup || bundled;
   if (backup) {
-    Object.assign(state, emptyState()); delete state.fleetSeedVersion; delete state.monthlyArchiveVersion; delete state.monthChecks; delete state.selectedSpecies; delete state.excludedSpeciesKeys;
+    Object.assign(state, emptyState()); delete state.fleetSeedVersion; delete state.monthlyArchiveVersion; delete state.monthChecks; delete state.selectedSpecies; delete state.excludedSpeciesKeys; delete state.tideDays;
     for (const key of ['fleetSeedVersion','monthlyArchiveVersion'] as const) if (typeof root[key] === 'string' && /^[a-f0-9]{16}$/.test(root[key])) state[key] = root[key];
   }
   const entries = backup ? arr(root.boats) : Object.values(obj(catalog.entries));
@@ -35,6 +36,7 @@ export function importData(input: unknown, current = emptyState()): { state: App
   if(backup && (typeof root.selectedSpecies==='string' || Array.isArray(root.selectedSpecies))) state.selectedSpecies=normalizeSpeciesSelection(root.selectedSpecies);
   const excluded=backup ? root.excludedSpeciesKeys:prefs.excluded_species_keys;
   if(Array.isArray(excluded)) state.excludedSpeciesKeys=[...new Set(excluded.filter(v=>typeof v==='string').slice(0,200).map(speciesFilterKey).filter((key):key is string=>key!==null))];
+  if(backup && Array.isArray(root.tideDays)) state.tideDays=mergeTideDays(root.tideDays);
   function readResult(value: unknown, observed?: unknown) {
     const r = obj(value); if (!Array.isArray(r.events)) return;
     recognized = true; const query = obj(r.query);

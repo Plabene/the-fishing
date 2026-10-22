@@ -1,14 +1,16 @@
 import type { DurableObjectNamespace, DurableObjectState, ExportedHandler } from '@cloudflare/workers-types';
 import { apiFailure, MonthlyService, validQuery, type Store } from './service';
+import { TideService } from './tides';
 
-interface Env {MONTHLY:DurableObjectNamespace; ALLOWED_ORIGIN:string}
+interface Env {MONTHLY:DurableObjectNamespace; ALLOWED_ORIGIN:string; KHOA_TIDE_API_KEY?:string}
 const json=(value:unknown,status=200,headers:Record<string,string>={})=>Response.json(value,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers}});
 export class MonthlyCoordinator {
   private service:MonthlyService;
-  constructor(ctx:DurableObjectState) {this.service=new MonthlyService(ctx.storage as unknown as Store);}
+  private tides:TideService;
+  constructor(ctx:DurableObjectState,env:Env) {this.service=new MonthlyService(ctx.storage as unknown as Store);this.tides=new TideService(ctx.storage as unknown as Store,env.KHOA_TIDE_API_KEY);}
   async fetch(request:Request):Promise<Response> {
     const u=new URL(request.url);
-    try {return json(await this.service.query(u.searchParams.get('uid') || '',u.searchParams.get('month') || ''));}
+    try {return json(u.pathname==='/v1/tides' ? await this.tides.query(u.searchParams.get('month') || ''):await this.service.query(u.searchParams.get('uid') || '',u.searchParams.get('month') || ''));}
     catch {return json(apiFailure('API_UNAVAILABLE','조회 서버 처리에 실패했습니다. 잠시 후 다시 시도하세요.'),503);}
   }
 }
@@ -22,7 +24,16 @@ export async function handleRequest(request:Request,env:Env):Promise<Response> {
     return new Response(null,{status:204,headers:{...headers,'Access-Control-Allow-Methods':'GET, OPTIONS','Access-Control-Max-Age':'600'}});
   }
   if(request.method!=='GET') return json(apiFailure('API_UNAVAILABLE','GET 요청만 지원합니다.'),405,headers);
-  if(url.pathname==='/health' && !url.search) return json({service:'thefishing-availability',schema:1,ready:!!env.MONTHLY},env.MONTHLY ? 200:503,headers);
+  if(url.pathname==='/health' && !url.search) return json({service:'thefishing-availability',schema:1,ready:!!env.MONTHLY,tidesReady:!!env.KHOA_TIDE_API_KEY},env.MONTHLY ? 200:503,headers);
+  if(url.pathname==='/v1/tides') {
+    const month=url.searchParams.get('month') || '';
+    if(!validQuery('1',month) || url.searchParams.getAll('month').length!==1 || [...url.searchParams.keys()].some(k=>k!=='month')) return json({message:'물때 조회 월을 확인하세요.'},400,headers);
+    try {
+      const coordinator=env.MONTHLY.get(env.MONTHLY.idFromName('tides-v1'));
+      const response=await coordinator.fetch(new Request(`https://coordinator/v1/tides?month=${month}`) as never);
+      return new Response(await response.text(),{status:response.status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
+    } catch {return json({message:'물때 조회 서버에 연결하지 못했습니다.'},503,headers);}
+  }
   if(url.pathname!=='/v1/month') return json(apiFailure('API_UNAVAILABLE','지원하지 않는 API 경로입니다.'),404,headers);
   const uid=url.searchParams.get('uid') || '',month=url.searchParams.get('month') || '';
   if(!validQuery(uid,month) || [...url.searchParams.keys()].some(k=>k!=='uid' && k!=='month') || url.searchParams.getAll('uid').length!==1 || url.searchParams.getAll('month').length!==1) return json(apiFailure('PARSER_UNSUPPORTED','조회 조건을 확인하세요.'),400,headers);

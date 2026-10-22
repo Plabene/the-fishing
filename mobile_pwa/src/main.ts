@@ -17,6 +17,10 @@ import { renderMonthlyList } from './monthlyView';
 import { diagnosticReport, renderDiagnostics } from './queryDiagnostics';
 import { renderSpeciesFilter } from './speciesFilter';
 import { eventSpecies } from './species';
+import tideArchive from './data/tideArchive.json';
+import { calculateTideMonth,mergeTideDays } from './tides';
+import { renderTideSummary } from './tideView';
+import { readTideMonth } from './providers/tideApi';
 const root = document.querySelector<HTMLDivElement>('#app')!;
 // Only static markup is inserted here. All imported content uses textContent/value.
 root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">≈</span><span>THEFISHING<small>선박별 예약 가능 일정</small></span></div><div class="hero-row"><div><p class="eyebrow">출조할 월과 인원을 선택하세요</p><h1>월별 예약 조회</h1><p>선택한 선박의 출조 일정과 잔여석을 날짜별로.</p></div><span id="connectivity"></span></div></div></header>
@@ -27,7 +31,7 @@ root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand
 <p class="query-source">조회 API가 원본 월 달력을 읽고 공개 일정·잔여석만 전달합니다. 성공한 선박만 갱신하며, 10분 이내 조회 결과는 재사용합니다.</p><details id="api-settings" class="api-settings"><summary>조회 API 연결 · <span id="api-state">연결 안 됨</span></summary><form id="api-form"><label>배포된 API 주소<input id="api-url" type="url" required placeholder="https://서비스명.계정명.workers.dev" autocomplete="off"></label><button type="submit">연결 확인 및 저장</button><button id="api-clear" type="button">연결 해제</button></form><p>API 주소는 이 기기에 저장됩니다. 계정 비밀번호나 토큰은 입력하지 않습니다. 연결 확인은 API 접속 확인이며, 실제 잔여석은 월 조회 결과로 확인합니다.</p><a href="https://github.com/Plabene/the-fishing/blob/main/mobile_pwa/availability_api/README_KO.md" target="_blank" rel="noopener noreferrer">API 배포 안내 ↗</a></details><p id="live-progress" role="status" aria-live="polite"></p><details id="live-diagnostics" hidden><summary>선박별 조회 결과</summary><div id="live-rows"></div><button id="copy-diagnostics" type="button">조회 진단 복사</button><textarea id="diagnostic-text" readonly hidden aria-label="조회 진단 내용"></textarea></details>
 <div id="archive-months" class="archive-months" aria-label="자료가 있는 월"></div><div id="query-status" class="query-status" role="status"></div>
 <div class="filters"><div id="tabs" class="tier-tabs" role="group" aria-label="선박 티어"></div><label class="search-label"><span class="sr-only">선박 또는 어종 검색</span><input id="search" type="search" placeholder="선박 · 항구 · 어종 검색"></label></div>
-<section id="species-filter" aria-label="어종 필터"></section>
+<section class="tide-panel" aria-label="보령 물때"><div id="tide-status"></div><button id="tide-refresh" type="button">물때 새로고침</button></section><section id="species-filter" aria-label="어종 필터"></section>
 <div class="result-toolbar"><label><input id="matching-only" type="checkbox" checked> 조회 당시 인원 충족 일정만</label><div class="view-tabs" role="group" aria-label="결과 보기"><button id="view-calendar" aria-pressed="true">달력</button><button id="view-list" aria-pressed="false">월 전체 목록</button></div></div>
 <p id="summary" class="summary"></p><div id="demo-banner" class="demo-banner" hidden>가상의 예시 자료입니다. 실제 선박·잔여석 정보가 아니며 내 자료에 저장되지 않습니다.</div><div id="calendar-layout" class="calendar-grid-layout"><div><div id="calendar" class="calendar-grid" aria-label="월별 날짜"></div><p class="legend">날짜별 숫자는 조회 조건에 맞는 출조 상품 수입니다. 한 선박에 여러 상품이 있을 수 있습니다. 이전 잔여석은 현재 예약 가능 여부를 보장하지 않습니다.</p><p id="last-observed" class="timestamp"></p></div><section id="day-view" class="day-view" aria-live="polite"></section></div><section id="month-results" aria-label="월 전체 조회 결과" hidden></section></section>
 <section id="source-access" class="source-access" aria-label="공식 예약 페이지 확인"></section>
@@ -53,7 +57,7 @@ renderApiSettings();
 const form = $<HTMLFormElement>('#boat-form');
 const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
 const say = (value: string) => { $('#message').textContent = value; };
-const active = () => demo ? {...fixtureState(state.month),requiredPeople:state.requiredPeople,selectedSpecies:state.selectedSpecies,excludedSpeciesKeys:state.excludedSpeciesKeys} : state;
+const active = () => demo ? {...fixtureState(state.month),requiredPeople:state.requiredPeople,selectedSpecies:state.selectedSpecies,excludedSpeciesKeys:state.excludedSpeciesKeys,tideDays:state.tideDays} : state;
 function connection() { $('#connectivity').textContent = navigator.onLine ? '● 온라인 · 월별 조회 준비' : '○ 오프라인 · 이전 조회 결과 열람'; }
 function setBusy(value: boolean) { busy = value; root.setAttribute('aria-busy', String(value)); root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input,button,select').forEach(n => { if (n.id !== 'cancel' && n.id!=='stop-query') n.disabled = value; }); }
 async function commit(candidate: AppState, message: string): Promise<boolean> {
@@ -84,6 +88,7 @@ function renderFleet() {
 }
 function render() {
   const shown = active(), result = queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly}), records=result.events;
+  renderTideSummary($('#tide-status'),calculateTideMonth(shown.month,shown.tideDays || []));
   if (!selectedDay.startsWith(state.month)) selectedDay = records[0]?.date || `${state.month}-01`;
   $<HTMLInputElement>('#month').value = state.month; $<HTMLInputElement>('#people').value=String(state.requiredPeople); $('#month-label').textContent = `${state.month.slice(0, 4)}년 ${Number(state.month.slice(5))}월`;
   $('#summary').textContent = `${LABELS[tier]} · ${shown.requiredPeople}명 · ${result.boats.length}척 대상 · ${result.days.length}일 / ${records.length}개 출조 일정`;
@@ -196,8 +201,18 @@ form.addEventListener('submit', async event => {
 for (const [id, include] of [['select-all', true], ['select-none', false]] as const) $('#' + id).addEventListener('click', () => { const c = structuredClone(state); c.selectedUids = include ? c.boats.map(b => b.uid) : []; void commit(c, '달력 선박 선택을 저장했습니다.'); });
 $('#undo').addEventListener('click', async () => { if (undoState) await commit(undoState, '이전 상태로 되돌렸습니다.'); });
 $('#restore-fleet').addEventListener('click', async () => { const previous=structuredClone(state); if (await commit(applyDefaultFleet(state), 'PC 선박 목록과 선택·티어를 적용했습니다. 기존 출조 기록은 유지합니다.')) { undoState=previous; $('#undo').hidden=false; } });
+$('#tide-refresh').addEventListener('click',async()=>{
+  if(busy) return;if(!configuredApi) {say('물때를 갱신하려면 조회 API를 먼저 연결하세요.');return;}
+  if(!navigator.onLine) {say('오프라인입니다. 저장된 물때를 표시합니다.');return;}
+  const month=state.month;setBusy(true);say(`${month} 보령 물때를 불러오는 중입니다.`);
+  try {
+    const result=await readTideMonth(configuredApi,month,new AbortController().signal);
+    const candidate={...state,tideDays:mergeTideDays(state.tideDays,result.days)};await saveState(candidate);state=candidate;undoState=null;$('#undo').hidden=true;say(result.message);
+  } catch {say('물때를 갱신하지 못했습니다. 기존 물때·예약 조회 자료는 유지합니다.');}
+  finally {setBusy(false);render();}
+});
 window.addEventListener('online', connection); window.addEventListener('offline', connection);
-setBusy(true); try { const prepared=initializeFleet(await loadState()), archive=initializeMonthlyArchive(prepared.state); state=archive.state; if (prepared.changed || archive.changed) await saveState(state); if (prepared.seeded) say(`PC 선박 목록 승계 완료 · 전체 ${state.boats.length}척 · 선택 ${state.selectedUids.length}척. 티어와 순서를 유지했습니다.`); } catch { say('저장 자료를 읽거나 저장하지 못했습니다. PC 선박 목록 적용 또는 백업 JSON 가져오기를 이용하세요.'); } finally { setBusy(false); render(); }
+setBusy(true); try { const prepared=initializeFleet(await loadState()), archive=initializeMonthlyArchive(prepared.state); state=archive.state;const tideDays=mergeTideDays(tideArchive.days,state.tideDays),tidesChanged=JSON.stringify(tideDays)!==JSON.stringify(state.tideDays);state={...state,tideDays}; if (prepared.changed || archive.changed || tidesChanged) await saveState(state); if (prepared.seeded) say(`PC 선박 목록 승계 완료 · 전체 ${state.boats.length}척 · 선택 ${state.selectedUids.length}척. 티어와 순서를 유지했습니다.`); } catch { say('저장 자료를 읽거나 저장하지 못했습니다. PC 선박 목록 적용 또는 백업 JSON 가져오기를 이용하세요.'); } finally { setBusy(false); render(); }
 // Refresh freshness labels while visible; this never makes a network request.
 setInterval(()=>{if(!busy && document.visibilityState==='visible') render();},60000);
 if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { say('오프라인 화면 저장에 실패했습니다. 연결된 상태에서 다시 열어 주세요.'); });
