@@ -18,7 +18,7 @@ test('default query button actually reads the month and persists verified result
   expect((document.querySelector('#stop-query') as HTMLElement).hidden).toBe(false);
   await vi.waitFor(()=>expect(document.querySelector('#live-progress')?.textContent).toContain('성공 1척'),{timeout:4000});
   expect(network).toHaveBeenCalledTimes(2);
-  expect(document.querySelector('#source-badge')?.textContent).toContain('최근 조회 1척');
+  expect(document.querySelector('#source-badge')?.textContent).toContain('이번 조회 1척');
   expect(document.querySelector('#summary')?.textContent).toContain('17개 출조 일정');
   expect(document.querySelector('#live-rows')?.textContent).toContain('17개 출조 상품을 직접 조회했습니다');
   const saved=await loadState() as typeof state;expect(saved.events.filter(e=>e.date.startsWith('2026-09')).every(e=>e.source==='direct')).toBe(true);

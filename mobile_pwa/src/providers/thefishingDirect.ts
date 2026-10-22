@@ -22,7 +22,6 @@ export class TheFishingDirect implements AvailabilityProvider {
   private admission:Promise<void>=Promise.resolve();
   private blockedUntil=0;
   private blockResult:ProviderResult|undefined;
-  private cache=new Map<string,ProviderResult>();
   private metadata=new Map<string,CalendarMetadata>();
   constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document,private metadataCache?:MetadataCache,private metadataTtlMs=3600000) {}
   private async admit(signal:AbortSignal) {
@@ -78,10 +77,9 @@ export class TheFishingDirect implements AvailabilityProvider {
     signal.throwIfAborted();
     if(!officialDetail(boat.url,boat.uid)) return fail('UNSUPPORTED_SOURCE','이 선박은 직접 조회를 지원하지 않습니다. 공식 페이지를 이용하세요.');
     if(!/^20\d\d-(0[1-9]|1[0-2])$/.test(month)) return fail('PARSER_UNSUPPORTED','조회 월을 확인하세요.');
-    const key=`${boat.uid}:${month}`, cached=this.cache.get(key);
+    const key=`${boat.uid}:${month}`;
     if(this.running.has(key)) return fail('UNVERIFIED','이미 조회 중입니다.',true);
     if(this.blockedUntil>Date.now() && this.blockResult) return this.blockResult;
-    if(cached?.observedAt && Date.now()-Date.parse(cached.observedAt)<600_000) return {...structuredClone(cached),cached:true,message:'10분 이내 직접 조회 결과를 재사용했습니다.'};
     this.running.add(key);
     try {
       let metadata=this.metadata.get(boat.uid) || await this.metadataCache?.get(boat.uid);
@@ -95,10 +93,7 @@ export class TheFishingDirect implements AvailabilityProvider {
       const html=await this.html(endpoint,'calendar',signal,new URLSearchParams({date6:month.replace('-',''),st_uid,pa_uid}));
       signal.throwIfAborted(); const observedAt=new Date().toISOString();
       const events=await parseCalendar(html,boat,month,observedAt,this.dom); signal.throwIfAborted();
-      const result:ProviderResult={status:'ALLOWED_READABLE',events,observedAt,message:`${events.length}개 출조 상품을 직접 조회했습니다.`};
-      this.cache.set(key,structuredClone(result));
-      while(this.cache.size>128) this.cache.delete(this.cache.keys().next().value!);
-      return result;
+      return {status:'ALLOWED_READABLE',events,observedAt,fresh:true,cached:false,message:`${events.length}개 출조 상품을 직접 조회했습니다.`};
     } catch(error) {
       if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
       const result=error instanceof ReadError ? error.result : fail('PARSER_UNSUPPORTED',error instanceof Error ? error.message : '달력 응답을 해석하지 못했습니다.');

@@ -10,7 +10,7 @@ test('month query form, people filter, list/day views and empty month work end t
   const network=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',network);
   await import('../src/main');
   expect(network).not.toHaveBeenCalled();
-  (document.querySelector('#query-mode') as HTMLSelectElement).value='saved';
+  (document.querySelector('#query-mode') as HTMLSelectElement).value='saved';document.querySelector('#query-mode')!.dispatchEvent(new Event('change'));
   const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
   const count=()=>Number((el('#summary').textContent || '').match(/(\d+)개 출조/)?.[1]);
   expect(document.querySelector('h1')?.textContent).toBe('월별 예약 조회');
@@ -29,6 +29,6 @@ test('month query form, people filter, list/day views and empty month work end t
   el('.month-date-heading').click(); expect(el('#calendar-layout').hidden).toBe(false);expect(el('#day-view').textContent).toContain('출조 일정');
   const month=el('#month') as HTMLInputElement; month.value='2027-01';month.dispatchEvent(new Event('change',{bubbles:true}));
   await vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
-  expect(count()).toBe(0);expect(el('#query-status').textContent).toContain('이 월의 조회 자료가 없습니다');
+  expect(count()).toBe(0);expect(el('#query-status').textContent).toContain('이 월의 저장 자료가 없습니다');
   expect(el('#day-view').textContent).toContain('예약 마감을 뜻하지 않습니다');
 });

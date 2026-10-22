@@ -5,7 +5,7 @@ import { applyLiveResults } from '../src/liveQuery';
 import { emptyState } from '../src/models';
 import defaultEndpoint from '../src/data/apiEndpoint.json';
 const boat={uid:'6130',name:'테스트 선박',port:'항구',url:'https://thefishing.kr/reservation/list.php?uid=6130'};
-const valid=()=>{const observedAt=new Date().toISOString();return {status:'ALLOWED_READABLE',observedAt,cached:true,events:[{id:'direct-123456789012345678901234',uid:'6130',date:'2026-10-22',trip:'출조',remaining:4,price:100000,departure:'05:00',observedAt}]};};
+const valid=()=>{const observedAt=new Date().toISOString();return {status:'ALLOWED_READABLE',observedAt,cached:false,fresh:true,events:[{id:'direct-123456789012345678901234',uid:'6130',date:'2026-10-22',trip:'출조',remaining:4,price:100000,departure:'05:00',observedAt}]};};
 afterEach(()=>vi.unstubAllGlobals());
 test('configured default is used but an explicit disconnect persists across reloads',()=>{
   localStorage.clear();expect(loadApiOrigin()).toBe(defaultEndpoint.url);
@@ -23,7 +23,7 @@ test('client calls only the configured API and normalizes verified results witho
   const request=vi.fn<typeof fetch>().mockResolvedValue(Response.json(valid()));
   const result=await new TheFishingApi('https://fishing.example.workers.dev',request).readMonth(boat,'2026-10',new AbortController().signal);
   expect(result.status).toBe('ALLOWED_READABLE');expect(result.events[0].source).toBe('api');expect(result.events[0].port).toBe('항구');
-  expect(request.mock.calls[0][0]).toBe('https://fishing.example.workers.dev/v1/month?uid=6130&month=2026-10');
+  expect(request.mock.calls[0][0]).toBe('https://fishing.example.workers.dev/v1/month?uid=6130&month=2026-10&fresh=1');
   expect(request.mock.calls[0][1]?.credentials).toBe('omit');
   expect(applyLiveResults(emptyState(),'2026-10',[{boat,result}]).monthChecks?.[0].source).toBe('api');
 });

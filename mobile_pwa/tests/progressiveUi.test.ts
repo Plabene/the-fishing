@@ -15,12 +15,12 @@ test('completed boats appear before the batch finishes, remain interactive, and 
   const before=await loadState() as AppState;
   const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
   el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(3));
-  const observedAt=new Date().toISOString();resolvers.get('991')!(Response.json({status:'ALLOWED_READABLE',observedAt,events:[{id:'direct-123456789012345678901234',uid:'991',date:'2026-10-22',trip:'문어',remaining:4,price:100000,departure:'05:00',observedAt}]}));
-  await vi.waitFor(()=>expect(el('#source-badge').textContent).toContain('최근 조회 1척'));
+  const observedAt=new Date().toISOString();resolvers.get('991')!(Response.json({status:'ALLOWED_READABLE',observedAt,fresh:true,cached:false,events:[{id:'direct-123456789012345678901234',uid:'991',date:'2026-10-22',trip:'문어',remaining:4,price:100000,departure:'05:00',observedAt}]}));
+  await vi.waitFor(()=>expect(el('#source-badge').textContent).toContain('이번 조회 1척'));
   expect(el('#app').getAttribute('aria-busy')).toBe('true');expect((el('#query-submit') as HTMLButtonElement).disabled).toBe(true);
   const day=el('.calendar-day[aria-label^="2026-10-22"]') as HTMLButtonElement;expect(day.disabled).toBe(false);day.click();expect(el('#day-view').textContent).toContain('조회 당시 잔여 4석');
-  el('#view-list').click();expect(el('#month-results').textContent).toContain('선박 991');expect((el('#query-submit') as HTMLButtonElement).disabled).toBe(true);
+  el('#view-list').click();expect(el('#month-results').textContent).toContain('선박 991');expect(el('#month-results').textContent).not.toContain('선박 992');expect((el('#query-submit') as HTMLButtonElement).disabled).toBe(true);
   el('#stop-query').click();await vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
   const saved=await loadState() as AppState;expect(saved.events.some(e=>e.uid==='991' && e.remaining===4)).toBe(true);expect(saved.events.filter(e=>e.uid==='992')).toEqual(before.events.filter(e=>e.uid==='992'));
-  expect(el('#live-progress').textContent).toContain('조회 취소');expect(el('#stop-query').hidden).toBe(true);vi.unstubAllGlobals();
+  expect(el('#live-progress').textContent).toContain('조회 취소');expect(el('#stop-query').hidden).toBe(true);expect(el('#query-phase').textContent).toBe('조회 취소');expect((el('#query-bar') as HTMLProgressElement).value).toBe(1);expect((el('#query-bar') as HTMLProgressElement).max).toBe(3);vi.unstubAllGlobals();
 });

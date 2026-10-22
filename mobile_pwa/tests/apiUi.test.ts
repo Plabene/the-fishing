@@ -7,7 +7,7 @@ test('a user connects the API then reads and saves a month without browser reque
   localStorage.clear();localStorage.setItem('thefishing-availability-api','');const state=emptyState();state.month='2026-10';state.boats=[{uid:'6130',name:'검증 선박',port:'항구',url:'https://thefishing.kr/reservation/list.php?uid=6130'}];state.selectedUids=['6130'];state.tiers.tier1=['6130'];
   await saveState(state);document.body.innerHTML='<div id="app"></div>';
   const observedAt=new Date().toISOString();
-  const request=vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({service:'thefishing-availability',schema:1,ready:true})).mockResolvedValueOnce(Response.json({status:'ALLOWED_READABLE',observedAt,events:[{id:'direct-123456789012345678901234',uid:'6130',date:'2026-10-22',trip:'출조',remaining:4,price:100000,departure:'05:00',observedAt}]}));
+  const request=vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({service:'thefishing-availability',schema:1,ready:true})).mockResolvedValueOnce(Response.json({status:'ALLOWED_READABLE',observedAt,fresh:true,cached:false,events:[{id:'direct-123456789012345678901234',uid:'6130',date:'2026-10-22',trip:'출조',remaining:4,price:100000,departure:'05:00',observedAt}]}));
   vi.stubGlobal('fetch',request);await import('../src/main');expect(request).not.toHaveBeenCalled();
   document.querySelector('#query-form')!.dispatchEvent(new Event('submit',{cancelable:true}));expect(request).not.toHaveBeenCalled();expect(document.querySelector('#message')?.textContent).toContain('API를 먼저 연결');
   (document.querySelector('#api-url') as HTMLInputElement).value='https://fishing.example.workers.dev';

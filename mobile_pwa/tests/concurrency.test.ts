@@ -8,7 +8,7 @@ import type { ProviderResult } from '../src/provider';
 const boat=(uid:string)=>({uid,name:uid,port:'',url:`https://thefishing.kr/reservation/list.php?uid=${uid}`});
 const detail=(uid:string)=>`<script>var data='date6='+date6+'&st_uid=981&pa_uid=${uid}';$.ajax({url:'../reservation/list.view.view.1.ajax.new.php'});</script>`;
 const calendar=(uid:string,month:string)=>`<div data-month="${month}"></div><table><tr><td><div class="re_status"><a onclick="t_popup('/member/popup.new.php?date=${month.replace('-','')}26&PA_N_UID=${uid}')">예약하기</a><p>남은인원 20명</p><ul class="schedule2"><li>문어 <span class="price">100,000원</span></li></ul></div></td></tr></table>`;
-const success=():ProviderResult=>({status:'ALLOWED_READABLE',events:[],observedAt:new Date().toISOString(),message:'ok'});
+const success=():ProviderResult=>({status:'ALLOWED_READABLE',fresh:true,cached:false,events:[],observedAt:new Date().toISOString(),message:'ok'});
 class MemoryStore implements Store {
   data=new Map<string,unknown>();async get<T>(key:string){return structuredClone(this.data.get(key)) as T|undefined;}
   async put<T>(key:string,value:T){this.data.set(key,structuredClone(value));}async delete(key:string){this.data.delete(key);}
@@ -25,7 +25,7 @@ test('concurrent source reads keep global spacing and reuse boat metadata on mon
   expect(first.every(r=>r.status==='ALLOWED_READABLE')).toBe(true);expect(methods.filter(m=>m==='GET')).toHaveLength(3);
   expect(starts.slice(1).every((t,i)=>t-starts[i]>=24)).toBe(true);
   await provider.readMonth(boat('1'),'2026-11',signal);expect(methods.filter(m=>m==='GET')).toHaveLength(3);expect(methods.filter(m=>m==='POST')).toHaveLength(4);
-  await provider.readMonth(boat('1'),'2026-11',signal);expect(request).toHaveBeenCalledTimes(7);
+  await provider.readMonth(boat('1'),'2026-11',signal);expect(request).toHaveBeenCalledTimes(8);
 });
 test('a blocked first response prevents queued source requests and retry',async()=>{
   const request=vi.fn<typeof fetch>().mockResolvedValue(new Response('',{status:403}));
@@ -48,24 +48,24 @@ test('cancel stops dispatch but retains already completed parallel results',asyn
   const pending=collectMonth({readMonth},['1','2','3','4'].map(boat),'2026-10',c.signal,rows=>{if(rows.length===1)c.abort();},3);
   const result=await pending;expect(result.cancelled).toBe(true);expect(result.rows).toHaveLength(1);expect(readMonth).toHaveBeenCalledTimes(3);
 });
-test('cache hits bypass busy source work and serialized writes retain every result and cooldown',async()=>{
+test('previous seats cannot bypass queued source work and cooldown remains shared',async()=>{
   const store=new MemoryStore();const first=new MonthlyService(store,{readMonth:vi.fn().mockResolvedValue(success())});await first.query('9','2026-10');
   const release:Array<(result:ProviderResult)=>void>=[];
   const service=new MonthlyService(store,{readMonth:()=>new Promise(r=>release.push(r))});
   const active=['1','2','3'].map(uid=>service.query(uid,'2026-10'));
-  await vi.waitFor(()=>expect(release).toHaveLength(3));expect((await service.query('9','2026-10')).cached).toBe(true);
+  await vi.waitFor(()=>expect(release).toHaveLength(3));const repeat=service.query('9','2026-10');
   release[0]({status:'ACCESS_RESTRICTED',stop:true,message:'403',events:[]});await active[0];release[1](success());release[2](success());await Promise.all(active);
-  expect((await store.get<string[]>('cache-index'))).toHaveLength(4);
+  expect((await repeat).status).toBe('ACCESS_RESTRICTED');expect(await store.get('cache-index')).toBeUndefined();expect(release).toHaveLength(3);
   expect((await service.query('4','2026-10')).status).toBe('ACCESS_RESTRICTED');
 });
-test('client deduplicates, caches successful reads and refetches after expiry without changing observedAt',async()=>{
+test('client deduplicates in-flight work but every subsequent query fetches again',async()=>{
   let now=Date.now();vi.spyOn(Date,'now').mockImplementation(()=>now);
   try {
     const read=vi.fn<typeof fetch>(async()=>Response.json(success())),client=new TheFishingApi('https://fishing.example.workers.dev',read),signal=new AbortController().signal;
     const [a,b]=await Promise.all([client.readMonth(boat('1'),'2026-10',signal),client.readMonth(boat('1'),'2026-10',signal)]);
     expect(read).toHaveBeenCalledTimes(1);expect(a).toEqual(b);
-    const cached=await client.readMonth(boat('1'),'2026-10',signal);expect(cached.cached).toBe(true);expect(cached.observedAt).toBe(a.observedAt);expect(read).toHaveBeenCalledTimes(1);
-    now=Date.parse(a.observedAt!)+600001;await client.readMonth(boat('1'),'2026-10',signal);expect(read).toHaveBeenCalledTimes(2);
+    const repeated=await client.readMonth(boat('1'),'2026-10',signal);expect(repeated.cached).toBe(false);expect(repeated.fresh).toBe(true);expect(read).toHaveBeenCalledTimes(2);
+    now=Date.parse(a.observedAt!)+600001;await client.readMonth(boat('1'),'2026-10',signal);expect(read).toHaveBeenCalledTimes(3);
   } finally {vi.restoreAllMocks();}
 });
 test('a long batch waits briefly at the minute boundary instead of losing unattempted boats',async()=>{

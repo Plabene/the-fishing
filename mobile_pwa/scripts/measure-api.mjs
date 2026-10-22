@@ -1,4 +1,5 @@
-// Explicit, bounded live benchmark. Never imported by tests or run by CI.
+// Explicit, bounded live benchmark. Every pass reads fresh seats; no result cache.
+// before/after select concurrency only; they do not restore historical code or servers.
 // pnpm exec node scripts/measure-api.mjs --live --phase=before|after
 import { createServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -14,8 +15,8 @@ try {
   let requests=0;const request=(input,init)=>{requests++;return fetch(input,{...init,headers:{...init?.headers,Origin:'https://plabene.github.io'}});};
   let client=new TheFishingApi(origin,request);
   const results=[];
-  for(const pass of ['first','server-cache',...(phase==='after' ? ['device-cache','next-month']:[])]) {
-    if(pass==='server-cache') client=new TheFishingApi(origin,request);
+  for(const pass of ['first','new-client',...(phase==='after' ? ['repeat','next-month']:[])]) {
+    if(pass==='new-client') client=new TheFishingApi(origin,request);
     const month=pass==='next-month' ? '2026-11':'2026-10';
     const start=performance.now(),before=requests;
     const result=await collectMonth(client,boats,month,new AbortController().signal,()=>{},phase==='before' ? 1:3);

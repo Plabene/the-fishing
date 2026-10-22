@@ -9,6 +9,7 @@ test('species controls filter calendar/list/day, persist choices, switch months 
   state.events=['쭈꾸미&갑이','문어','다운샷'].map((trip,i)=>({id:String(i),uid:'998899',date:'2026-10-26',trip,speciesKey:i===0 ? '주꾸미':trip,port:'',departure:'',remaining:10,verified:true,observedAt:new Date().toISOString(),source:'imported' as const}));
   state.events.push({...state.events[1],id:'next',date:'2026-11-26'});await saveState(state);
   document.body.innerHTML='<div id="app"></div>';const network=vi.fn();vi.stubGlobal('fetch',network);await import('../src/main');
+  (document.querySelector('#query-mode') as HTMLSelectElement).value='saved';document.querySelector('#query-mode')!.dispatchEvent(new Event('change'));
   const el=(q:string)=>document.querySelector<HTMLElement>(q)!;
   const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
   const choice=(value:string)=>el(`[data-species-choice="${value}"]`) as HTMLInputElement;

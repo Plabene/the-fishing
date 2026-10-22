@@ -11,7 +11,7 @@ class MemoryStore implements Store {
   async put<T>(key:string,value:T) {this.data.set(key,structuredClone(value));}
   async delete(key:string) {return this.data.delete(key);}
 }
-const success=():ProviderResult=>({status:'ALLOWED_READABLE',events:[],observedAt:new Date().toISOString(),message:'ok'});
+const success=():ProviderResult=>({status:'ALLOWED_READABLE',fresh:true,cached:false,events:[],observedAt:new Date().toISOString(),message:'ok'});
 const detail=`<script>var data='date6='+date6+'&st_uid=981&pa_uid=6130';$.ajax({url:'../reservation/list.view.view.1.ajax.new.php'});</script>`;
 test('server DOM parses the same real-format calendar and does not expose raw HTML',async()=>{
   const fetcher=vi.fn<typeof fetch>().mockResolvedValueOnce(new Response(detail)).mockResolvedValueOnce(new Response(calendar));
@@ -35,21 +35,27 @@ test('worker transport rejects redirects without using the unsupported edge redi
     expect(fetcher.mock.calls[0][1]?.redirect).toBe('manual');expect(result.httpStatus).toBe(302);expect(fetcher).toHaveBeenCalledTimes(1);
   } finally {vi.unstubAllGlobals();}
 });
-test('persistent success cache survives coordinator replacement and retains observation time',async()=>{
+test('coordinator replacement still fetches the origin and never reuses successful seats',async()=>{
   const store=new MemoryStore(),readMonth=vi.fn().mockResolvedValue(success());
   const result=await new MonthlyService(store,{readMonth}).query('6130','2026-09');
   const again=await new MonthlyService(store,{readMonth}).query('6130','2026-09');
-  expect(again.cached).toBe(true);expect(again.observedAt).toBe(result.observedAt);expect(readMonth).toHaveBeenCalledTimes(1);
+  expect(result.fresh).toBe(true);expect(again.cached).toBe(false);expect(again.fresh).toBe(true);expect(readMonth).toHaveBeenCalledTimes(2);
 });
-test('previous species cache is replaced without clearing the persistent request budget',async()=>{
+test('old persisted seats are ignored while the request budget is retained',async()=>{
   const store=new MemoryStore(),readMonth=vi.fn().mockResolvedValue({...success(),message:'new classification'});
-  await store.put('month:species-v2:563:2026-10',{expires:Date.now()+600000,result:{...success(),message:'old classification'}});
+  await store.put('month:species-v3:563:2026-10',{expires:Date.now()+600000,result:{...success(),message:'old classification'}});
   await store.put('limits',{windowStart:Date.now(),count:7,blockedUntil:0});
   const result=await new MonthlyService(store,{readMonth}).query('563','2026-10');
   expect(result.cached).not.toBe(true);expect(readMonth).toHaveBeenCalledTimes(1);
   expect((await store.get<{count:number}>('limits'))?.count).toBe(8);
   const cached=await new MonthlyService(store,{readMonth}).query('563','2026-10');
-  expect(cached.cached).toBe(true);expect(cached.observedAt).toBe(result.observedAt);expect(readMonth).toHaveBeenCalledTimes(1);
+  expect(cached.cached).toBe(false);expect(cached.fresh).toBe(true);expect(readMonth).toHaveBeenCalledTimes(2);expect((await store.get<{count:number}>('limits'))?.count).toBe(9);
+});
+
+test('an old provider cannot label a cached success as a fresh API result',async()=>{
+  const readMonth=vi.fn().mockResolvedValue({...success(),cached:true});
+  const result=await new MonthlyService(new MemoryStore(),{readMonth}).query('6130','2026-10');
+  expect(result.status).toBe('API_UNAVAILABLE');expect(result.events).toEqual([]);expect(result.fresh).not.toBe(true);
 });
 test('validated metadata persists across coordinator replacement while monthly data is fetched separately',async()=>{
   const store=new MemoryStore(),calls:string[]=[];
@@ -106,9 +112,9 @@ test('HTTP gateway allows the deployment origin and exact GET query only',async(
   const env={ALLOWED_ORIGIN:'https://plabene.github.io',MONTHLY:{idFromName:()=>'',get:()=>({fetch:fetcher})}} as never;
   const request=(path:string,origin='https://plabene.github.io',method='GET')=>new Request('https://api.test'+path,{method,headers:{Origin:origin}});
   const health=await handleRequest(request('/health'),env);expect(health.status).toBe(200);expect((await health.json()).service).toBe('thefishing-availability');
-  const response=await handleRequest(request('/v1/month?uid=6130&month=2026-10'),env);
+  const response=await handleRequest(request('/v1/month?uid=6130&month=2026-10&fresh=1'),env);
   expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://plabene.github.io');expect(response.headers.has('Access-Control-Allow-Credentials')).toBe(false);expect(fetcher).toHaveBeenCalledTimes(1);
-  for(const path of ['/v1/month?uid=6130&month=2026-10&url=https://evil.test','/v1/month?uid=1&uid=2&month=2026-10','/v1/month?uid=../1&month=2026-10','/member/popup.php']) expect((await handleRequest(request(path),env)).ok).toBe(false);
+  for(const path of ['/v1/month?uid=6130&month=2026-10&fresh=0','/v1/month?uid=6130&month=2026-10&fresh=1&fresh=1','/v1/month?uid=6130&month=2026-10&url=https://evil.test','/v1/month?uid=1&uid=2&month=2026-10','/v1/month?uid=../1&month=2026-10','/member/popup.php']) expect((await handleRequest(request(path),env)).ok).toBe(false);
   expect((await handleRequest(request('/v1/month?uid=6130&month=2026-10','https://evil.test'),env)).status).toBe(403);
   expect((await handleRequest(request('/v1/month?uid=6130&month=2026-10',undefined,'POST'),env)).status).toBe(405);
   expect(fetcher).toHaveBeenCalledTimes(1);

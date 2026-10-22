@@ -1,0 +1,38 @@
+// @vitest-environment jsdom
+import {expect,test,vi} from 'vitest';
+import 'fake-indexeddb/auto';
+import {emptyState} from '../src/models';
+import {loadState,saveState} from '../src/availabilityStore';
+
+test('new queries clear old seats, display 4 to 0 changes, and do not show old availability after failure or month change',async()=>{
+  const state=emptyState();state.month='2026-10';
+  const boat={uid:'9988',name:'실시간 시험호',port:'항구',url:'https://thefishing.kr/reservation/list.php?uid=9988'};
+  state.boats=[boat];state.selectedUids=[boat.uid];state.tiers.tier1=[boat.uid];
+  const old={id:'direct-123456789012345678901234',uid:boat.uid,date:'2026-10-22',trip:'문어',species:'문어',speciesKey:'문어',port:'항구',departure:'05:00',remaining:99,price:100000,observedAt:new Date().toISOString(),source:'api' as const,verified:true};
+  state.events=[old];state.monthChecks=[{uid:boat.uid,month:state.month,requiredPeople:1,observedAt:old.observedAt,source:'api'}];await saveState(state);
+  document.body.innerHTML='<div id="app"></div>';localStorage.clear();
+  let resolve!:(response:Response)=>void;
+  const request=vi.fn<typeof fetch>(()=>new Promise(r=>{resolve=r;}));vi.stubGlobal('fetch',request);await import('../src/main');
+  const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
+  const submit=()=>el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));
+  const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
+  const payload=(remaining:number,month='2026-10')=>{const observedAt=new Date().toISOString();return {status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{...old,date:`${month}-22`,remaining,observedAt}]};};
+  expect(el('#summary').textContent).toContain('0개 출조');expect(request).not.toHaveBeenCalled();
+  submit();await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(1));expect(el('#query-monitor').hidden).toBe(false);
+  expect(el('#summary').textContent).toContain('0개 출조');resolve(Response.json(payload(4)));await settle();
+  el('.calendar-day[aria-label^="2026-10-22"]').click();expect(el('#day-view').textContent).toContain('조회 당시 잔여 4석');
+  expect((el('#query-bar') as HTMLProgressElement).value).toBe(1);expect(el('#query-phase').textContent).toBe('조회 완료');
+  (el('#matching-only') as HTMLInputElement).click();
+  submit();await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(2));
+  expect(el('#summary').textContent).toContain('0개 출조');expect(el('#day-view').textContent).not.toContain('잔여 4석');
+  resolve(Response.json(payload(0)));await settle();el('.calendar-day[aria-label^="2026-10-22"]').click();
+  expect(el('#day-view').textContent).toContain('조회 당시 잔여 0석');expect(el('#day-view').textContent).not.toContain('잔여 4석');
+  submit();await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(3));
+  resolve(Response.json({status:'HTTP_ERROR',httpStatus:500,events:[],message:'원본 응답 실패',stop:false}));await settle();
+  expect(el('#summary').textContent).toContain('0개 출조');expect(el('#source-badge').textContent).toBe('최신 조회 필요');expect(el('#live-progress').textContent).toContain('실패/미지원 1척');
+  expect((await loadState() as typeof state).events.find(e=>e.uid===boat.uid)?.remaining).toBe(0);
+  const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();expect(el('#query-monitor').hidden).toBe(true);
+  submit();await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(4));expect(String(request.mock.calls[3][0])).toContain('month=2026-11&fresh=1');
+  resolve(Response.json(payload(2,'2026-11')));await settle();el('.calendar-day[aria-label^="2026-11-22"]').click();expect(el('#day-view').textContent).toContain('조회 당시 잔여 2석');
+  expect(el('#query-form').nextElementSibling?.id).toBe('calendar-layout');vi.unstubAllGlobals();
+});

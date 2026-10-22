@@ -20,7 +20,7 @@ beforeEach(()=>{vi.stubGlobal('crypto',webcrypto);vi.stubGlobal('fetch',vi.fn(()
 afterEach(()=>vi.unstubAllGlobals());
 
 test('direct query performs exactly validated detail GET and monthly POST without cookies or forbidden headers',async()=>{
-  const network=vi.fn<typeof fetch>().mockResolvedValueOnce(ok(detail)).mockResolvedValueOnce(ok(calendar));
+  const network=vi.fn<typeof fetch>().mockResolvedValueOnce(ok(detail)).mockResolvedValueOnce(ok(calendar)).mockResolvedValueOnce(ok(calendar.replace('남은인원 <span>2</span>명','남은인원 <span>0</span>명')));
   const provider=new TheFishingDirect(network,0), result=await provider.readMonth(boat,'2026-09',new AbortController().signal);
   expect(result.status).toBe('ALLOWED_READABLE'); expect(result.events).toHaveLength(17);
   expect(network).toHaveBeenCalledTimes(2);
@@ -32,7 +32,7 @@ test('direct query performs exactly validated detail GET and monthly POST withou
   const headers=new Headers(request?.headers);for(const header of ['Cookie','Origin','Referer','Authorization']) expect(headers.has(header)).toBe(false);
   expect(result.events[0].remaining).toBe(2);expect(result.events[0].departure).toBe('05:00');expect(result.events[0].price).toBe(100000);
   expect(result.events.every(e=>e.source==='direct' && e.verified)).toBe(true);
-  const again=await provider.readMonth(boat,'2026-09',new AbortController().signal);expect(again.cached).toBe(true);expect(network).toHaveBeenCalledTimes(2);
+  const again=await provider.readMonth(boat,'2026-09',new AbortController().signal);expect(again.cached).toBe(false);expect(again.fresh).toBe(true);expect(again.events[0].remaining).toBe(0);expect(network).toHaveBeenCalledTimes(3);
 });
 test('multiple products, unknown seats and inert untrusted HTML preserve correct meanings',async()=>{
   const html=fixture('multi-product')+'<img src="https://evil.test/a"><script>throw new Error("execute")</script>';

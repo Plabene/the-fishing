@@ -36,7 +36,8 @@ export async function handleRequest(request:Request,env:Env):Promise<Response> {
   }
   if(url.pathname!=='/v1/month') return json(apiFailure('API_UNAVAILABLE','지원하지 않는 API 경로입니다.'),404,headers);
   const uid=url.searchParams.get('uid') || '',month=url.searchParams.get('month') || '';
-  if(!validQuery(uid,month) || [...url.searchParams.keys()].some(k=>k!=='uid' && k!=='month') || url.searchParams.getAll('uid').length!==1 || url.searchParams.getAll('month').length!==1) return json(apiFailure('PARSER_UNSUPPORTED','조회 조건을 확인하세요.'),400,headers);
+  const fresh=url.searchParams.getAll('fresh');
+  if(!validQuery(uid,month) || [...url.searchParams.keys()].some(k=>!['uid','month','fresh'].includes(k)) || url.searchParams.getAll('uid').length!==1 || url.searchParams.getAll('month').length!==1 || (fresh.length>0 && (fresh.length!==1 || fresh[0]!=='1'))) return json(apiFailure('PARSER_UNSUPPORTED','조회 조건을 확인하세요.'),400,headers);
   try {
     const coordinator=env.MONTHLY.get(env.MONTHLY.idFromName('monthly-v1'));
     const response=await coordinator.fetch(new Request(`https://coordinator/v1/month?uid=${uid}&month=${month}`) as never);
