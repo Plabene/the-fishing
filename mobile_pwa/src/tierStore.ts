@@ -25,5 +25,6 @@ export function removeBoat(state: AppState, id: string): void {
 }
 export function orderedBoats(state: AppState) {
   const order = [...TIERS.flatMap(t => state.tiers[t]), ...state.boats.map(b => b.uid)];
-  return [...new Set(order)].flatMap(id => state.boats.filter(b => b.uid === id));
+  const byId=new Map(state.boats.map(b=>[b.uid,b]));
+  return [...new Set(order)].flatMap(id => {const boat=byId.get(id);return boat ? [boat]:[];});
 }

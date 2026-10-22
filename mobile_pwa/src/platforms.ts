@@ -45,3 +45,14 @@ export function duplicateCandidates(boat:Boat,boats:Boat[]):Boat[] {
   const name=(v:string)=>v.normalize('NFKC').replace(/\s/g,'').toLowerCase();
   return boats.filter(b=>b.uid!==boat.uid && boatPlatform(b)!==boatPlatform(boat) && b.port===boat.port && b.region?.province===boat.region?.province && b.region?.local===boat.region?.local && name(b.name)===name(boat.name));
 }
+/** Index once for the full fleet, instead of scanning every vessel for every row. */
+export function possibleDuplicateIds(boats:Boat[]):Set<string> {
+  const groups=new Map<string,Boat[]>(),result=new Set<string>();
+  for(const boat of boats) {
+    if(!boat.port || !boat.region?.province || !boat.region.local) continue;
+    const key=JSON.stringify([boat.name.normalize('NFKC').replace(/\s/g,'').toLowerCase(),boat.port,boat.region.province,boat.region.local]);
+    const group=groups.get(key) || [];group.push(boat);groups.set(key,group);
+  }
+  for(const group of groups.values()) if(new Set(group.map(boatPlatform)).size>1) for(const boat of group) result.add(boat.uid);
+  return result;
+}

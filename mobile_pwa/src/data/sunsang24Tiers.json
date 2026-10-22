@@ -1,0 +1,56 @@
+{
+  "version": "247bc1d066d69d6b",
+  "tiers": {
+    "tier1": [
+      "sunsang24:ship:312",
+      "sunsang24:ship:1530",
+      "sunsang24:ship:1976",
+      "sunsang24:ship:115",
+      "sunsang24:ship:2065",
+      "sunsang24:ship:884",
+      "sunsang24:ship:1468"
+    ],
+    "tier2": [
+      "sunsang24:ship:2068",
+      "sunsang24:ship:307",
+      "sunsang24:ship:660",
+      "sunsang24:ship:1418"
+    ],
+    "tier3": [],
+    "other": [
+      "sunsang24:ship:2171",
+      "sunsang24:ship:409",
+      "sunsang24:ship:360",
+      "sunsang24:ship:1188",
+      "sunsang24:ship:698",
+      "sunsang24:ship:1971",
+      "sunsang24:ship:320",
+      "sunsang24:ship:512",
+      "sunsang24:ship:344",
+      "sunsang24:ship:1773"
+    ]
+  },
+  "selectedUids": [
+    "sunsang24:ship:312",
+    "sunsang24:ship:1530",
+    "sunsang24:ship:1976",
+    "sunsang24:ship:115",
+    "sunsang24:ship:2065",
+    "sunsang24:ship:884",
+    "sunsang24:ship:1468",
+    "sunsang24:ship:2068",
+    "sunsang24:ship:307",
+    "sunsang24:ship:660",
+    "sunsang24:ship:1418",
+    "sunsang24:ship:2171",
+    "sunsang24:ship:409",
+    "sunsang24:ship:360",
+    "sunsang24:ship:1188",
+    "sunsang24:ship:698",
+    "sunsang24:ship:1971",
+    "sunsang24:ship:320",
+    "sunsang24:ship:512",
+    "sunsang24:ship:344",
+    "sunsang24:ship:1773"
+  ]
+}

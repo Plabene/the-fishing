@@ -11,5 +11,9 @@
 .platform-control select{min-width:160px;padding:.6rem;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#0f172a}
 .location-evidence{font-size:.8rem;color:#64748b;margin:.4rem 0;line-height:1.5}
 .boat-selection{flex-wrap:wrap}
+/* All rows remain in the document; supporting browsers skip off-screen painting. */
+.boat-row{content-visibility:auto;contain-intrinsic-size:auto 180px}
+.tier-backup{margin:1rem 0;padding:1rem;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc}
+.tier-backup p{margin:.5rem 0;font-size:.85rem;color:#475569}
 .status-unavailable{color:#7c2d12;background:#ffedd5}
 .calendar-boat .platform-tag{font-size:.6rem;padding:0 3px;margin-right:3px}

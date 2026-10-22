@@ -1,6 +1,9 @@
 import './style.css';
 import { emptyState, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier } from './models';
 import { importData, exportData } from './importLegacy';
+import {exportTierBackup,restoreTierBackup,isTierBackup} from './tierBackup';
+import {saveJsonFile,canShareJson} from './fileSave';
+import {applySunsangTiers,SUNSANG_TIER_COUNT} from './sunsang24Tiers';
 import { loadState, saveState } from './availabilityStore';
 import { orderedBoats, moveBoat, removeBoat, tierFor } from './tierStore';
 import { renderCalendar } from './calendarView';
@@ -27,7 +30,7 @@ import { matchesRegion,readRegion,regionLabel,regionSummary } from './regions';
 import { renderRegionFilter } from './regionFilter';
 import fleetSeed from './data/defaultFleet.json';
 import sunsangSeed from './data/sunsang24Fleet.json';
-import {boatPlatform,matchesPlatform,platformBadge,readPlatform,PLATFORM_LABELS,duplicateCandidates,SUNSANG24_DISABLED_MESSAGE} from './platforms';
+import {boatPlatform,matchesPlatform,platformBadge,readPlatform,PLATFORM_LABELS,possibleDuplicateIds,SUNSANG24_DISABLED_MESSAGE} from './platforms';
 import {locationDescription} from './regions';
 import {IntegratedProvider,Sunsang24Api} from './providers/sunsang24Api';
 const root = document.querySelector<HTMLDivElement>('#app')!;
@@ -46,7 +49,7 @@ root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand
 <details id="api-settings" class="api-settings secondary-panel"><summary>조회 방식 · API 연결 설정</summary><label class="mode-label">조회 방식<select id="query-mode" form="query-form"><option value="api">조회 API 사용</option><option value="direct">브라우저 직접 조회 (진단용)</option><option value="saved">이전 자료 열람 (예약 판단용 아님)</option></select></label><p>API 연결 · <span id="api-state">연결 안 됨</span></p><form id="api-form"><label>배포된 API 주소<input id="api-url" type="url" required placeholder="https://서비스명.계정명.workers.dev" autocomplete="off"></label><button type="submit">연결 확인 및 저장</button><button id="api-clear" type="button">연결 해제</button></form><p class="query-source">조회 API가 원본 월 달력을 읽고 공개 일정·잔여석만 전달합니다. 조회 버튼을 누를 때마다 원본의 잔여석을 새로 확인하며, 이번에 확인한 선박만 표시합니다.</p><p>API 주소는 이 기기에 저장됩니다. 계정 비밀번호나 토큰은 입력하지 않습니다. 연결 확인은 API 접속 확인이며, 실제 잔여석은 월 조회 결과로 확인합니다.</p><a href="https://github.com/Plabene/the-fishing/blob/main/mobile_pwa/availability_api/README_KO.md" target="_blank" rel="noopener noreferrer">API 배포 안내 ↗</a></details>
 <details class="data-tools"><summary>저장된 월별 자료 · 가져오기 · 백업</summary><div id="archive-months" class="archive-months" aria-label="자료가 있는 월"></div><section class="data-bar" aria-label="조회 자료 관리"><div><strong>PC 조회 자료 · 선박 설정</strong><p>PC의 monthly_availability_cache.json을 가져오면 월별 조회 결과를 갱신할 수 있습니다. 설정과 가져온 자료는 이 기기에 저장됩니다.</p></div><div class="actions"><label class="button primary">PC 조회 결과 가져오기<input id="import" type="file" accept=".json,application/json" multiple></label><button id="export">백업 저장</button><button id="demo">예시 둘러보기</button><button id="restore-fleet">기본 목록·티어 복원</button></div></section>
 </details>
-<section id="fleet-section" class="fleet-section"><div class="section-heading"><div><p class="eyebrow dark">기기별 설정</p><h2>내 선박 관리</h2></div><button id="add-toggle">+ 선박 추가</button></div><p class="muted">조회할 선박을 선택하고 티어와 순서를 바꾸세요. 다른 기기와 자동으로 동기화되지 않습니다.</p><form id="boat-form" class="boat-form" hidden><label>선박 UID<input name="uid" inputmode="numeric" required maxlength="80" placeholder="실제 선박의 숫자 UID"></label><label>선박 이름<input name="name" required maxlength="100"></label><label>항구<input name="port" maxlength="100"></label><label>권역<input name="sea" maxlength="60" placeholder="서해권"></label><label>시·도/지역<input name="province" maxlength="60" placeholder="충청남도"></label><label>세부 지역<input name="local" maxlength="60" placeholder="보령시"></label><label class="url-field">공식 상세 URL (선택)<input name="url" type="url" placeholder="https://thefishing.kr/reservation/list.php?uid=…"></label><label>티어<select name="tier"><option value="tier1">1티어</option><option value="tier2">2티어</option><option value="tier3">3티어</option><option value="other">기타</option></select></label><div class="actions"><button type="submit" class="primary">선박 저장</button><button type="button" id="edit-cancel">닫기</button></div></form><p id="fleet-catalog-status" class="muted"></p><div class="fleet-tools"><label>목록 검색<input id="fleet-search" type="search" placeholder="이름 또는 UID"></label><span id="fleet-count"></span><button id="select-all">검색된 선박 모두 선택</button><button id="select-none">검색된 선박 모두 해제</button></div><div id="boats"></div></section>
+<section id="fleet-section" class="fleet-section"><div class="section-heading"><div><p class="eyebrow dark">기기별 설정</p><h2>내 선박 관리</h2></div><button id="add-toggle">+ 선박 추가</button></div><p class="muted">조회할 선박을 선택하고 티어와 순서를 바꾸세요. 다른 기기와 자동으로 동기화되지 않습니다.</p><form id="boat-form" class="boat-form" hidden><label>선박 UID<input name="uid" inputmode="numeric" required maxlength="80" placeholder="실제 선박의 숫자 UID"></label><label>선박 이름<input name="name" required maxlength="100"></label><label>항구<input name="port" maxlength="100"></label><label>권역<input name="sea" maxlength="60" placeholder="서해권"></label><label>시·도/지역<input name="province" maxlength="60" placeholder="충청남도"></label><label>세부 지역<input name="local" maxlength="60" placeholder="보령시"></label><label class="url-field">공식 상세 URL (선택)<input name="url" type="url" placeholder="https://thefishing.kr/reservation/list.php?uid=…"></label><label>티어<select name="tier"><option value="tier1">1티어</option><option value="tier2">2티어</option><option value="tier3">3티어</option><option value="other">기타</option></select></label><div class="actions"><button type="submit" class="primary">선박 저장</button><button type="button" id="edit-cancel">닫기</button></div></form><section class="tier-backup" aria-label="선박 티어 백업"><strong>내 티어 목록 보관</strong><p>티어·순서·선택한 선박을 JSON 파일로 저장합니다. 다른 휴대폰에서도 이 파일을 불러올 수 있습니다.</p><div class="actions"><button id="tier-export" type="button">티어 목록 저장</button><button id="tier-share" type="button" hidden>티어 파일 공유</button><label class="button">티어 파일 불러오기<input id="tier-import" type="file" accept=".json,application/json"></label></div><p>파일 공유에서 저장 위치를 선택하세요. 불러오기는 파일에 담긴 선박의 설정만 바꾸며, 다른 선박과 조회 자료는 유지합니다.</p><details><summary>선상24 PC 티어 가져오기</summary><p>PC에 저장된 ${SUNSANG_TIER_COUNT}척을 처음 한 번 적용합니다. 웹에서 이미 지정한 티어는 유지합니다. 다시 적용하면 이 ${SUNSANG_TIER_COUNT}척의 티어와 선택 상태를 PC 기준으로 바꿉니다.</p><button id="restore-sunsang-tiers" type="button">선상24 PC 티어 다시 적용</button></details></section><p id="fleet-catalog-status" class="muted"></p><div class="fleet-tools"><label>목록 검색<input id="fleet-search" type="search" placeholder="이름 또는 UID"></label><span id="fleet-count"></span><button id="select-all">검색된 선박 모두 선택</button><button id="select-none">검색된 선박 모두 해제</button></div><div id="boats"></div></section>
 <details class="about"><summary>자료 상태와 오프라인 사용 안내</summary><p><strong>조회 API · 수동 실행</strong></p><p>조회 API가 더피싱 상세 페이지와 월 달력을 읽습니다. API 또는 원본 사이트의 연결 상태에 따라 실패할 수 있습니다. 브라우저 직접 조회는 진단용이며 원본 사이트의 CORS 허용이 필요합니다. 404·접근 제한·응답 해석 실패를 구분하며, 실패를 예약 마감으로 표시하지 않습니다. PC 오류는 모바일의 조회 가능 여부를 결정하지 않습니다. 조회할 때마다 월 달력을 새로 읽으며, 저장된 잔여석을 재사용하지 않습니다.</p><p>한 번 열린 화면과 저장 자료는 오프라인에서 다시 볼 수 있습니다. 브라우저 저장소를 지우면 자료가 사라지므로 백업을 보관하세요. 앱을 닫은 상태의 자동 새로고침은 제공하지 않습니다.</p><p>관리 기능은 이 기기의 설정입니다. 중앙 관리자 계정과 기기 간 자동 동기화는 없습니다. 공식 페이지 링크는 새 탭에서 열립니다.</p></details></main><footer>월별 예약 조회 · 조회 자료와 기준 시각 표시<span>예약·로그인·결제 기능 없음</span></footer>`;
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 let state = emptyState(), tier: Filter = 'all', search = '', fleetSearch = '', demo = false;
@@ -81,25 +84,28 @@ async function commit(candidate: AppState, message: string): Promise<boolean> {
 function chooseDay(day: string) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result); }
 function fleetVisible() {return orderedBoats(state).filter(b=>matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && `${b.name} ${b.uid} ${b.port} ${regionLabel(b)} ${locationDescription(b)}`.toLowerCase().includes(fleetSearch.toLowerCase()));}
 function renderFleet() {
-  const target = $('#boats'); target.replaceChildren();
+  const target = $('#boats'),fragment=document.createDocumentFragment();
   const boats = fleetVisible();
+  const selected=new Set(state.selectedUids),duplicates=possibleDuplicateIds(state.boats);
+  const tiers=new Map(TIERS.flatMap(t=>state.tiers[t].map(id=>[id,t] as const)));
   $('#fleet-count').textContent = `${state.selectedUids.length}척 선택 / 전체 ${state.boats.length}척 · 표시 ${boats.length}척 · ${regionSummary(state.selectedRegion)}`;
-  if (!boats.length) target.append(el('p', state.boats.length ? '검색 결과가 없습니다.' : '아직 등록한 선박이 없습니다. JSON을 가져오거나 선박을 추가하세요.', 'empty'));
-  for (const boat of boats.slice(0, 200)) {
+  if (!boats.length) fragment.append(el('p', state.boats.length ? '검색 결과가 없습니다.' : '아직 등록한 선박이 없습니다. JSON을 가져오거나 선박을 추가하세요.', 'empty'));
+  for (const boat of boats) {
     const row = el('article', '', 'boat-row'), info = el('div', '', 'boat-info'), label = el('label', '', 'boat-selection'), check = el('input');
-    check.type = 'checkbox'; check.checked = state.selectedUids.includes(boat.uid); check.setAttribute('aria-label', `${boat.name} 달력에 포함`);
+    row.dataset.uid=boat.uid;
+    check.type = 'checkbox'; check.checked = selected.has(boat.uid); check.setAttribute('aria-label', `${boat.name} 달력에 포함`);
     check.addEventListener('change', () => { const c = structuredClone(state); c.selectedUids = check.checked ? [...new Set([...c.selectedUids, boat.uid])] : c.selectedUids.filter(id => id !== boat.uid); void commit(c, '달력에 표시할 선박을 저장했습니다.'); });
     label.append(check, el('strong', boat.name),platformBadge(boat)); info.append(label, el('p', `${regionLabel(boat)} · ${boat.port || '정확한 항구 미확인'} · UID ${boat.uid}`, 'muted')); const link = sourceLink(boat.url, boat.uid); if (link) info.append(link);
     const location=locationDescription(boat);if(location) info.append(el('p',location,'location-evidence'));
-    if(duplicateCandidates(boat,state.boats).length) info.append(el('p','다른 플랫폼에 같은 이름·출항지 항목이 있습니다. 동일 선박 미확인 · 예약정보는 별도로 표시합니다.','muted'));
+    if(duplicates.has(boat.uid)) info.append(el('p','다른 플랫폼에 같은 이름·출항지 항목이 있습니다. 동일 선박 미확인 · 예약정보는 별도로 표시합니다.','muted'));
     const controls = el('div', '', 'boat-actions'), select = el('select'); select.setAttribute('aria-label', `${boat.name} 티어`);
-    for (const t of TIERS) { const o = el('option', LABELS[t]); o.value = t; select.append(o); } select.value = tierFor(state, boat.uid);
+    for (const t of TIERS) { const o = el('option', LABELS[t]); o.value = t; select.append(o); } select.value = tiers.get(boat.uid) || 'other';
     select.addEventListener('change', () => { const c = structuredClone(state); moveBoat(c, boat.uid, select.value as Tier); void commit(c, '티어를 저장했습니다.'); }); controls.append(select);
     for (const [caption, offset] of [['↑', -1], ['↓', 1]] as const) { const b = el('button', caption); b.type = 'button'; b.setAttribute('aria-label', `${boat.name} ${offset < 0 ? '위로' : '아래로'}`); b.addEventListener('click', () => { const c = structuredClone(state); moveBoat(c, boat.uid, tierFor(c, boat.uid), offset); void commit(c, '선박 순서를 저장했습니다.'); }); controls.append(b); }
     const edit = el('button', '수정'); edit.addEventListener('click', () => { editing = boat.uid; field('uid').value = boat.uid; field('uid').readOnly = true; field('name').value = boat.name; field('port').value = boat.port;field('sea').value=boat.region?.sea || '';field('province').value=boat.region?.province || '';field('local').value=boat.region?.local || ''; field('url').value = boat.url; field('tier').value = tierFor(state, boat.uid); form.hidden = false; field('name').focus(); });
-    const remove = el('button', '삭제', 'quiet-danger'); remove.setAttribute('aria-label', `${boat.name} 삭제`); remove.addEventListener('click', async () => { const previous = structuredClone(state), c = structuredClone(state); removeBoat(c, boat.uid); if (await commit(c, '선박과 해당 기록을 삭제했습니다. 되돌릴 수 있습니다.')) { undoState = previous; $('#undo').hidden = false; } }); controls.append(edit, remove); row.append(info, controls); target.append(row);
+    const remove = el('button', '삭제', 'quiet-danger'); remove.setAttribute('aria-label', `${boat.name} 삭제`); remove.addEventListener('click', async () => { const previous = structuredClone(state), c = structuredClone(state); removeBoat(c, boat.uid); if (await commit(c, '선박과 해당 기록을 삭제했습니다. 되돌릴 수 있습니다.')) { undoState = previous; $('#undo').hidden = false; } }); controls.append(edit, remove); row.append(info, controls); fragment.append(row);
   }
-  if (boats.length > 200) target.append(el('p', '처음 200척만 표시합니다. 목록 검색으로 범위를 좁히세요.', 'muted'));
+  target.replaceChildren(fragment);
 }
 function renderResults(shown:AppState,result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly})) {
   const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && (c.source==='direct' || c.source==='api') && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
@@ -154,7 +160,7 @@ $<HTMLInputElement>('#import').addEventListener('change', async event => {
   importController = new AbortController(); const { signal } = importController; setBusy(true); $('#cancel').hidden = false; say('자료를 확인하고 있습니다…');
   try {
     let c = structuredClone(state); const warnings: string[] = [];
-    for (const file of files) { if (file.size > 20_000_000) throw new Error('20MB 이하 JSON을 선택하세요.'); const data = JSON.parse(await file.text()); signal.throwIfAborted(); const r = importData(data, c); c = r.state; warnings.push(...r.warnings); }
+    for (const file of files) { if (file.size > 20_000_000) throw new Error('20MB 이하 JSON을 선택하세요.'); const data = JSON.parse(await file.text()); signal.throwIfAborted(); if(isTierBackup(data)) c=restoreTierBackup(data,c).state; else {const r = importData(data, c); c = r.state; warnings.push(...r.warnings);} }
     signal.throwIfAborted(); await saveState(c, signal); state = c; demo = false; selectedDay = state.events.find(e => e.date.startsWith(state.month))?.date || `${state.month}-01`; undoState = null; $('#undo').hidden = true;
     say(`가져오기 완료 · ${files.length}개 파일. ${warnings.slice(0, 4).join(' ')}`);
   } catch (error) { say(signal.aborted ? '가져오기를 취소했습니다. 기존 자료를 유지합니다.' : `가져오지 못했습니다. ${error instanceof Error ? error.message : 'JSON 형식을 확인하세요.'}`); }
@@ -215,7 +221,34 @@ $('#matching-only').addEventListener('change',event=>{matchingOnly=(event.curren
 $('#view-calendar').addEventListener('click',()=>{listView=false;render();});
 $('#view-list').addEventListener('click',()=>{listView=true;render();});
 $('#cancel').addEventListener('click', () => importController?.abort());
-$('#export').addEventListener('click', () => { const url = URL.createObjectURL(new Blob([exportData(state)], { type: 'application/json' })); const a = el('a'); a.href = url; a.download = 'thefishing-offline-backup.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); say('자료를 백업했습니다. 예시 자료는 포함하지 않습니다.'); });
+let savingFile=false;
+async function exportFile(tiersOnly:boolean,share=false) {
+  if(busy || savingFile) return;savingFile=true;
+  try {
+    const outcome=await saveJsonFile(tiersOnly ? exportTierBackup(state):exportData(state),tiersOnly ? 'thefishing-tiers':'thefishing-full-backup',share);
+    say(outcome==='cancelled' ? '파일 공유를 취소했습니다. 기기 설정은 유지됩니다.' : outcome==='shared' ? '파일을 공유 화면으로 전달했습니다. 선택한 저장 위치에서 파일을 확인하세요.' : 'JSON 파일 다운로드를 요청했습니다. 휴대폰의 다운로드·파일 앱에서 확인하세요.');
+  } catch {say('파일을 저장하지 못했습니다. 티어 목록 저장 버튼으로 다시 다운로드하거나 브라우저의 다운로드 설정을 확인하세요.');}
+  finally {savingFile=false;}
+}
+$('#export').addEventListener('click',()=>void exportFile(false));
+$('#tier-export').addEventListener('click',()=>void exportFile(true));
+$('#tier-share').hidden=!canShareJson();
+$('#tier-share').addEventListener('click',()=>void exportFile(true,true));
+$<HTMLInputElement>('#tier-import').addEventListener('change',async event=>{
+  const input=event.currentTarget as HTMLInputElement,file=input.files?.[0];if(!file || busy) return;
+  const previous=structuredClone(state);setBusy(true);
+  try {
+    if(file.size>20_000_000) throw new Error('20MB 이하 JSON을 선택하세요.');
+    const restored=restoreTierBackup(JSON.parse(await file.text()),state);
+    await saveState(restored.state);state=restored.state;undoState=previous;$('#undo').hidden=false;
+    say(`티어 ${restored.count}척 복원 완료 · 파일의 티어·순서·선택 상태를 적용했습니다. 다른 선박과 조회 자료는 유지합니다. 변경 되돌리기가 가능합니다.`);
+  } catch(error) {say(`티어를 복원하지 못했습니다. 기존 설정을 유지합니다. ${error instanceof Error ? error.message:''}`);}
+  finally {input.value='';setBusy(false);render();}
+});
+$('#restore-sunsang-tiers').addEventListener('click',async()=>{
+  const previous=structuredClone(state);
+  if(await commit(applySunsangTiers(state,true),`선상24 PC 목록 ${SUNSANG_TIER_COUNT}척의 티어·순서·선택 상태를 다시 적용했습니다. 다른 선박 설정은 유지합니다.`)) {undoState=previous;$('#undo').hidden=false;}
+});
 $('#demo').addEventListener('click', () => { demo = !demo; selectedDay = `${state.month}-${demo ? '09' : '01'}`; render(); });
 async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)) return; if(busy) return;const c = structuredClone(state); c.month = value; resultLimit=50;if(value!==state.month) {liveRows=[];progress.reset();}await commit(c, '조회 월을 변경했습니다. 실시간 월 조회를 눌러 새 잔여석을 확인하세요.'); }
 $<HTMLInputElement>('#month').addEventListener('change', e => { void setMonth((e.currentTarget as HTMLInputElement).value); });

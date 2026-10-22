@@ -4,13 +4,14 @@ import sunsang from './data/sunsang24Fleet.json';
 import {migrateRegionFilter} from './regions';
 import { importData } from './importLegacy';
 import { TIERS, type AppState,type Boat } from './models';
+import {applySunsangTiers,SUNSANG_TIER_VERSION} from './sunsang24Tiers';
 
 export const FLEET_VERSION = seed.version.slice(0,8)+sunsang.version.slice(0,8);
 export function defaultFleet(): AppState {
   const state=importData(seed.state).state;
   const existing=new Set(state.boats.map(b=>b.uid));
   state.boats.push(...sunsang.boats.filter(b=>!existing.has(b.uid)).map(b=>({uid:b.uid,name:b.name,port:b.port,url:b.url,region:{sea:b.sea,province:b.province,local:b.local}})));
-  return {...state,fleetSeedVersion:FLEET_VERSION,fleetBaseline:structuredClone(state.boats)};
+  return applySunsangTiers({...state,fleetSeedVersion:FLEET_VERSION,fleetBaseline:structuredClone(state.boats)});
 }
 export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,baseline:Boat[]):AppState {
   const state=structuredClone(current),previous=new Map(baseline.map(b=>[b.uid,b])),incoming=new Map(boats.map(b=>[b.uid,b]));
@@ -32,14 +33,16 @@ export function initializeFleet(saved: unknown): {state:AppState; seeded:boolean
   let state = importData(saved).state;
   if (!state.fleetSeedVersion && !state.boats.length && !state.events.length && !state.failures.length)
     return {state:defaultFleet(), seeded:true, changed:true};
-  const changed=state.fleetSeedVersion!==FLEET_VERSION || !state.fleetBaseline;
-  if(changed) {
+  const catalogChanged=state.fleetSeedVersion!==FLEET_VERSION || !state.fleetBaseline;
+  const tiersChanged=state.sunsangTierVersion!==SUNSANG_TIER_VERSION;
+  if(catalogChanged) {
     const defaults=defaultFleet();
     const baseline=state.fleetBaseline || (state.fleetSeedVersion===legacy.version ? legacy.boats:defaults.boats);
     state=mergeFleetCatalog(state,defaults.boats,FLEET_VERSION,baseline);
     if(state.selectedRegion) state.selectedRegion=migrateRegionFilter(state.boats,state.selectedRegion);
   }
-  return {state, seeded:false, changed};
+  if(tiersChanged) state=applySunsangTiers(state);
+  return {state, seeded:false, changed:catalogChanged || tiersChanged};
 }
 /** Explicit restore replaces the PC fleet's order while retaining custom boats and observations. */
 export function applyDefaultFleet(current: AppState): AppState {
@@ -52,5 +55,6 @@ export function applyDefaultFleet(current: AppState): AppState {
   state.requiredPeople = defaults.requiredPeople;
   state.fleetSeedVersion = FLEET_VERSION;
   state.fleetBaseline=structuredClone(defaults.boats);
+  state.sunsangTierVersion=SUNSANG_TIER_VERSION;
   return state;
 }

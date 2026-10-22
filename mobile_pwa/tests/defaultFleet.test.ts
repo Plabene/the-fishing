@@ -12,10 +12,10 @@ test('PC seed contains all saved native boats plus active external and fleet mem
   const state=defaultFleet();
   expect(state.boats.length).toBeGreaterThanOrEqual(512);
   expect(state.boats).toHaveLength(seed.state.boats.length+additions);
-  expect(state.selectedUids).toHaveLength(83);
-  expect(Object.values(state.tiers).map(v=>v.length)).toEqual([10,10,20,43]);
-  expect(state.selectedUids).toEqual(seed.state.selectedUids);
-  expect(state.tiers).toEqual(seed.state.tiers);
+  expect(state.selectedUids).toHaveLength(104);
+  expect(Object.values(state.tiers).map(v=>v.length)).toEqual([17,14,20,53]);
+  expect(state.selectedUids.slice(0,83)).toEqual(seed.state.selectedUids);
+  for(const tier of ['tier1','tier2','tier3','other'] as const) expect(state.tiers[tier].slice(0,seed.state.tiers[tier].length)).toEqual(seed.state.tiers[tier]);
   expect(state.events).toEqual([]); expect(state.failures).toEqual([]);
   expect(state.boats.filter(b=>state.selectedUids.includes(b.uid)).every(b=>b.url && b.name)).toBe(true);
   expect(importData(JSON.parse(exportData(state))).state).toEqual(state);
@@ -39,7 +39,7 @@ test('only exact registered external/fleet links are accepted for navigation',()
   expect(reservationLink('https://evil.example','__proto__')).toBe('');
 });
 test('first visit and previous empty MVP state receive the PC fleet',()=>{
-  expect(initializeFleet(undefined).state.selectedUids).toHaveLength(83);
+  expect(initializeFleet(undefined).state.selectedUids).toHaveLength(104);
   expect(initializeFleet(emptyState()).seeded).toBe(true);
 });
 test('existing custom boats and explicit empty selections are preserved',()=>{

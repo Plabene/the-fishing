@@ -22,12 +22,12 @@ test('all 380 public listings import exactly once, preserving four legacy IDs an
   for(const b of sun) expect(reservationLink(b.url,b.uid)).toBe(b.url);
   for(const field of ['cookie','token','password','remaining','applicant','phone','session']) expect(JSON.stringify(catalog)).not.toContain(`"${field}"`);
 });
-test('upgrade adds 376 unselected listings and retains personal deletion, name, tier, selection and source region',()=>{
+test('upgrade adds 376 listings and inherits the 21 saved PC tiers and retains personal deletion, name, tier, selection and source region',()=>{
   const state={...emptyState(),...structuredClone(original.state),schema:1 as const,fleetSeedVersion:original.version,fleetBaseline:structuredClone(original.state.boats)};
   const deleted=state.boats.at(-1)!.uid;removeBoat(state,deleted);state.boats[0].name='내 이름';const before=structuredClone(state);
   const upgraded=initializeFleet(state).state;
   expect(upgraded.boats).toHaveLength(before.boats.length+376);expect(upgraded.boats[0].name).toBe('내 이름');expect(upgraded.boats.some(b=>b.uid===deleted)).toBe(false);
-  expect(upgraded.tiers).toEqual(before.tiers);expect(upgraded.selectedUids).toEqual(before.selectedUids);
+  for(const tier of ['tier1','tier2','tier3','other'] as const) expect(upgraded.tiers[tier].filter(id=>!id.startsWith('sunsang24:'))).toEqual(before.tiers[tier]);expect(upgraded.selectedUids.filter(id=>!id.startsWith('sunsang24:'))).toEqual(before.selectedUids);expect(upgraded.selectedUids.length-before.selectedUids.length).toBe(21);
   expect(initializeFleet(upgraded).state).toEqual(upgraded);
 });
 test('source-specific province/local aliases join regions; nearby departure labels never become ports',()=>{

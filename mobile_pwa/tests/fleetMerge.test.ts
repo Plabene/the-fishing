@@ -29,7 +29,7 @@ test('first migration of the original PC catalog enriches regions and adds new b
   state.selectedUids=[enriched.uid];state.tiers.tier3=[enriched.uid];state.boats.find(b=>b.uid===enriched.uid)!.name='개인 이름';
   const result=initializeFleet(state);expect(result.changed).toBe(true);expect(result.state.fleetSeedVersion).toBe(FLEET_VERSION);
   expect(result.state.boats.find(b=>b.uid===enriched.uid)).toMatchObject({name:'개인 이름',region:enriched.region});
-  expect(result.state.boats.some(b=>b.uid===deleted.uid)).toBe(false);expect(result.state.selectedUids).toEqual(state.selectedUids);expect(result.state.tiers).toEqual(state.tiers);
+  expect(result.state.boats.some(b=>b.uid===deleted.uid)).toBe(false);expect(result.state.selectedUids.filter(id=>!id.startsWith('sunsang24:'))).toEqual(state.selectedUids);for(const tier of ['tier1','tier2','tier3','other'] as const) expect(result.state.tiers[tier].filter(id=>!id.startsWith('sunsang24:'))).toEqual(state.tiers[tier]);
   const restored=importData(JSON.parse(exportData(result.state))).state;
   expect(restored.fleetBaseline).toEqual(result.state.fleetBaseline);expect(initializeFleet(restored).changed).toBe(false);
 });

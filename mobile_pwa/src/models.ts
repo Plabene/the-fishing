@@ -29,6 +29,7 @@ export interface AppState {
   selectedPlatform?:PlatformFilter;
   // Last published catalog, used to preserve personal edits and deliberately deleted boats.
   fleetBaseline?:Boat[];
+  sunsangTierVersion?:string;
 }
 export function localMonth(now = new Date()): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).format(now);
