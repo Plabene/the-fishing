@@ -13,7 +13,7 @@ test('PC mixed species label and saved colors remain stable and unknown is expli
   expect(speciesLabel('unknown')).toBe('기타/미확인');expect(eventSpecies({trip:'문어',species:'기타/미확인'})).toBe('문어');
   expect(matchesSpecies('쭈갑','주꾸미')).toBe(true);expect(matchesSpecies('쭈갑','갑오징어')).toBe(true);expect(matchesSpecies('쭈갑','문어')).toBe(false);
 });
-const html=`<div data-month="2026-10"></div><table><tr><td><div class="re_status"><a onclick="t_popup('/member/popup.new.php?date=20261026&PA_N_UID=6130')">예약하기</a><p>남은인원 <span>20</span>명</p><div class="schedule">공지 출항:05시</div><ul class="schedule2"><ul class="schedule2"><li><a href="#">쭈꾸미/갑오징어</a><span class="fc_g"><span class="ico_d">대</span>100,000</span></li><li>문어 <span class="price">120,000원</span></li></ul></ul></div></td></tr></table>`;
+const html=`<div data-month="2026-10"></div><table><tr><td><div class="re_status"><a onclick="t_popup('/member/popup.new.php?date=20261026&PA_N_UID=6130')">예약하기</a><p>남은인원 <span>20</span>명</p><div class="schedule">공지 출항:05시</div><ul class="schedule2"><ul class="schedule2"><li><a href="#">쭈/갑 (중식 미제공)</a><span class="fc_g"><span class="ico_d">대</span>100,000</span></li><li>문어 <span class="price">120,000원</span></li></ul></ul></div></td></tr></table>`;
 test('nested real-format product lists retain linked trip names, prices, species and departure in both DOMs',async()=>{
   for(const dom of [document,parseHTML('<html></html>').document as unknown as Document]) {
     const events=await parseCalendar(html,boat,'2026-10',new Date().toISOString(),dom);
@@ -35,5 +35,5 @@ test('species filters project results without corrupting raw records, coverage o
   expect(queryMonth(state,{...q,excludedSpeciesKeys:['쭈갑']}).events[0].speciesKey).toBe('문어');
   expect(queryMonth(state,{...q,month:'2026-11'}).events).toHaveLength(0);expect(JSON.stringify(state.events)).toBe(raw);
   state.selectedSpecies='갑오징어';state.excludedSpeciesKeys=['문어'];const restored=importData(JSON.parse(exportData(state))).state;
-  expect(restored.selectedSpecies).toBe('갑오징어');expect(restored.excludedSpeciesKeys).toEqual(['문어']);expect(restored.events[0].speciesKey).toBe('주꾸미+갑오징어');
+  expect(restored.selectedSpecies).toEqual(['갑오징어']);expect(restored.excludedSpeciesKeys).toEqual(['문어']);expect(restored.events[0].speciesKey).toBe('주꾸미+갑오징어');
 });

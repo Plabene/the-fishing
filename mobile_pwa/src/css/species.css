@@ -1,7 +1,14 @@
 #species-filter{border:1px solid #d6dfd9;border-radius:12px;padding:14px;margin:12px 0;background:#fafcf9}
-.species-controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap}
-.species-controls label{display:grid;gap:6px;font-weight:700;flex:1;min-width:160px;max-width:360px}
-.species-controls select{max-width:100%;min-height:42px}
+.species-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.species-controls strong{flex:1;min-width:180px}
+.species-controls button{min-height:44px}
+.species-controls button[aria-pressed="true"]{background:#176347;color:#fff;border-color:#176347}
+.species-selection-summary{font-size:13px;margin:10px 0;overflow-wrap:anywhere}
+.species-options{display:flex;flex-wrap:wrap;gap:8px;border:0;margin:0;padding:0;min-width:0}
+.species-option{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 11px;border:1px solid #64748b;border-radius:8px;color:#17202a;font-size:13px;cursor:pointer;max-width:100%;overflow-wrap:anywhere}
+.species-option:has(input:checked){outline:2px solid #176347;outline-offset:1px;font-weight:700}
+.species-option:focus-within{outline:3px solid #176347;outline-offset:2px}
+.species-option input{width:18px;height:18px;min-height:0;margin:0;flex-shrink:0;accent-color:#176347}
 .species-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
 .species-panels h3{font-size:14px;margin:0 0 8px}
 .species-chips{display:flex;flex-wrap:wrap;align-content:start;gap:7px}

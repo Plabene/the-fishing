@@ -1,6 +1,6 @@
 import { type AppState, type Observation, type Failure, emptyState, text, uid, reservationLink, dateOnly, timestamp, TIERS } from './models';
 import { normalizeTiers } from './tierStore';
-import { speciesKey, speciesLabel } from './species';
+import { eventSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
 type Obj = Record<string, unknown>;
 const obj = (v: unknown): Obj => v && typeof v === 'object' && !Array.isArray(v) ? v as Obj : {};
 const arr = (v: unknown): unknown[] => Array.isArray(v) ? v : [];
@@ -32,9 +32,9 @@ export function importData(input: unknown, current = emptyState()): { state: App
   if (/^20\d\d-(?:0[1-9]|1[0-2])$/.test(String(month))) state.month = String(month);
   const people = Number(backup ? root.requiredPeople : prefs.required_people);
   if (Number.isInteger(people) && people >= 1 && people <= 100) state.requiredPeople = people;
-  if(backup && typeof root.selectedSpecies==='string') state.selectedSpecies=root.selectedSpecies==='all' ? 'all':speciesKey(root.selectedSpecies);
+  if(backup && (typeof root.selectedSpecies==='string' || Array.isArray(root.selectedSpecies))) state.selectedSpecies=normalizeSpeciesSelection(root.selectedSpecies);
   const excluded=backup ? root.excludedSpeciesKeys:prefs.excluded_species_keys;
-  if(Array.isArray(excluded)) state.excludedSpeciesKeys=[...new Set(excluded.filter(v=>typeof v==='string').slice(0,200).map(speciesKey))];
+  if(Array.isArray(excluded)) state.excludedSpeciesKeys=[...new Set(excluded.filter(v=>typeof v==='string').slice(0,200).map(speciesFilterKey).filter((key):key is string=>key!==null))];
   function readResult(value: unknown, observed?: unknown) {
     const r = obj(value); if (!Array.isArray(r.events)) return;
     recognized = true; const query = obj(r.query);
@@ -61,7 +61,7 @@ export function importData(input: unknown, current = emptyState()): { state: App
       const event: Observation = { id: text(e.id ?? e.event_id, 200) || `${id}:${day}:${text(e.trip ?? e.trip_name)}`, uid: id, date: day,
         trip: text(e.trip ?? e.trip_name), port: text(e.port ?? e.departure_port), departure: text(e.departure ?? e.departure_time),
         remaining, verified: e.verified === true && source !== 'fixture', observedAt, source };
-      event.speciesKey=speciesKey(text(e.speciesKey ?? e.species_key) || text(e.species ?? e.species_label) || event.trip);
+      event.speciesKey=eventSpecies({...event,speciesKey:text(e.speciesKey ?? e.species_key),species:text(e.species ?? e.species_label)});
       event.species=speciesLabel(event.speciesKey);
       if ('price' in e || 'price_won' in e) {
         const price=e.price ?? e.price_won;

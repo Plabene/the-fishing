@@ -42,8 +42,8 @@ export class MonthlyService {
   }
   query(uid:string,month:string):Promise<ProviderResult> {
     if(!validQuery(uid,month)) return Promise.resolve(apiFailure('PARSER_UNSUPPORTED','선박 UID 또는 조회 월이 올바르지 않습니다.'));
-    // Old cached responses lack species; keep persistent cooldowns while versioning parsed data.
-    const key=`month:species-v2:${uid}:${month}`,pending=this.pending.get(key);if(pending) return pending;
+    // Invalidate old species classifications without resetting request budgets or cooldowns.
+    const key=`month:species-v3:${uid}:${month}`,pending=this.pending.get(key);if(pending) return pending;
     const promise=this.run(uid,month,key).finally(()=>this.pending.delete(key));this.pending.set(key,promise);return promise;
   }
   private async acquire():Promise<boolean> {

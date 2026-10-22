@@ -7,7 +7,7 @@ GitHub Pages 화면은 그대로 사용하고, Cloudflare Worker가 더피싱의
 - 웹앱: https://plabene.github.io/the-fishing/
 - API: https://thefishing-availability.thefishing-mobile-a.workers.dev
 - 상태 확인: https://thefishing-availability.thefishing-mobile-a.workers.dev/health
-- 배포: 2026-10-22 본인 Cloudflare 계정, 어종·병렬 조회 Worker 버전 `d6a5e0c6-6e6f-4ef0-982e-415ee584dbaa`
+- 배포: 2026-10-22 본인 Cloudflare 계정, 어종 약칭 보정 Worker 버전 `2dd433bf-d4f2-4f3f-8566-9d42abd3956d`
 
 2026-10-21의 60분 임시 계정 배포는 종료됐습니다. 본인 계정의 OAuth 로그인과 이메일 인증을 완료한 뒤 새로 배포했습니다. 앱 기본 연결을 새 주소로 변경했고, 이전 임시 주소를 저장한 기기도 자동으로 전환합니다. 다른 사용자 지정 주소와 명시적인 연결 해제는 유지합니다.
 

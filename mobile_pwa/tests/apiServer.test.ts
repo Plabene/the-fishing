@@ -41,6 +41,16 @@ test('persistent success cache survives coordinator replacement and retains obse
   const again=await new MonthlyService(store,{readMonth}).query('6130','2026-09');
   expect(again.cached).toBe(true);expect(again.observedAt).toBe(result.observedAt);expect(readMonth).toHaveBeenCalledTimes(1);
 });
+test('previous species cache is replaced without clearing the persistent request budget',async()=>{
+  const store=new MemoryStore(),readMonth=vi.fn().mockResolvedValue({...success(),message:'new classification'});
+  await store.put('month:species-v2:563:2026-10',{expires:Date.now()+600000,result:{...success(),message:'old classification'}});
+  await store.put('limits',{windowStart:Date.now(),count:7,blockedUntil:0});
+  const result=await new MonthlyService(store,{readMonth}).query('563','2026-10');
+  expect(result.cached).not.toBe(true);expect(readMonth).toHaveBeenCalledTimes(1);
+  expect((await store.get<{count:number}>('limits'))?.count).toBe(8);
+  const cached=await new MonthlyService(store,{readMonth}).query('563','2026-10');
+  expect(cached.cached).toBe(true);expect(cached.observedAt).toBe(result.observedAt);expect(readMonth).toHaveBeenCalledTimes(1);
+});
 test('validated metadata persists across coordinator replacement while monthly data is fetched separately',async()=>{
   const store=new MemoryStore(),calls:string[]=[];
   const request=vi.fn<typeof fetch>(async(_input,init)=>{

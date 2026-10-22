@@ -1,7 +1,7 @@
 import { dateOnly, officialDetail, text, timestamp, type Boat, type Observation } from '../models';
 import type { AvailabilityProvider, ProviderResult } from '../provider';
 import defaultEndpoint from '../data/apiEndpoint.json';
-import { speciesKey, speciesLabel } from '../species';
+import { eventSpecies, speciesLabel } from '../species';
 
 const key='thefishing-availability-api';
 export function apiOrigin(value:string):string {
@@ -52,7 +52,7 @@ export function validateApiResult(value:unknown,boat:Boat,month:string):Provider
     if(count!==null && (!Number.isInteger(count) || Number(count)<0 || Number(count)>10000)) throw new Error('잔여석을 확인할 수 없습니다.');
     if(row.price!==null && row.price!==undefined && (!Number.isInteger(row.price) || Number(row.price)<0 || Number(row.price)>100000000)) throw new Error('요금을 확인할 수 없습니다.');
     const departure=typeof row.departure==='string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(row.departure) ? row.departure:'';
-    const trip=text(row.trip), species=speciesKey(text(row.speciesKey) || text(row.species) || trip);
+    const trip=text(row.trip), species=eventSpecies({trip,speciesKey:text(row.speciesKey),species:text(row.species)});
     return {id:row.id,uid:boat.uid,date,trip,speciesKey:species,species:speciesLabel(species),port:boat.port,departure,remaining:count as number|null,price:row.price==null ? null:Number(row.price),observedAt,verified:true,source:'api'};
   });
   return {status:'ALLOWED_READABLE',message:`${events.length}개 출조 상품을 API로 확인했습니다.${data.cached===true ? ' (10분 이내 저장 응답)':''}`,events,observedAt,source:'api',cached:data.cached===true};

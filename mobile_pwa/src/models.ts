@@ -18,7 +18,8 @@ export interface AppState {
   schema: 1; boats: Boat[]; tiers: Record<Tier, string[]>; events: Observation[];
   failures: Failure[]; month: string; requiredPeople: number; selectedUids: string[]; fleetSeedVersion?: string;
   monthlyArchiveVersion?: string; monthChecks?: MonthCheck[];
-  selectedSpecies?: string; excludedSpeciesKeys?: string[];
+  // Legacy backups may contain one string; arrays select any matching species, [] selects none.
+  selectedSpecies?: string | string[]; excludedSpeciesKeys?: string[];
 }
 export function localMonth(now = new Date()): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).format(now);
