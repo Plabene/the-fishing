@@ -30,9 +30,11 @@ import { matchesRegion,readRegion,regionLabel,regionSummary } from './regions';
 import { renderRegionFilter } from './regionFilter';
 import fleetSeed from './data/defaultFleet.json';
 import sunsangSeed from './data/sunsang24Fleet.json';
-import {boatPlatform,matchesPlatform,platformBadge,readPlatform,PLATFORM_LABELS,possibleDuplicateIds,SUNSANG24_DISABLED_MESSAGE} from './platforms';
+import {boatPlatform,matchesPlatform,platformBadge,readPlatform,PLATFORM_LABELS,possibleDuplicateIds} from './platforms';
+import {publicRouteForBoat} from './sunsang24PublicRoutes';
 import {locationDescription} from './regions';
-import {IntegratedProvider,Sunsang24Api} from './providers/sunsang24Api';
+import {IntegratedProvider} from './providers/sunsang24Api';
+import {Sunsang24PublicApi} from './providers/sunsang24PublicApi';
 const root = document.querySelector<HTMLDivElement>('#app')!;
 // Only static markup is inserted here. All imported content uses textContent/value.
 root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">≈</span><span>THEFISHING<small>더피싱 · 선상24 통합 선박 검색</small></span></div><div class="hero-row"><div><p class="eyebrow">출조할 월과 인원을 선택하세요</p><h1>월별 예약 조회</h1><p>선택한 선박의 출조 일정과 잔여석을 날짜별로.</p></div><span id="connectivity"></span></div></div></header>
@@ -136,11 +138,11 @@ function render() {
   $('#reservation-filter-summary').textContent=`${PLATFORM_LABELS[state.selectedPlatform || 'all']} · ${regionSummary(state.selectedRegion)} · ${LABELS[tier]} · ${selectedSpecies==='all' ? '전체 어종':selectedSpecies.length ? selectedSpecies.length<=2 ? selectedSpecies.map(speciesLabel).join(', '):`어종 ${selectedSpecies.length}개`:'어종 선택 없음'}${shown.excludedSpeciesKeys?.length ? ` · 제외 ${shown.excludedSpeciesKeys.length}개`:''}${search ? ' · 검색 적용':''}${matchingOnly ? '':' · 인원 미달 포함'}`;
   $('#query-status').replaceChildren();
   const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && (c.source==='direct' || c.source==='api') && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
-  const onlySunsang=state.selectedPlatform==='sunsang24' || (result.boats.length>0 && result.boats.every(b=>boatPlatform(b)==='sunsang24'));
-  $('#query-status').append(el('strong',demo ? '예시 조회 결과' : savedMode() ? '이전 자료 열람 · 현재 잔여석이 아닙니다' : onlySunsang ? '선상24 공식 페이지 확인 필요':`이번 조회 ${fresh}척 · 미확인 ${result.missingBoats.length}척`),el('p',result.latest ? `자료 기준 ${new Date(result.latest).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})} · 현재 잔여석은 공식 페이지에서 확인하세요.` : savedMode() ? '이 월의 저장 자료가 없습니다.' : onlySunsang ? '선상24는 선박 검색과 공식 페이지 연결을 제공합니다. 앱 내 실시간 조회는 아직 지원되지 않습니다.':'실시간 월 조회를 누르면 원본의 잔여석을 새로 확인합니다.'));
+  $('#query-status').append(el('strong',demo ? '예시 조회 결과' : savedMode() ? '이전 자료 열람 · 현재 잔여석이 아닙니다' : `이번 조회 ${fresh}척 · 미확인 ${result.missingBoats.length}척`),el('p',result.latest ? `자료 기준 ${new Date(result.latest).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})} · 현재 잔여석은 공식 페이지에서 확인하세요.` : savedMode() ? '이 월의 저장 자료가 없습니다.' : '실시간 월 조회를 누르면 원본의 잔여석을 새로 확인합니다.'));
   if (result.missingBoats.length) { const missing=el('details'); missing.append(el('summary',`미확인 선박 ${result.missingBoats.length}척 보기`),el('p',result.missingBoats.map(b=>b.name).join(' · '))); $('#query-status').append(missing); }
   if (result.failures.length) $('#query-status').append(el('p',`${result.failures.length}척에 수집 실패 이력이 있습니다. 현재 예약 가능 여부는 확인되지 않았습니다.`,'notice'));
-  if(onlySunsang || result.boats.some(b=>boatPlatform(b)==='sunsang24')) $('#query-status').append(el('p',SUNSANG24_DISABLED_MESSAGE,'notice'));
+  const sunsang=result.boats.filter(b=>boatPlatform(b)==='sunsang24'),linked=sunsang.filter(b=>publicRouteForBoat(b.uid)).length;
+  if(sunsang.length) $('#query-status').append(el('p',`선상24 선택 ${sunsang.length}척 중 공개 예약표 연동 ${linked}척${linked<sunsang.length?` · 주소 미확인 ${sunsang.length-linked}척은 공식 페이지 확인 필요`:''}`));
   $('#archive-months').replaceChildren();
   for (const month of [...new Set([...state.events.map(e=>e.date.slice(0,7)),...(state.monthChecks || []).map(c=>c.month)])].sort()) {
     const b=el('button',`${month.slice(0,4)}년 ${Number(month.slice(5))}월 자료`); b.setAttribute('aria-pressed',String(month===state.month)); b.addEventListener('click',()=>{$<HTMLSelectElement>('#query-mode').value='saved';$('#query-mode').dispatchEvent(new Event('change'));void setMonth(month);}); $('#archive-months').append(b);
@@ -180,7 +182,7 @@ $('#query-form').addEventListener('submit',async event=>{
   if(!navigator.onLine) {say('오프라인입니다. 현재 잔여석을 확인할 수 없습니다. 연결 후 다시 조회하세요.');return;}
   const useApi=$<HTMLSelectElement>('#query-mode').value==='api';
   if(useApi && !configuredApi) {say('조회 API를 먼저 연결하세요. API 주소를 입력하고 연결 확인 및 저장을 누르세요.');$<HTMLDetailsElement>('#api-settings').open=true;$<HTMLInputElement>('#api-url').focus();return;}
-  const provider=new IntegratedProvider(useApi ? apiProvider:directProvider,new Sunsang24Api(configuredApi));
+  const provider=new IntegratedProvider(useApi ? apiProvider:directProvider,new Sunsang24PublicApi(configuredApi));
   const started=performance.now();
   liveController=new AbortController();livePreview=candidate;render();setBusy(true); $('#stop-query').hidden=false;progress.start(boats.length);
   $('#live-diagnostics').hidden=true;$('#diagnostic-text').hidden=true;

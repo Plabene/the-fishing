@@ -20,10 +20,10 @@ test('an HTTP failure keeps its exact stage and renders source text without HTML
   expect(target.textContent).toContain('월 달력 요청 · HTTP 404');
   expect(target.querySelector('img')).toBeNull();
 });
-test('disabled Sunsang integration explains that no source request ran and links to setup guidance',()=>{
+test('restricted Sunsang homepage explains host-specific policy and links to guidance',()=>{
   const target=document.createElement('div');
   renderDiagnostics(target,[{boat:{uid:'sunsang24:ship:698',name:'자연피싱호',port:'',url:'https://www.sunsang24.com/ship/list?ship_no=698'},result:{status:'PERMISSION_DENIED',stage:'api',events:[],message:'연동 이용 허가 확인 필요'}}]);
-  expect(target.textContent).toContain('실시간 연동 준비');expect(target.textContent).toContain('실시간 요청을 실행하지 않으므로');
+  expect(target.textContent).toContain('자동 조회가 제한');expect(target.textContent).toContain('다른 선사의 조회는 계속');
   expect(target.querySelector('.query-help a')?.getAttribute('href')).toContain('availability_api/README_KO.md#');
   expect(target.querySelector('.diagnostic-row a')?.getAttribute('href')).toContain('ship_no=698');
   expect(target.textContent).not.toContain('HTTP 403');expect(target.textContent).not.toContain('실패 단계:');

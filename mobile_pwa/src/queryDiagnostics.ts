@@ -13,7 +13,7 @@ export function renderDiagnostics(target:HTMLElement,rows:LiveRow[]):void {
   target.replaceChildren();
   if(rows.some(row=>boatPlatform(row.boat)==='sunsang24' && row.result.status==='PERMISSION_DENIED')) {
     const notice=el('div','','query-help');
-    notice.append(el('strong','선상24 실시간 연동 준비가 필요합니다.'),el('p','현재 선상24는 저장된 선박 목록과 티어만 연결되어 있습니다. 앱 설정에서 실시간 요청을 실행하지 않으므로 다시 조회해도 새 일정·잔여석이 수집되지 않습니다. 아래 공식 예약 페이지에서 확인하세요.'));
+    notice.append(el('strong','해당 선사의 자동 조회가 제한되어 있습니다.'),el('p','원본 사이트의 접근 정책으로 이 선사의 새 일정·잔여석을 확인할 수 없습니다. 아래 공식 예약 페이지에서 확인하세요. 다른 선사의 조회는 계속 진행합니다.'));
     const guide=el('a','운영자용 API 연동 안내 ↗');guide.href='https://github.com/Plabene/the-fishing/blob/main/mobile_pwa/availability_api/README_KO.md#선상24-api-연동-진단과-신청';guide.target='_blank';guide.rel='noopener noreferrer';notice.append(guide);target.append(notice);
   }
   if(rows.some(row=>row.result.status==='NETWORK_OR_CORS' || row.result.status==='CORS_DENIED')) {

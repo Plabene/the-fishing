@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "routes": [
+    {
+      "host": "doji.sunsang24.com",
+      "ships": [
+        "1530"
+      ],
+      "evidenceUrl": "https://doji.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "doublek.sunsang24.com",
+      "ships": [
+        "1867"
+      ],
+      "evidenceUrl": "https://doublek.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "nurifishing.sunsang24.com",
+      "ships": [
+        "2322",
+        "2323"
+      ],
+      "evidenceUrl": "https://nurifishing.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "think.sunsang24.com",
+      "ships": [
+        "885"
+      ],
+      "evidenceUrl": "https://think.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "pigho.sunsang24.com",
+      "ships": [
+        "312"
+      ],
+      "evidenceUrl": "https://pigho.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "rkclgh.sunsang24.com",
+      "ships": [
+        "115"
+      ],
+      "evidenceUrl": "https://rkclgh.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "eungabi.sunsang24.com",
+      "ships": [
+        "2065"
+      ],
+      "evidenceUrl": "https://eungabi.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "horeng2.sunsang24.com",
+      "ships": [
+        "1468"
+      ],
+      "evidenceUrl": "https://horeng2.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "jh.sunsang24.com",
+      "ships": [
+        "884"
+      ],
+      "evidenceUrl": "https://jh.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "ocpro.sunsang24.com",
+      "ships": [
+        "300",
+        "299",
+        "307"
+      ],
+      "evidenceUrl": "https://ocpro.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "akbari.sunsang24.com",
+      "ships": [
+        "1976",
+        "2171",
+        "2299"
+      ],
+      "evidenceUrl": "https://akbari.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "daebak.sunsang24.com",
+      "ships": [
+        "660",
+        "661",
+        "2459"
+      ],
+      "evidenceUrl": "https://daebak.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "bj.sunsang24.com",
+      "ships": [
+        "1418",
+        "1846"
+      ],
+      "evidenceUrl": "https://bj.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "seojin.sunsang24.com",
+      "ships": [
+        "360"
+      ],
+      "evidenceUrl": "https://seojin.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "hi.sunsang24.com",
+      "ships": [
+        "1188"
+      ],
+      "evidenceUrl": "https://hi.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "metafishingclub.sunsang24.com",
+      "ships": [
+        "1971"
+      ],
+      "evidenceUrl": "https://metafishingclub.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "seamanho.sunsang24.com",
+      "ships": [
+        "512"
+      ],
+      "evidenceUrl": "https://seamanho.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "princeho.sunsang24.com",
+      "ships": [
+        "320"
+      ],
+      "evidenceUrl": "https://princeho.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "goldroger.sunsang24.com",
+      "ships": [
+        "1773"
+      ],
+      "evidenceUrl": "https://goldroger.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "cjh.sunsang24.com",
+      "ships": [
+        "344",
+        "850"
+      ],
+      "evidenceUrl": "https://cjh.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "marineho.sunsang24.com",
+      "ships": [
+        "1330",
+        "409",
+        "1710",
+        "338"
+      ],
+      "evidenceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    },
+    {
+      "host": "nature.sunsang24.com",
+      "ships": [
+        "698",
+        "64"
+      ],
+      "evidenceUrl": "https://nature.sunsang24.com/ship/schedule_fleet/202610",
+      "verifiedAt": "2026-10-23"
+    }
+  ]
+}
