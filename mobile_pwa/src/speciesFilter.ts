@@ -15,6 +15,7 @@ export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>
   const options=[...new Set(keys.flatMap(key=>[key,...key.split('+')]))].sort((a,b)=>speciesLabel(a).localeCompare(speciesLabel(b),'ko'));
   for(const key of options) {
     const label=el('label','','species-option'),checkbox=el('input');checkbox.type='checkbox';checkbox.value=key;checkbox.dataset.speciesChoice=key;checkbox.checked=selection!=='all' && selection.includes(key);
+    label.style.backgroundColor=speciesColor(key);
     const count=[...counts].reduce((total,[source,n])=>total+(source===key || (!key.includes('+') && source.split('+').includes(key))?n:0),0);
     label.append(checkbox,el('span',speciesLabel(key)),el('small',`${count}건`));
     checkbox.addEventListener('change',()=>{const next=new Set(selection==='all' ? []:selection);if(checkbox.checked) next.add(key);else next.delete(key);onChange([...next],[]);});group.append(label);

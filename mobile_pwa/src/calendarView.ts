@@ -41,7 +41,7 @@ export function renderCalendar(target: HTMLElement, state: AppState, tier: Filte
       const trips=records.filter(e=>e.uid===id),keys=[...new Set(trips.map(eventSpecies))];
       const label=document.createElement('span'); label.className='calendar-boat';label.style.backgroundColor=speciesColor(keys[0]);
       const boatName=boats.get(id)?.name || id;
-      const name=document.createElement('span');name.className='calendar-boat-name';name.textContent=boatName;
+      const name=document.createElement('span');name.className='calendar-boat-name';name.textContent=boatName;name.title=boatName;
       const species=document.createElement('span');species.className='calendar-boat-species';species.textContent=keys.map(speciesLabel).join(' / ');
       label.append(name,species);label.title=[boatName,...trips.map(e=>`${e.trip} · ${speciesLabel(eventSpecies(e))}`)].join('\n');button.append(label);
     }

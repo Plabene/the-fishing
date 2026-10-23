@@ -14,15 +14,15 @@ test('calendar cells put complete vessel names before species without platform b
   const labels=[...root.querySelectorAll<HTMLElement>('.calendar-boat')];expect(labels).toHaveLength(2);
   expect(root.querySelector('.platform-tag')).toBeNull();
   labels.forEach((label,i)=>{
-    expect(label.firstElementChild?.className).toBe('calendar-boat-name');expect(label.firstElementChild?.textContent).toBe(state.boats[i].name);
+    expect(label.firstElementChild?.className).toBe('calendar-boat-name');expect(label.firstElementChild?.textContent).toBe(state.boats[i].name);expect((label.firstElementChild as HTMLElement).title).toBe(state.boats[i].name);
     expect(label.querySelector('.calendar-boat-species')?.textContent).toContain('갑오징어');expect(label.title).toContain(state.boats[i].name);
   });
   labels[0].closest('button')!.click();expect(onSelect).toHaveBeenCalledWith('2026-10-25');
   state.month='2026-11';renderCalendar(root,state,'all','','2026-11-01',onSelect);expect(root.querySelectorAll('.calendar-boat')).toHaveLength(0);
 });
-test('calendar name CSS overrides the old ellipsis rule and allows long names to wrap',()=>{
-  const style=document.createElement('style');style.textContent=readFileSync('src/css/styles.css','utf8')+'\n'+readFileSync('src/css/species.css','utf8');document.head.append(style);
+test('calendar names stay on one line with ellipsis under the complete stylesheet cascade',()=>{
+  const style=document.createElement('style');style.textContent=[...readFileSync('src/style.css','utf8').matchAll(/@import '\.\/(.*?)';/g)].map(match=>readFileSync('src/'+match[1],'utf8')).join('\n');document.head.append(style);
   const label=document.createElement('span');label.className='calendar-boat';label.innerHTML='<span class="calendar-boat-name">까치선장 자이언트호</span><span class="calendar-boat-species">문어</span>';document.body.append(label);
-  try {expect(getComputedStyle(label).whiteSpace).toBe('normal');expect(getComputedStyle(label).overflow).toBe('visible');expect(getComputedStyle(label.firstElementChild!).overflowWrap).toBe('anywhere');expect(getComputedStyle(label.lastElementChild!).textOverflow).toBe('ellipsis');}
+  try {const name=getComputedStyle(label.firstElementChild!);expect(name.display).toBe('block');expect(name.whiteSpace).toBe('nowrap');expect(name.overflow).toBe('hidden');expect(name.textOverflow).toBe('ellipsis');expect(name.overflowWrap).toBe('normal');expect(getComputedStyle(label.lastElementChild!).textOverflow).toBe('ellipsis');}
   finally {style.remove();label.remove();}
 });

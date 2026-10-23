@@ -1,18 +1,200 @@
-/* Calendar is the default surface; controls keep useful hit areas without large cards. */
-.hero-inner{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}.brand{font-size:10px;gap:6px}.brand-mark{font-size:22px}.brand small{font-size:9px;letter-spacing:0}.hero-row{display:block;margin:0}h1{font-size:21px;letter-spacing:-.5px;margin:0}#connectivity{display:block;font-size:10px;text-align:right}
-main{padding:8px 16px 0}.message-row p{font-size:11px;margin:4px 0}.calendar-shell{padding:14px;margin:0 0 10px}.calendar-shell>.section-heading{flex-direction:row;align-items:center;gap:8px}.calendar-shell .section-heading h2{font-size:21px}
-.query-controls{display:grid;grid-template-columns:minmax(0,1fr) 56px 100px;align-items:end;gap:8px;margin:8px 0 4px;max-width:620px}.query-controls .month-controls{min-width:0;width:100%;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:4px}.month-controls input{width:100%;min-width:0;text-align:center;padding:5px;font-size:16px}.month-controls button{width:40px;min-width:0;padding:0;min-height:44px}.query-controls>.primary{min-width:0;width:100%;min-height:44px;padding:6px;font-size:14px;margin:0}.query-controls .people-label{font-size:10px;min-width:0;gap:1px}.people-label input{min-width:0;width:100%;padding:6px;font-size:16px}.query-controls>.query-monitor{grid-column:1/-1;margin:4px 0}.query-controls>#stop-query{grid-column:1/-1;min-height:36px}
-.query-target{font-size:11px;margin:4px 0}.platform-tabs{margin:7px 0 4px;gap:5px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:620px}.platform-tabs button{min-width:0;min-height:36px;padding:6px;font-size:12px}
-.tier-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:4px 0;max-width:620px}.tier-tabs button{min-height:36px;padding:5px 2px;min-width:0;font-size:12px}
-.calendar-filter-row{display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start;margin:4px 0}.calendar-filter-row>.button,.calendar-filter-row>details>summary{min-height:36px;border:1px solid #cbd8d4;border-radius:8px;padding:7px 10px;font-size:12px;color:#22484c;background:#fff;cursor:pointer;text-decoration:none;font-weight:600;display:flex;align-items:center}
-#species-toggle{flex:1;min-width:130px}#species-toggle[open]{flex-basis:100%;order:3}#species-toggle-label[aria-disabled=true]{color:#73807c;background:#f3f5f4}#species-filter{margin:5px 0 0;padding:10px}.species-controls strong{font-size:12px}.species-selection-summary{margin:5px 0;font-size:11px}
-.result-options{margin:5px 0;gap:5px;justify-content:space-between}.result-options .view-tabs{margin:0}.result-options .view-tabs button{min-height:36px;padding:5px 9px;font-size:12px}.result-options .matching-option{font-size:11px;min-height:36px}
-.calendar-grid-layout{gap:14px}.calendar-day{min-height:82px;padding:5px 3px;gap:2px;border-radius:7px}.calendar-day[aria-pressed=true]{padding:4px 2px}.calendar-tide{font-size:9px;margin:0}.calendar-availability{font-size:10px!important;line-height:1.4}.calendar-day[data-availability=available]{background:#e7f4eb;border-color:#93bca7}.calendar-day[data-availability=failed] .calendar-availability{color:#a14a39}.calendar-day[data-availability=unqueried] .calendar-availability{color:#697f77}.calendar-day[data-availability=unavailable] .calendar-availability{color:#7b6655}
-.calendar-day[data-tide-grade=gold]{box-shadow:inset 0 0 0 2px #b58b19}.calendar-day[data-tide-grade=silver]{box-shadow:inset 0 0 0 2px #a0a9b2}.calendar-boat{font-size:11px;padding:2px}.calendar-boat-name{line-height:1.3}.calendar-boat-species{font-size:9px;margin-top:0}.weekday{padding:5px 0}.legend{font-size:10px;margin:7px 0}.timestamp{margin:4px 0}
-.day-view{padding:12px;scroll-margin-top:8px}.day-view h2{font-size:15px;margin:0 0 4px}.day-status{margin:2px 0 8px;font-size:12px;font-weight:650}.day-group h3{margin:10px 0 4px}.event-card{padding:10px;margin:5px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 8px}.event-card h4{font-size:16px;margin:0;grid-column:1/-1}.event-card p{margin:0;font-size:12px;grid-column:1/-1}.event-card .species-badge{margin:0;font-size:11px;padding:2px 5px;justify-self:start;grid-column:1/-1}.event-card .source-link{margin:0;grid-column:1/-1;justify-self:end;min-height:40px;display:flex;align-items:center;white-space:nowrap}.event-card .seats{grid-column:1;font-size:13px}.event-card .timestamp{grid-column:1;font-size:10px}.event-card .badge,.event-card .platform-tag{justify-self:start;font-size:10px}.event-card .badge{justify-self:end}
-.query-status{padding:10px;font-size:12px}.query-status p{font-size:11px}.summary{font-size:12px;margin:8px 0}.search-shell,.fleet-section{margin:8px 0;padding:0 12px;border-radius:10px}.search-shell>summary,.fleet-section>summary{cursor:pointer;min-height:44px;padding:11px 0;font-size:14px;font-weight:650}.search-shell[open],.fleet-section[open]{padding-bottom:12px}#fleet-brief,#reservation-filter-summary{font-size:11px;font-weight:400;color:#59736b;margin-left:5px}.fleet-tools{margin-top:8px}.fleet-list{max-height:360px}.source-access{padding:12px;margin-top:10px}.source-access h2{font-size:16px}.source-access p{font-size:11px}.secondary-panel{margin:8px 0}.about{margin:10px 0;padding:10px 12px}footer{padding:12px 16px;gap:8px;flex-wrap:wrap;font-size:10px}
-@media(max-width:620px){
-  .hero-inner{padding:9px 10px}.brand small{display:none}.brand-mark{display:none}h1{font-size:18px}.hero{border-bottom-width:2px}#connectivity{font-size:9px}main{padding:6px 8px 0}.calendar-shell{padding:10px 8px;border-radius:10px}.calendar-shell .section-heading h2{font-size:18px}.query-controls{grid-template-columns:minmax(0,1fr) 44px 76px;gap:5px}.query-controls .month-controls{grid-template-columns:32px minmax(0,1fr) 32px;gap:2px}.month-controls button{width:32px}.month-controls input{font-size:14px;padding:3px}.query-controls>.primary{font-size:13px}.people-label input{padding:4px 2px}.platform-tabs button,.tier-tabs button{font-size:11px}.calendar-filter-row>.button,.calendar-filter-row>details>summary{padding:6px 8px;font-size:11px}#species-toggle{min-width:110px}.result-options .view-tabs button{font-size:11px;padding:5px 7px}.result-options .matching-option{font-size:10px;gap:4px}.calendar-grid{gap:3px}.calendar-day{min-height:74px;font-size:13px;padding:5px 2px}.calendar-day[aria-pressed=true]{padding:4px 1px}.calendar-tide{font-size:8px;line-height:1.3}.calendar-tide>span:nth-child(2){display:none}.calendar-availability{font-size:9px!important;word-break:keep-all;overflow-wrap:anywhere}.calendar-boat{font-size:10px;padding:1px}.calendar-boat-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.calendar-boat-species{font-size:8px}.calendar-grid-layout{gap:10px}.day-view{padding:10px}.event-card{gap:3px 5px}.event-card h4{font-size:15px}.event-card p{font-size:11px}.event-card .source-link{font-size:10px}.search-shell,.fleet-section{padding-left:10px;padding-right:10px}.boat-row{min-height:74px}.fleet-list{max-height:310px}
+/* Final layout layer. Colors/data remain owned by the existing provider and species modules. */
+:root { --control-height:36px; --field-height:40px; --control-radius:7px; --layout-gap:6px; }
+main button:not(.calendar-day), main .button {
+  min-height:var(--control-height); border-radius:var(--control-radius);
+  padding:6px 10px; gap:6px; font-size:12px; line-height:1.3;
 }
-
-.monthly-result{padding:10px 4px;gap:10px}.monthly-result h3{font-size:16px;margin:3px 0}.monthly-result p{font-size:12px}.month-date-heading{margin-top:10px}
+main input:not([type=checkbox]):not([type=file]), main select {
+  min-height:var(--field-height); min-width:0; max-width:100%; border-radius:var(--control-radius);
+  padding:6px 8px; line-height:1.3;
+}
+main input[type=checkbox] { width:16px; height:16px; min-height:0; margin:0; padding:0; flex-shrink:0; }
+.hero-inner { padding:10px 16px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.brand { font-size:11px; gap:6px; }
+.brand-mark { font-size:22px; }
+.brand small { font-size:10px; letter-spacing:0; }
+.hero-row { display:block; margin:0; }
+h1 { font-size:21px; letter-spacing:-.5px; margin:0; }
+#connectivity { display:block; font-size:10px; text-align:right; }
+main { padding:8px 16px 0; }
+.message-row { gap:6px; }
+.message-row p { font-size:12px; margin:4px 0; }
+.calendar-shell { padding:12px; margin:0 0 8px; border-radius:10px; }
+.calendar-shell>.section-heading { flex-direction:row; align-items:center; gap:8px; }
+.calendar-shell .section-heading h2 { font-size:21px; }
+.query-controls { display:grid; grid-template-columns:minmax(0,1fr) 60px 100px; align-items:end; gap:6px; margin:8px 0 4px; max-width:620px; }
+.query-controls .month-controls { min-width:0; width:100%; display:grid; grid-template-columns:40px minmax(0,1fr) 40px; gap:4px; }
+.month-controls input { width:100%; min-width:0; max-width:none; text-align:center; font-size:16px; }
+#prev, #next { width:40px; min-width:0; height:var(--field-height); min-height:var(--field-height); padding:0; font-size:22px; line-height:1; }
+.query-controls>#query-submit { min-width:0; width:100%; height:var(--field-height); padding:6px; font-size:14px; margin:0; }
+.query-controls .people-label { font-size:11px; min-width:0; gap:2px; }
+.people-label input { width:100%; font-size:16px; }
+.query-controls>.query-monitor { grid-column:1/-1; margin:4px 0; padding:8px 10px; }
+.query-controls>#stop-query { grid-column:1/-1; }
+#query-bar { margin:6px 0; height:8px; }
+.query-target { font-size:11px; margin:4px 0; }
+.platform-tabs { margin:6px 0 4px; gap:4px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); max-width:620px; }
+.platform-tabs button { min-width:0; }
+.tier-tabs { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; margin:4px 0; padding:3px; max-width:620px; border-radius:8px; }
+main .tier-tabs button { min-width:0; padding:5px 2px; }
+.calendar-filter-row { display:flex; flex-wrap:wrap; gap:4px; align-items:flex-start; margin:4px 0; }
+.calendar-filter-row>.button, .calendar-filter-row>details>summary {
+  min-height:var(--control-height); border:1px solid #cbd8d4; border-radius:var(--control-radius);
+  padding:6px 10px; font-size:12px; line-height:1.3; color:#22484c; background:#fff;
+  cursor:pointer; text-decoration:none; font-weight:600; display:flex; align-items:center;
+}
+#species-toggle { flex:1; min-width:125px; }
+#species-toggle[open] { flex-basis:100%; order:3; }
+#species-toggle-label[aria-disabled=true] { color:#73807c; background:#f3f5f4; }
+#species-filter { margin:4px 0 0; padding:8px; border-radius:8px; }
+.species-controls { gap:4px; }
+.species-controls strong { font-size:12px; min-width:0; }
+#species-filter .species-controls button { min-height:32px; padding:4px 8px; font-size:12px; }
+.species-selection-summary { margin:5px 0; font-size:11px; line-height:1.4; }
+.species-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:5px; }
+.species-option, .species-option:has(input:checked) {
+  min-width:0; min-height:32px; padding:4px 7px; gap:6px;
+  border-width:1px; border-radius:6px; font-size:12px; line-height:1.35;
+}
+.species-option:has(input:checked) { outline:2px solid var(--accent); outline-offset:-2px; }
+.species-option:focus-within { outline:3px solid #b58b19; outline-offset:1px; }
+.species-option>span { min-width:0; overflow-wrap:anywhere; }
+.species-option small { margin-left:auto; white-space:nowrap; }
+#species-panel { margin-top:5px; }
+#species-panel>summary { min-height:32px; padding:6px 0; }
+.species-panels { gap:8px; margin-top:6px; }
+.species-panels h3 { font-size:12px; margin:0 0 5px; }
+.species-chips { gap:5px; }
+#species-filter .species-chip { min-height:32px; padding:4px 7px; font-size:12px; }
+.result-options { margin:4px 0; gap:5px; justify-content:space-between; }
+.result-options .view-tabs { margin:0; gap:4px; }
+.result-options .matching-option { font-size:12px; min-height:var(--control-height); gap:5px; }
+.calendar-grid-layout { gap:12px; align-items:start; }
+.calendar-day { min-width:0; min-height:80px; padding:5px 3px; gap:2px; border-radius:7px; }
+.calendar-day[aria-pressed=true] { padding:4px 2px; }
+.calendar-tide { font-size:9px; margin:0; }
+.calendar-availability { font-size:10px!important; line-height:1.4; }
+.calendar-day[data-availability=available] { background:#e7f4eb; border-color:#93bca7; }
+.calendar-day[data-availability=failed] .calendar-availability { color:#a14a39; }
+.calendar-day[data-availability=unqueried] .calendar-availability { color:#697f77; }
+.calendar-day[data-availability=unavailable] .calendar-availability { color:#7b6655; }
+.calendar-day[aria-pressed=true] { background:#17594f; color:#fff; border-color:#266858; }
+.calendar-day[aria-pressed=true] .calendar-availability { color:#e6f2e8; }
+.calendar-day[data-tide-grade=gold] { box-shadow:inset 0 0 0 2px #b58b19; }
+.calendar-day[data-tide-grade=silver] { box-shadow:inset 0 0 0 2px #a0a9b2; }
+.calendar-boat { font-size:11px; padding:2px; overflow:hidden; }
+.calendar-boat-name { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; overflow-wrap:normal; line-height:1.3; }
+.calendar-boat-species { font-size:9px; margin-top:0; }
+.weekday { padding:4px 0; }
+.legend { font-size:11px; margin:6px 0; }
+.timestamp { margin:3px 0; }
+.day-view { padding:10px; scroll-margin-top:8px; border-radius:8px; }
+.day-view h2 { font-size:15px; margin:0 0 4px; }
+.day-status { margin:2px 0 6px; font-size:12px; font-weight:650; }
+.day-group h3 { margin:8px 0 4px; }
+.event-card { padding:8px 9px; margin:5px 0; display:flex; flex-direction:column; gap:4px; border-radius:8px; }
+.event-card>div { min-width:0; }
+.event-card h4 { font-size:15px; margin:0; line-height:1.35; min-width:0; overflow-wrap:anywhere; }
+.event-card p { margin:0; font-size:12px; line-height:1.4; }
+.event-heading { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:2px 8px; }
+.event-heading h4 { flex:1 1 140px; }
+.event-card .seats { margin:0; font-size:13px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.event-tags { display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
+.event-card .species-badge, .event-card .platform-tag, .event-card .badge { margin:0; padding:2px 5px; font-size:11px; line-height:1.3; border-radius:5px; }
+.event-details { display:grid; gap:2px; }
+.event-booking { display:flex; flex-wrap:wrap; gap:2px 10px; }
+.event-footer { display:flex; align-items:center; flex-wrap:wrap; justify-content:space-between; gap:3px 8px; }
+.event-card .timestamp { flex:1 1 170px; margin:0; font-size:11px; line-height:1.4; }
+.event-card .source-link { margin:0; padding:4px 8px; min-height:32px; display:inline-flex; align-items:center; font-size:12px; border:1px solid #cbd8d4; border-radius:var(--control-radius); white-space:nowrap; text-decoration:none; }
+.query-status { padding:8px 10px; font-size:12px; }
+.query-status p { font-size:11px; margin-top:4px; }
+.summary { font-size:12px; margin:6px 0; }
+.search-shell, .fleet-section { margin:8px 0; padding:0 10px; border-radius:10px; }
+.search-shell>summary, .fleet-section>summary { cursor:pointer; min-height:40px; padding:9px 0; font-size:14px; font-weight:650; }
+.search-shell[open], .fleet-section[open] { padding-bottom:10px; }
+#fleet-brief, #reservation-filter-summary { font-size:11px; font-weight:400; color:#59736b; margin-left:5px; }
+.region-controls { gap:6px; margin:8px 0; }
+.region-controls label { gap:3px; }
+.region-controls select, .region-controls button { min-height:var(--field-height); }
+.fleet-tools { margin-top:6px; gap:6px; }
+.fleet-tools input, .fleet-tools select, .fleet-tools button { min-height:var(--field-height); }
+.fleet-selection-tools { margin:6px 0; gap:5px; }
+.fleet-list { max-height:360px; border-radius:8px; }
+.boat-row { padding:6px 8px; min-height:64px; gap:6px; }
+.boat-selection { min-height:32px; grid-template-columns:16px minmax(0,1fr) auto; gap:6px; }
+.boat-meta { margin-left:22px; }
+.boat-actions { gap:4px; }
+.boat-actions select { min-height:var(--control-height); }
+.boat-more>summary { min-height:var(--control-height); width:34px; border-radius:var(--control-radius); }
+.reorder-actions button { min-width:34px; }
+.platform-results { gap:6px; margin-top:8px; }
+.platform-result { padding:8px 10px; }
+.source-access { padding:10px; margin:8px 0; gap:10px; border-radius:10px; }
+.source-access h2 { font-size:16px; }
+.source-access p { font-size:12px; line-height:1.5; }
+.source-access-controls { gap:6px; }
+.secondary-panel { margin:8px 0; padding:0 10px; border-radius:8px; }
+.secondary-panel>summary, .day-tide-details>summary { min-height:40px; padding:9px 0; }
+.secondary-panel[open] { padding-bottom:10px; }
+.tier-backup { padding:10px; margin:8px 0; border-radius:8px; }
+.tier-backup p { margin:5px 0; font-size:12px; }
+.day-tide-details { margin-top:8px; }
+.day-tide { padding:8px 10px; margin:6px 0; }
+.about { margin:8px 0; padding:8px 10px; }
+.empty { padding:12px 0; }
+.monthly-result { padding:9px 4px; gap:8px; }
+.monthly-result h3 { font-size:16px; margin:3px 0; }
+.monthly-result p { font-size:12px; }
+.monthly-result .source-link { min-height:32px; display:inline-flex; align-items:center; }
+.month-date-heading { margin-top:8px; }
+.result-detail { min-width:0; max-width:45%; }
+footer { padding:12px 16px; gap:8px; flex-wrap:wrap; font-size:11px; }
+@media(max-width:620px) {
+  .hero-inner { padding:9px 10px; }
+  .brand small, .brand-mark { display:none; }
+  h1 { font-size:18px; }
+  .hero { border-bottom-width:2px; }
+  #connectivity { font-size:10px; }
+  main { padding:6px 8px 0; }
+  .calendar-shell { padding:10px 8px; }
+  .calendar-shell .section-heading h2 { font-size:18px; }
+  .query-controls { grid-template-columns:minmax(0,1fr) 44px 72px; gap:4px; }
+  .query-controls .month-controls { grid-template-columns:32px minmax(0,1fr) 32px; gap:2px; }
+  #prev, #next { width:32px; }
+  #month { font-size:16px; padding:3px 0; }
+  .query-controls>#query-submit { font-size:13px; padding:4px; }
+  #people { padding:4px 2px; }
+  main .platform-tabs button, main .tier-tabs button { font-size:12px; padding:5px 2px; }
+  .calendar-filter-row>.button, .calendar-filter-row>details>summary { padding:6px 8px; }
+  #species-toggle { min-width:110px; }
+  #species-filter .species-controls button, #species-filter .species-chip { min-height:36px; }
+  .species-option, .species-option:has(input:checked) { min-height:36px; }
+  main .result-options .view-tabs button { font-size:12px; padding:5px 6px; }
+  .result-options .matching-option { font-size:11px; gap:4px; }
+  .calendar-grid { gap:3px; }
+  .calendar-day { min-height:74px; font-size:13px; padding:5px 2px; }
+  .calendar-day[aria-pressed=true] { padding:4px 1px; }
+  .calendar-tide { font-size:8px; line-height:1.3; }
+  .calendar-tide>span:nth-child(2) { display:none; }
+  .calendar-availability { font-size:9px!important; word-break:keep-all; overflow-wrap:anywhere; }
+  .calendar-boat { font-size:10px; padding:1px; }
+  .calendar-boat-species { font-size:8px; }
+  .calendar-grid-layout { gap:8px; }
+  .day-view { padding:8px; }
+  .event-card { padding:7px 8px; }
+  .event-card .source-link { min-height:36px; }
+  .event-card .timestamp { flex-basis:150px; }
+  .boat-row { grid-template-columns:minmax(0,1fr) 92px; min-height:70px; }
+  .boat-selection { grid-template-columns:16px minmax(0,1fr); gap:2px 6px; min-height:36px; }
+  .boat-selection input { grid-row:1/3; }
+  .boat-actions select { width:54px; padding:4px 2px; }
+  .fleet-list { max-height:310px; }
+  main .region-controls select, main .fleet-tools input, main .search-label input, main .boat-form input { font-size:16px; }
+  .api-settings label { min-width:0; flex-basis:100%; }
+  .platform-results { grid-template-columns:minmax(0,1fr); }
+  .monthly-result h3 { font-size:15px; }
+  .monthly-result .source-link { min-height:36px; }
+}
+@media(pointer:coarse) {
+  :root { --control-height:40px; }
+}
