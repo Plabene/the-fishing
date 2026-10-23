@@ -2,7 +2,7 @@
 @import './css/species.css';
 @import './css/tides.css';
 @import './css/booking-layout.css';
-/* Provider identity stays visible beside vessel names in both result views. */
+/* Provider identity stays visible in management and detailed results, outside calendar cells. */
 .platform-tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.75rem;font-weight:700;line-height:1.4;white-space:nowrap;vertical-align:middle}
 .platform-thefishing{color:#075985;background:#e0f2fe;border:1px solid #7dd3fc}
 .platform-sunsang24{color:#6b21a8;background:#f3e8ff;border:1px solid #d8b4fe}
@@ -16,4 +16,3 @@
 .tier-backup{margin:1rem 0;padding:1rem;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc}
 .tier-backup p{margin:.5rem 0;font-size:.85rem;color:#475569}
 .status-unavailable{color:#7c2d12;background:#ffedd5}
-.calendar-boat .platform-tag{font-size:.6rem;padding:0 3px;margin-right:3px}

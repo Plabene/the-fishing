@@ -4,7 +4,6 @@ import { queryMonth } from './monthlyQuery';
 import { eventSpecies, speciesColor, speciesLabel } from './species';
 import { calculateTideMonth } from './tides';
 import { addTideToCell } from './tideView';
-import {platformBadge} from './platforms';
 
 export function visibleEvents(state: AppState, tier: Filter, search = '', matchingOnly=false) {
   return queryMonth(state,{month:state.month,requiredPeople:state.requiredPeople,tier,search,matchingOnly}).events;
@@ -40,7 +39,10 @@ export function renderCalendar(target: HTMLElement, state: AppState, tier: Filte
     for (const id of [...new Set(records.map(e=>e.uid))].slice(0,2)) {
       const trips=records.filter(e=>e.uid===id),keys=[...new Set(trips.map(eventSpecies))];
       const label=document.createElement('span'); label.className='calendar-boat';label.style.backgroundColor=speciesColor(keys[0]);
-      label.textContent=`${boats.get(id)?.name || id} · ${keys.map(speciesLabel).join(' / ')}`;label.prepend(platformBadge({uid:id}));label.title=trips.map(e=>`${e.trip} · ${speciesLabel(eventSpecies(e))}`).join('\n');button.append(label);
+      const boatName=boats.get(id)?.name || id;
+      const name=document.createElement('span');name.className='calendar-boat-name';name.textContent=boatName;
+      const species=document.createElement('span');species.className='calendar-boat-species';species.textContent=keys.map(speciesLabel).join(' / ');
+      label.append(name,species);label.title=[boatName,...trips.map(e=>`${e.trip} · ${speciesLabel(eventSpecies(e))}`)].join('\n');button.append(label);
     }
     if (records.length) button.classList.add('has-records');
     button.addEventListener('click', () => onSelect(day)); target.append(button);
