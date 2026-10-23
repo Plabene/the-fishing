@@ -28,6 +28,8 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
     return (!e.reservationStatus || e.reservationStatus==='available') && (e.verified || e.source==='fixture') && status!=='BLOCKED' && status!=='UNKNOWN' && status!=='UNVERIFIED' && e.remaining!==null && e.remaining>=query.requiredPeople;
   };
   const speciesCounts=new Map<string,number>();
+  const rawSpeciesCounts=new Map<string,number>();
+  for(const e of raw) {const key=eventSpecies(e);rawSpeciesCounts.set(key,(rawSpeciesCounts.get(key) || 0)+1);}
   for(const e of raw) if(!query.matchingOnly || meetsPeople(e)) {const key=eventSpecies(e);speciesCounts.set(key,(speciesCounts.get(key) || 0)+1);}
   const excluded=new Set((query.excludedSpeciesKeys ?? state.excludedSpeciesKeys ?? []).map(speciesFilterKey).filter(key=>key!==null));
   const species=normalizeSpeciesSelection(query.species ?? state.selectedSpecies);
@@ -40,6 +42,6 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   const dates=raw.flatMap(e=>e.observedAt ? [e.observedAt] : []);
   dates.push(...(state.monthChecks || []).filter(c=>c.month===query.month && ids.has(c.uid)).map(c=>c.observedAt));
   dates.sort((a,b)=>Date.parse(b)-Date.parse(a));
-  return {events,all,matches,days,boats,speciesCounts,checkedCount:checked.size,missingBoats:boats.filter(b=>!checked.has(b.uid)),failures,latest:dates[0] || null,
+  return {events,all,matches,days,boats,speciesCounts,rawSpeciesCounts,checkedCount:checked.size,missingBoats:boats.filter(b=>!checked.has(b.uid)),failures,latest:dates[0] || null,
     liveCount:events.filter(e=>eventStatus(e,context,now)==='AVAILABLE').length};
 }

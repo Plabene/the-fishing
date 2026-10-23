@@ -7,7 +7,10 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin || event.request.method !== 'GET' || !url.pathname.startsWith(BASE)) return;
   const path = url.pathname.slice(BASE.length);
   // No user data, remote HTML, probes or authentication endpoints enter this cache.
-  if (FILES.includes(path) || event.request.mode === 'navigate') event.respondWith(
-    caches.open(CACHE).then(cache => cache.match(BASE + (event.request.mode === 'navigate' ? 'index.html' : path))).then(saved => saved || fetch(event.request))
-  );
+  if (event.request.mode === 'navigate') {
+    // Online navigation must see a newly deployed app, even when an older worker still controls the page.
+    event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
+      if(!response.ok) throw new Error('Navigation unavailable');return response;
+    }).catch(()=>caches.open(CACHE).then(cache=>cache.match(BASE+'index.html')).then(saved=>saved || Response.error())));
+  } else if(FILES.includes(path)) event.respondWith(caches.open(CACHE).then(cache=>cache.match(BASE+path)).then(saved=>saved || fetch(event.request)));
 });

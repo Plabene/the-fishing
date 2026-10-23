@@ -1,5 +1,7 @@
-import './style.css';
-import { emptyState, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier } from './models';
+import {appLayout} from './appLayout';
+import {alphabeticFleet,uniqueFleet,platformCounts,supportsLive,platformQueryStats} from './fleetList';
+import {watchAppUpdates} from './appUpdate';
+import { emptyState, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier, type Boat } from './models';
 import { importData, exportData } from './importLegacy';
 import {exportTierBackup,restoreTierBackup,isTierBackup} from './tierBackup';
 import {saveJsonFile,canShareJson} from './fileSave';
@@ -19,7 +21,7 @@ import { queryMonth } from './monthlyQuery';
 import { renderMonthlyList } from './monthlyView';
 import { diagnosticReport, renderDiagnostics } from './queryDiagnostics';
 import { renderSpeciesFilter } from './speciesFilter';
-import { eventSpecies, normalizeSpeciesSelection, speciesLabel } from './species';
+
 import tideArchive from './data/tideArchive.json';
 import { calculateTideMonth,mergeTideDays } from './tides';
 import { renderTideSummary } from './tideView';
@@ -37,22 +39,7 @@ import {IntegratedProvider} from './providers/sunsang24Api';
 import {Sunsang24PublicApi} from './providers/sunsang24PublicApi';
 const root = document.querySelector<HTMLDivElement>('#app')!;
 // Only static markup is inserted here. All imported content uses textContent/value.
-root.innerHTML = `<header class="hero"><div class="hero-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">≈</span><span>THEFISHING<small>더피싱 · 선상24 통합 선박 검색</small></span></div><div class="hero-row"><div><p class="eyebrow">출조할 월과 인원을 선택하세요</p><h1>월별 예약 조회</h1><p>선택한 선박의 출조 일정과 잔여석을 날짜별로.</p></div><span id="connectivity"></span></div></div></header>
-<main><div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="cancel" hidden>가져오기 취소</button><button id="undo" hidden>변경 되돌리기</button></div>
-
-<section class="calendar-shell" aria-label="월별 예약 조회"><div class="section-heading"><div><p class="eyebrow dark">월별 출조 일정 · 잔여석</p><h2 id="month-label"></h2></div><span id="source-badge" class="badge status-stale">조회 대기</span></div>
-<div class="booking-options"><details id="reservation-filters"><summary>지역·어종·선박 필터 <span id="reservation-filter-summary"></span></summary><label class="platform-control">예약 플랫폼<select id="platform-filter"><option value="all">전체 플랫폼</option><option value="thefishing">더피싱</option><option value="sunsang24">선상24</option></select></label><section id="region-filter" aria-label="지역 선택"></section><div class="filters"><div id="tabs" class="tier-tabs" role="group" aria-label="선박 티어"></div><label class="search-label"><span class="sr-only">선박 또는 어종 검색</span><input id="search" type="search" placeholder="선박 · 항구 · 어종 검색"></label></div><section id="species-filter" aria-label="어종 필터"></section><label class="matching-option"><input id="matching-only" type="checkbox" checked> 조회 당시 인원 충족 일정만</label></details><div class="view-tabs" role="group" aria-label="결과 보기"><button id="view-calendar" aria-pressed="true">달력</button><button id="view-list" aria-pressed="false">월 전체 목록</button></div></div>
-<div id="demo-banner" class="demo-banner" hidden>가상의 예시 자료입니다. 실제 선박·잔여석 정보가 아니며 내 자료에 저장되지 않습니다.</div>
-<form id="query-form" class="query-controls"><div class="month-controls"><button id="prev" type="button" aria-label="이전 달">‹</button><label class="sr-only" for="month">조회 월</label><input id="month" type="month" min="2000-01" max="2099-12" required><button id="next" type="button" aria-label="다음 달">›</button></div><label class="people-label">출조 인원<input id="people" type="number" min="1" max="100" step="1" required></label><button id="query-submit" class="primary" type="submit">실시간 월 조회</button><button id="stop-query" type="button" hidden>조회 취소</button><div id="query-monitor" class="query-monitor" role="group" aria-label="월별 조회 진행 상태" hidden><div class="query-monitor-heading"><strong id="query-phase"></strong><span id="query-elapsed" aria-live="off"></span></div><progress id="query-bar" max="1" value="0" aria-label="선박 조회 진행률"></progress><p id="query-counts"></p><p id="live-progress" role="status" aria-live="polite"></p></div></form>
-<div id="calendar-layout" class="calendar-grid-layout"><div><div id="calendar" class="calendar-grid" aria-label="월별 날짜"></div><p class="legend">날짜별 숫자는 조회 조건에 맞는 출조 상품 수입니다. 한 선박에 여러 상품이 있을 수 있습니다. 이전 잔여석은 현재 예약 가능 여부를 보장하지 않습니다.</p><p id="last-observed" class="timestamp"></p></div><section id="day-view" class="day-view" aria-live="polite"></section></div><section id="month-results" aria-label="월 전체 조회 결과" hidden></section>
-<p id="summary" class="summary"></p><div id="query-status" class="query-status" role="status"></div><details id="live-diagnostics" hidden><summary>선박별 조회 결과</summary><div id="live-rows"></div><button id="copy-diagnostics" type="button">조회 진단 복사</button><textarea id="diagnostic-text" readonly hidden aria-label="조회 진단 내용"></textarea></details></section>
-<section id="source-access" class="source-access" aria-label="공식 예약 페이지 확인"></section>
-<details id="tide-info" class="secondary-panel"><summary>물때 설명 · 새로고침</summary><section class="tide-panel" aria-label="보령 물때"><div id="tide-status"></div><button id="tide-refresh" type="button">물때 새로고침</button></section></details>
-<details id="api-settings" class="api-settings secondary-panel"><summary>조회 방식 · API 연결 설정</summary><label class="mode-label">조회 방식<select id="query-mode" form="query-form"><option value="api">조회 API 사용</option><option value="direct">브라우저 직접 조회 (진단용)</option><option value="saved">이전 자료 열람 (예약 판단용 아님)</option></select></label><p>API 연결 · <span id="api-state">연결 안 됨</span></p><form id="api-form"><label>배포된 API 주소<input id="api-url" type="url" required placeholder="https://서비스명.계정명.workers.dev" autocomplete="off"></label><button type="submit">연결 확인 및 저장</button><button id="api-clear" type="button">연결 해제</button></form><p class="query-source">조회 API가 원본 월 달력을 읽고 공개 일정·잔여석만 전달합니다. 조회 버튼을 누를 때마다 원본의 잔여석을 새로 확인하며, 이번에 확인한 선박만 표시합니다.</p><p>API 주소는 이 기기에 저장됩니다. 계정 비밀번호나 토큰은 입력하지 않습니다. 연결 확인은 API 접속 확인이며, 실제 잔여석은 월 조회 결과로 확인합니다.</p><a href="https://github.com/Plabene/the-fishing/blob/main/mobile_pwa/availability_api/README_KO.md" target="_blank" rel="noopener noreferrer">API 배포 안내 ↗</a></details>
-<details class="data-tools"><summary>저장된 월별 자료 · 가져오기 · 백업</summary><div id="archive-months" class="archive-months" aria-label="자료가 있는 월"></div><section class="data-bar" aria-label="조회 자료 관리"><div><strong>PC 조회 자료 · 선박 설정</strong><p>PC의 monthly_availability_cache.json을 가져오면 월별 조회 결과를 갱신할 수 있습니다. 설정과 가져온 자료는 이 기기에 저장됩니다.</p></div><div class="actions"><label class="button primary">PC 조회 결과 가져오기<input id="import" type="file" accept=".json,application/json" multiple></label><button id="export">백업 저장</button><button id="demo">예시 둘러보기</button><button id="restore-fleet">기본 목록·티어 복원</button></div></section>
-</details>
-<section id="fleet-section" class="fleet-section"><div class="section-heading"><div><p class="eyebrow dark">기기별 설정</p><h2>내 선박 관리</h2></div><button id="add-toggle">+ 선박 추가</button></div><p class="muted">조회할 선박을 선택하고 티어와 순서를 바꾸세요. 다른 기기와 자동으로 동기화되지 않습니다.</p><form id="boat-form" class="boat-form" hidden><label>선박 UID<input name="uid" inputmode="numeric" required maxlength="80" placeholder="실제 선박의 숫자 UID"></label><label>선박 이름<input name="name" required maxlength="100"></label><label>항구<input name="port" maxlength="100"></label><label>권역<input name="sea" maxlength="60" placeholder="서해권"></label><label>시·도/지역<input name="province" maxlength="60" placeholder="충청남도"></label><label>세부 지역<input name="local" maxlength="60" placeholder="보령시"></label><label class="url-field">공식 상세 URL (선택)<input name="url" type="url" placeholder="https://thefishing.kr/reservation/list.php?uid=…"></label><label>티어<select name="tier"><option value="tier1">1티어</option><option value="tier2">2티어</option><option value="tier3">3티어</option><option value="other">기타</option></select></label><div class="actions"><button type="submit" class="primary">선박 저장</button><button type="button" id="edit-cancel">닫기</button></div></form><section class="tier-backup" aria-label="선박 티어 백업"><strong>내 티어 목록 보관</strong><p>티어·순서·선택한 선박을 JSON 파일로 저장합니다. 다른 휴대폰에서도 이 파일을 불러올 수 있습니다.</p><div class="actions"><button id="tier-export" type="button">티어 목록 저장</button><button id="tier-share" type="button" hidden>티어 파일 공유</button><label class="button">티어 파일 불러오기<input id="tier-import" type="file" accept=".json,application/json"></label></div><p>파일 공유에서 저장 위치를 선택하세요. 불러오기는 파일에 담긴 선박의 설정만 바꾸며, 다른 선박과 조회 자료는 유지합니다.</p><details><summary>선상24 PC 티어 가져오기</summary><p>PC에 저장된 ${SUNSANG_TIER_COUNT}척을 처음 한 번 적용합니다. 웹에서 이미 지정한 티어는 유지합니다. 다시 적용하면 이 ${SUNSANG_TIER_COUNT}척의 티어와 선택 상태를 PC 기준으로 바꿉니다.</p><button id="restore-sunsang-tiers" type="button">선상24 PC 티어 다시 적용</button></details></section><p id="fleet-catalog-status" class="muted"></p><div class="fleet-tools"><label>목록 검색<input id="fleet-search" type="search" placeholder="이름 또는 UID"></label><span id="fleet-count"></span><button id="select-all">검색된 선박 모두 선택</button><button id="select-none">검색된 선박 모두 해제</button></div><div id="boats"></div></section>
-<details class="about"><summary>자료 상태와 오프라인 사용 안내</summary><p><strong>조회 API · 수동 실행</strong></p><p>조회 API가 더피싱 상세 페이지와 월 달력을 읽습니다. API 또는 원본 사이트의 연결 상태에 따라 실패할 수 있습니다. 브라우저 직접 조회는 진단용이며 원본 사이트의 CORS 허용이 필요합니다. 404·접근 제한·응답 해석 실패를 구분하며, 실패를 예약 마감으로 표시하지 않습니다. PC 오류는 모바일의 조회 가능 여부를 결정하지 않습니다. 조회할 때마다 월 달력을 새로 읽으며, 저장된 잔여석을 재사용하지 않습니다.</p><p>한 번 열린 화면과 저장 자료는 오프라인에서 다시 볼 수 있습니다. 브라우저 저장소를 지우면 자료가 사라지므로 백업을 보관하세요. 앱을 닫은 상태의 자동 새로고침은 제공하지 않습니다.</p><p>관리 기능은 이 기기의 설정입니다. 중앙 관리자 계정과 기기 간 자동 동기화는 없습니다. 공식 페이지 링크는 새 탭에서 열립니다.</p></details></main><footer>월별 예약 조회 · 조회 자료와 기준 시각 표시<span>예약·로그인·결제 기능 없음</span></footer>`;
+root.innerHTML = appLayout(SUNSANG_TIER_COUNT);
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 let state = emptyState(), tier: Filter = 'all', search = '', fleetSearch = '', demo = false;
 let selectedDay = `${state.month}-01`, busy = false, editing: string | null = null;
@@ -60,6 +47,8 @@ let sourceBoat = '', matchingOnly=true, listView=false, resultLimit=50;
 let importController: AbortController | null = null, undoState: AppState | null = null;
 let liveController:AbortController|null=null; const directProvider=new TheFishingDirect();
 let liveRows:LiveRow[]=[], liveMonth=state.month;
+let queryBoats:Boat[]=[],fleetSort='name',selectedOnly=false;
+const fleetRows=new Map<string,{signature:string;row:HTMLElement;check:HTMLInputElement;select:HTMLSelectElement}>();
 let livePreview:AppState|null=null;
 let configuredApi=loadApiOrigin();
 let apiProvider=new TheFishingApi(configuredApi), lastFleetKey='';
@@ -76,7 +65,7 @@ const savedMode=()=> $<HTMLSelectElement>('#query-mode').value==='saved';
 const progress=new QueryProgress($('#query-monitor'));
 const active = () => demo ? {...fixtureState(state.month),requiredPeople:state.requiredPeople,selectedSpecies:state.selectedSpecies,excludedSpeciesKeys:state.excludedSpeciesKeys,tideDays:state.tideDays,selectedRegion:state.selectedRegion} : savedMode() ? state : freshQueryView(livePreview || state,liveMonth,liveRows);
 function connection() { $('#connectivity').textContent = navigator.onLine ? '● 온라인 · 월별 조회 준비' : '○ 오프라인 · 이전 조회 결과 열람'; }
-function setBusy(value: boolean) { busy = value; root.setAttribute('aria-busy', String(value)); root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input,button,select').forEach(n => { if (n.id !== 'cancel' && n.id!=='stop-query') n.disabled = value && !(livePreview && (n.closest('#calendar,#month-results') || n.matches('#view-calendar,#view-list'))); }); }
+function setBusy(value: boolean) { busy = value; root.setAttribute('aria-busy', String(value)); root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input,button,select').forEach(n => { if (n.id !== 'cancel' && n.id!=='stop-query') n.disabled = n.dataset.locked==='true' || value && !(livePreview && (n.closest('#calendar,#month-results') || n.matches('#view-calendar,#view-list'))); }); }
 async function commit(candidate: AppState, message: string): Promise<boolean> {
   if (busy) return false; setBusy(true);
   try { await saveState(candidate); state = candidate; undoState = null; $('#undo').hidden = true; say(message); return true; }
@@ -84,30 +73,52 @@ async function commit(candidate: AppState, message: string): Promise<boolean> {
   finally { setBusy(false); render(); }
 }
 function chooseDay(day: string) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result); }
-function fleetVisible() {return orderedBoats(state).filter(b=>matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && `${b.name} ${b.uid} ${b.port} ${regionLabel(b)} ${locationDescription(b)}`.toLowerCase().includes(fleetSearch.toLowerCase()));}
+function fleetVisible() {const selected=new Set(state.selectedUids);return (fleetSort==='name'?alphabeticFleet(state.boats):uniqueFleet(orderedBoats(state))).filter(b=>matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (!selectedOnly || selected.has(b.uid)) && `${b.name} ${b.uid} ${b.port} ${regionLabel(b)} ${locationDescription(b)}`.toLowerCase().includes(fleetSearch.toLowerCase()));}
 function renderFleet() {
   const target = $('#boats'),fragment=document.createDocumentFragment();
   const boats = fleetVisible();
   const selected=new Set(state.selectedUids),duplicates=possibleDuplicateIds(state.boats);
   const tiers=new Map(TIERS.flatMap(t=>state.tiers[t].map(id=>[id,t] as const)));
   $('#fleet-count').textContent = `${state.selectedUids.length}척 선택 / 전체 ${state.boats.length}척 · 표시 ${boats.length}척 · ${regionSummary(state.selectedRegion)}`;
+  $('#selected-only').setAttribute('aria-pressed',String(selectedOnly));
+  target.dataset.sort=fleetSort;
+  const alive=new Set(state.boats.map(b=>b.uid));for(const id of fleetRows.keys()) if(!alive.has(id)) fleetRows.delete(id);
   if (!boats.length) fragment.append(el('p', state.boats.length ? '검색 결과가 없습니다.' : '아직 등록한 선박이 없습니다. JSON을 가져오거나 선박을 추가하세요.', 'empty'));
   for (const boat of boats) {
+    const signature=JSON.stringify([boat,duplicates.has(boat.uid)]),cached=fleetRows.get(boat.uid);
+    if(cached?.signature===signature) {cached.check.checked=selected.has(boat.uid);cached.select.value=tiers.get(boat.uid) || 'other';cached.row.classList.toggle('is-selected',cached.check.checked);fragment.append(cached.row);continue;}
     const row = el('article', '', 'boat-row'), info = el('div', '', 'boat-info'), label = el('label', '', 'boat-selection'), check = el('input');
     row.dataset.uid=boat.uid;
+    row.classList.toggle('is-selected',selected.has(boat.uid));
     check.type = 'checkbox'; check.checked = selected.has(boat.uid); check.setAttribute('aria-label', `${boat.name} 달력에 포함`);
     check.addEventListener('change', () => { const c = structuredClone(state); c.selectedUids = check.checked ? [...new Set([...c.selectedUids, boat.uid])] : c.selectedUids.filter(id => id !== boat.uid); void commit(c, '달력에 표시할 선박을 저장했습니다.'); });
-    label.append(check, el('strong', boat.name),platformBadge(boat)); info.append(label, el('p', `${regionLabel(boat)} · ${boat.port || '정확한 항구 미확인'} · UID ${boat.uid}`, 'muted')); const link = sourceLink(boat.url, boat.uid); if (link) info.append(link);
-    const location=locationDescription(boat);if(location) info.append(el('p',location,'location-evidence'));
-    if(duplicates.has(boat.uid)) info.append(el('p','다른 플랫폼에 같은 이름·출항지 항목이 있습니다. 동일 선박 미확인 · 예약정보는 별도로 표시합니다.','muted'));
+    label.append(check, el('strong', boat.name),platformBadge(boat));info.append(label);
+    const metadata=el('p','','boat-meta'),region=el('span',`${regionLabel(boat)}${boat.port?` · ${boat.port}`:''}`);region.title=locationDescription(boat) || region.textContent || '';
+    const capability=el('span',supportsLive(boat)?'일정 연동':'공식 페이지 확인',supportsLive(boat)?'live-capable':'link-only');metadata.append(region,capability);info.append(metadata);
+    const details=el('details','','boat-more'),summary=el('summary','···');summary.setAttribute('aria-label',`${boat.name} 관리 메뉴`);details.append(summary);
+    const extra=el('div','','boat-extra');extra.append(el('p',`UID ${boat.uid}`,'muted'));
+    const link=sourceLink(boat.url,boat.uid);if(link) extra.append(link);
+    const location=locationDescription(boat);if(location) extra.append(el('p',location,'location-evidence'));
+    if(duplicates.has(boat.uid)) extra.append(el('p','다른 플랫폼에 같은 이름·출항지 항목이 있습니다. 예약정보는 플랫폼별로 구분합니다.','muted'));
     const controls = el('div', '', 'boat-actions'), select = el('select'); select.setAttribute('aria-label', `${boat.name} 티어`);
     for (const t of TIERS) { const o = el('option', LABELS[t]); o.value = t; select.append(o); } select.value = tiers.get(boat.uid) || 'other';
     select.addEventListener('change', () => { const c = structuredClone(state); moveBoat(c, boat.uid, select.value as Tier); void commit(c, '티어를 저장했습니다.'); }); controls.append(select);
-    for (const [caption, offset] of [['↑', -1], ['↓', 1]] as const) { const b = el('button', caption); b.type = 'button'; b.setAttribute('aria-label', `${boat.name} ${offset < 0 ? '위로' : '아래로'}`); b.addEventListener('click', () => { const c = structuredClone(state); moveBoat(c, boat.uid, tierFor(c, boat.uid), offset); void commit(c, '선박 순서를 저장했습니다.'); }); controls.append(b); }
-    const edit = el('button', '수정'); edit.addEventListener('click', () => { editing = boat.uid; field('uid').value = boat.uid; field('uid').readOnly = true; field('name').value = boat.name; field('port').value = boat.port;field('sea').value=boat.region?.sea || '';field('province').value=boat.region?.province || '';field('local').value=boat.region?.local || ''; field('url').value = boat.url; field('tier').value = tierFor(state, boat.uid); form.hidden = false; field('name').focus(); });
-    const remove = el('button', '삭제', 'quiet-danger'); remove.setAttribute('aria-label', `${boat.name} 삭제`); remove.addEventListener('click', async () => { const previous = structuredClone(state), c = structuredClone(state); removeBoat(c, boat.uid); if (await commit(c, '선박과 해당 기록을 삭제했습니다. 되돌릴 수 있습니다.')) { undoState = previous; $('#undo').hidden = false; } }); controls.append(edit, remove); row.append(info, controls); fragment.append(row);
+    const reorder=el('div','','reorder-actions');
+    for (const [caption, offset] of [['↑', -1], ['↓', 1]] as const) { const b = el('button', caption); b.type = 'button'; b.setAttribute('aria-label', `${boat.name} ${offset < 0 ? '위로' : '아래로'}`); b.addEventListener('click', () => { const c = structuredClone(state); moveBoat(c, boat.uid, tierFor(c, boat.uid), offset); void commit(c, '선박 순서를 저장했습니다.'); }); reorder.append(b); }extra.append(reorder);
+    const edit = el('button', '수정'); edit.addEventListener('click', () => { editing = boat.uid; field('uid').value = boat.uid; field('uid').readOnly = true; field('name').value = boat.name; field('port').value = boat.port;field('sea').value=boat.region?.sea || '';field('province').value=boat.region?.province || '';field('local').value=boat.region?.local || ''; field('url').value = boat.url; field('tier').value = tierFor(state, boat.uid); form.hidden = false; $<HTMLDetailsElement>('.fleet-management').open=true; field('name').focus(); });
+    const remove = el('button', '삭제', 'quiet-danger'); remove.setAttribute('aria-label', `${boat.name} 삭제`); remove.addEventListener('click', async () => { const previous = structuredClone(state), c = structuredClone(state); removeBoat(c, boat.uid); if (await commit(c, '선박과 해당 기록을 삭제했습니다. 되돌릴 수 있습니다.')) { undoState = previous; $('#undo').hidden = false; } });extra.append(edit,remove);details.append(extra);controls.append(details);row.append(info,controls);fragment.append(row);fleetRows.set(boat.uid,{signature,row,check,select});
   }
   target.replaceChildren(fragment);
+}
+function renderPlatformResults() {
+  const target=$('#platform-results');target.replaceChildren();
+  if(!queryBoats.length || liveMonth!==state.month) {target.append(el('p','선박 목록은 기기에 저장된 목록입니다. 조회하기를 누르면 선택한 선박의 일정·잔여석을 새로 확인합니다.','muted'));return;}
+  for(const item of platformQueryStats(queryBoats,liveRows)) {
+    const card=el('div','','platform-result');card.dataset.platform=item.platform;
+    card.append(el('strong',PLATFORM_LABELS[item.platform]),el('span',`${item.success}/${item.total}척 확인 · 일정 ${item.events}건`));
+    const states=[item.unlinked?`공개 주소 미연동 ${item.unlinked}`:'',item.restricted?`접근 제한 ${item.restricted}`:'',item.failed?`조회 실패 ${item.failed}`:'',item.pending?`${liveController?'대기':'미조회'} ${item.pending}`:''].filter(Boolean);
+    card.append(el('small',states.join(' · ') || '조회 완료'));target.append(card);
+  }
 }
 function renderResults(shown:AppState,result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly})) {
   const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && (c.source==='direct' || c.source==='api') && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
@@ -122,20 +133,24 @@ function renderResults(shown:AppState,result=queryMonth(shown,{month:shown.month
 }
 function render() {
   const shown = active(), result = queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly}), records=result.events;
-  $<HTMLSelectElement>('#platform-filter').value=state.selectedPlatform || 'all';
-  renderRegionFilter($('#region-filter'),state.boats.filter(b=>matchesPlatform(b,state.selectedPlatform)),state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
+  const counts=platformCounts(state.boats);
+  for(const button of $('#platform-filter').querySelectorAll<HTMLButtonElement>('button')) {const platform=readPlatform(button.dataset.platform);button.textContent=`${PLATFORM_LABELS[platform]} ${counts[platform]}`;button.setAttribute('aria-pressed',String(platform===(state.selectedPlatform || 'all')));}
+  renderRegionFilter($('#region-filter'),state.boats,state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion,selectedSpecies:'all',excludedSpeciesKeys:[]},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
+  const targets=orderedBoats(state).filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (tier==='all' || tierFor(state,b.uid)===tier)),targetCounts=platformCounts(targets);
+  $('#query-target').textContent=`조회 대상 ${targets.length}척 · 더피싱 ${targetCounts.thefishing} · 선상24 ${targetCounts.sunsang24} · 아래 목록에서 선박 선택을 바꿀 수 있습니다.`;
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
   $('#fleet-catalog-status').textContent=`더피싱 기본 목록 ${fleetSeed.state.boats.length}개${catalog ? ` · 확인 ${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}`:''} · 매주 월요일 오전 6:17 갱신 예정. 선상24 ${sunsangSeed.boats.length}개는 PC 공개 목록(2026년 8~9월 자료)이며 자동 갱신하지 않습니다. 기존 선상24 링크 4개는 중복 추가하지 않습니다. 새 항목은 선택 해제 상태이며 개인 티어·선택은 유지됩니다.`;
   renderTideSummary($('#tide-status'),calculateTideMonth(shown.month,shown.tideDays || []));
   if (!selectedDay.startsWith(shown.month)) selectedDay = records[0]?.date || `${shown.month}-01`;
   $<HTMLInputElement>('#month').value = shown.month; $<HTMLInputElement>('#people').value=String(shown.requiredPeople); $('#month-label').textContent = `${shown.month.slice(0, 4)}년 ${Number(shown.month.slice(5))}월`;
   const panelOpen=$<HTMLDetailsElement>('#species-panel')?.open || false;
-  renderSpeciesFilter($('#species-filter'),result.speciesCounts,state.selectedSpecies || 'all',state.excludedSpeciesKeys || [],(selectedSpecies,excludedSpeciesKeys)=>{
+  const speciesCounts=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search:'',matchingOnly:false}).rawSpeciesCounts;
+  const speciesReason=liveController?'선박 조회 중입니다. 완료 후 수집된 어종을 선택할 수 있습니다.':!speciesCounts.size ? (liveRows.length || savedMode()?'현재 월·플랫폼·선택 선박에 어종을 선택할 출조 정보가 없습니다.':'먼저 조회하기를 눌러 출조 정보를 불러오세요.') : '';
+  renderSpeciesFilter($('#species-filter'),speciesCounts,state.selectedSpecies || 'all',state.excludedSpeciesKeys || [],(selectedSpecies,excludedSpeciesKeys)=>{
     resultLimit=50;void commit({...state,selectedSpecies,excludedSpeciesKeys},'어종 필터를 적용했습니다. 원본 조회 결과는 유지합니다.');
-  },[...new Set(shown.events.map(eventSpecies))]);
+  },speciesReason);
   $<HTMLDetailsElement>('#species-panel').open=panelOpen;
-  const selectedSpecies=normalizeSpeciesSelection(shown.selectedSpecies || 'all');
-  $('#reservation-filter-summary').textContent=`${PLATFORM_LABELS[state.selectedPlatform || 'all']} · ${regionSummary(state.selectedRegion)} · ${LABELS[tier]} · ${selectedSpecies==='all' ? '전체 어종':selectedSpecies.length ? selectedSpecies.length<=2 ? selectedSpecies.map(speciesLabel).join(', '):`어종 ${selectedSpecies.length}개`:'어종 선택 없음'}${shown.excludedSpeciesKeys?.length ? ` · 제외 ${shown.excludedSpeciesKeys.length}개`:''}${search ? ' · 검색 적용':''}${matchingOnly ? '':' · 인원 미달 포함'}`;
+  $('#reservation-filter-summary').textContent=`${LABELS[tier]} · ${regionSummary(state.selectedRegion)}`;
   $('#query-status').replaceChildren();
   const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && (c.source==='direct' || c.source==='api') && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
   $('#query-status').append(el('strong',demo ? '예시 조회 결과' : savedMode() ? '이전 자료 열람 · 현재 잔여석이 아닙니다' : `이번 조회 ${fresh}척 · 미확인 ${result.missingBoats.length}척`),el('p',result.latest ? `자료 기준 ${new Date(result.latest).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})} · 현재 잔여석은 공식 페이지에서 확인하세요.` : savedMode() ? '이 월의 저장 자료가 없습니다.' : '실시간 월 조회를 누르면 원본의 잔여석을 새로 확인합니다.'));
@@ -149,13 +164,14 @@ function render() {
   }
   $('#live-diagnostics').hidden=!liveRows.length;
   renderDiagnostics($('#live-rows'),liveRows);
+  renderPlatformResults();
   $('#demo-banner').hidden = !demo; $('#demo').textContent = demo ? '실제 조회 자료로 돌아가기' : '예시 둘러보기'; $('#fleet-section').hidden = demo;
   $('#tabs').replaceChildren(); for (const t of ['all', ...TIERS] as Filter[]) { const b = el('button', LABELS[t]); b.setAttribute('aria-pressed', String(t === tier)); b.addEventListener('click', () => { tier = t; render(); }); $('#tabs').append(b); }
   $('#source-access').hidden = demo;
   renderSourceAccess($('#source-access'), state, sourceBoat, value => { sourceBoat=value; render(); });
   renderResults(shown,result);
   // Saves clone state. Compare fleet values so a month/tide change doesn't rebuild every row.
-  const fleetKey=JSON.stringify([state.boats,state.tiers,state.selectedUids,state.selectedRegion,state.selectedPlatform]);
+  const fleetKey=JSON.stringify([state.boats,state.tiers,state.selectedUids,state.selectedRegion,state.selectedPlatform,fleetSort,selectedOnly]);
   if(lastFleetKey!==fleetKey) {renderFleet();lastFleetKey=fleetKey;}
   connection();if(busy) setBusy(true);
 }
@@ -174,11 +190,11 @@ $('#query-form').addEventListener('submit',async event=>{
   event.preventDefault(); if (busy) return;
   const month=$<HTMLInputElement>('#month').value, requiredPeople=Number($<HTMLInputElement>('#people').value);
   try { queryMonth(state,{month,requiredPeople,tier,search,matchingOnly}); } catch (error) { say(error instanceof Error ? error.message : '조회 조건을 확인하세요.'); return; }
-  const candidate={...state,month,requiredPeople}; resultLimit=50; selectedDay=`${month}-01`;
+  const candidate={...state,month,requiredPeople,selectedSpecies:'all',excludedSpeciesKeys:[]}; resultLimit=50; selectedDay=`${month}-01`;
   if(demo || $<HTMLSelectElement>('#query-mode').value==='saved') {await commit(candidate,'저장된 월별 자료를 조건 검색했습니다.');return;}
   const boats=orderedBoats(candidate).filter(b=>candidate.selectedUids.includes(b.uid) && matchesPlatform(b,candidate.selectedPlatform) && matchesRegion(b,candidate.selectedRegion) && (tier==='all' || tierFor(candidate,b.uid)===tier));
   if(!boats.length) {say('선택한 지역·티어에 조회할 선박이 없습니다. 내 선박 관리에서 선박을 선택하거나 지역을 변경하세요.');return;}
-  liveRows=[];liveMonth=month;progress.reset();render();
+  liveRows=[];liveMonth=month;queryBoats=boats;progress.reset();render();
   if(!navigator.onLine) {say('오프라인입니다. 현재 잔여석을 확인할 수 없습니다. 연결 후 다시 조회하세요.');return;}
   const useApi=$<HTMLSelectElement>('#query-mode').value==='api';
   if(useApi && !configuredApi) {say('조회 API를 먼저 연결하세요. API 주소를 입력하고 연결 확인 및 저장을 누르세요.');$<HTMLDetailsElement>('#api-settings').open=true;$<HTMLInputElement>('#api-url').focus();return;}
@@ -192,6 +208,7 @@ $('#query-form').addEventListener('submit',async event=>{
   try {
     const result=await collectMonth(provider,boats,month,liveController.signal,(rows,total)=>{
       liveRows=rows;progress.update(rows.length,rows.filter(row=>row.result.status==='ALLOWED_READABLE').length);const delta=rows.filter(row=>!applied.has(row.boat.uid)),last=delta.at(-1)!;
+      renderPlatformResults();
       for(const row of delta) applied.add(row.boat.uid);
       livePreview=applyLiveResults(livePreview || candidate,month,delta);
       $('#live-progress').textContent=`${rows.length}/${total}척 확인 · ${last.boat.name} · 달력에 순차 반영 중`;
@@ -213,7 +230,7 @@ $('#copy-diagnostics').addEventListener('click',async()=>{
   catch {fallback.value=report;fallback.hidden=false;fallback.focus();fallback.select();say('아래 진단 내용을 길게 눌러 복사하세요.');}
 });
 $('#stop-query').addEventListener('click',()=>{liveController?.abort();});
-$('#query-mode').addEventListener('change',()=>{$('#query-submit').textContent=$<HTMLSelectElement>('#query-mode').value==='saved' ? '저장 자료 검색':'실시간 월 조회';render();});
+$('#query-mode').addEventListener('change',()=>{$('#query-submit').textContent=$<HTMLSelectElement>('#query-mode').value==='saved' ? '저장 자료 검색':'조회하기';render();});
 $('#api-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy) return;setBusy(true);
   try {const origin=await checkApi($<HTMLInputElement>('#api-url').value);saveApiOrigin(origin);configuredApi=origin;apiProvider=new TheFishingApi(origin);renderApiSettings();say('조회 API 연결을 확인했습니다. 월과 인원을 선택하고 실시간 월 조회를 누르세요.');}
@@ -254,11 +271,13 @@ $('#restore-sunsang-tiers').addEventListener('click',async()=>{
   if(await commit(applySunsangTiers(state,true),`선상24 PC 목록 ${SUNSANG_TIER_COUNT}척의 티어·순서·선택 상태를 다시 적용했습니다. 다른 선박 설정은 유지합니다.`)) {undoState=previous;$('#undo').hidden=false;}
 });
 $('#demo').addEventListener('click', () => { demo = !demo; selectedDay = `${state.month}-${demo ? '09' : '01'}`; render(); });
-async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)) return; if(busy) return;const c = structuredClone(state); c.month = value; resultLimit=50;if(value!==state.month) {liveRows=[];progress.reset();}await commit(c, '조회 월을 변경했습니다. 실시간 월 조회를 눌러 새 잔여석을 확인하세요.'); }
+async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)) return; if(busy) return;const c = structuredClone(state); c.month = value; resultLimit=50;if(value!==state.month) {liveRows=[];queryBoats=[];progress.reset();c.selectedSpecies='all';c.excludedSpeciesKeys=[];}await commit(c, '조회 월을 변경했습니다. 조회하기를 눌러 새 잔여석을 확인하세요.'); }
 $<HTMLInputElement>('#month').addEventListener('change', e => { void setMonth((e.currentTarget as HTMLInputElement).value); });
 for (const [id, offset] of [['prev', -1], ['next', 1]] as const) $('#' + id).addEventListener('click', () => { const [y, m] = state.month.split('-').map(Number); void setMonth(new Date(Date.UTC(y, m - 1 + offset)).toISOString().slice(0, 7)); });
 $<HTMLInputElement>('#search').addEventListener('input', e => { search = (e.currentTarget as HTMLInputElement).value.trim(); render(); });
-$<HTMLSelectElement>('#platform-filter').addEventListener('change',event=>{const selectedPlatform=readPlatform((event.currentTarget as HTMLSelectElement).value);resultLimit=50;void commit({...state,selectedPlatform},`${PLATFORM_LABELS[selectedPlatform]} 플랫폼을 적용했습니다. 내 선박 관리에서 조회할 선박을 선택하세요.`);});
+$('#platform-filter').addEventListener('click',event=>{const button=(event.target as HTMLElement).closest<HTMLButtonElement>('button[data-platform]');if(!button || busy) return;const selectedPlatform=readPlatform(button.dataset.platform);resultLimit=50;void commit({...state,selectedPlatform,selectedSpecies:'all',excludedSpeciesKeys:[]},`${PLATFORM_LABELS[selectedPlatform]} 선박과 조회 결과를 표시합니다. 추가 수집은 하지 않습니다.`);});
+$<HTMLSelectElement>('#fleet-sort').addEventListener('change',event=>{fleetSort=(event.currentTarget as HTMLSelectElement).value;renderFleet();});
+$('#selected-only').addEventListener('click',()=>{selectedOnly=!selectedOnly;renderFleet();});
 $<HTMLInputElement>('#fleet-search').addEventListener('input', e => { fleetSearch = (e.currentTarget as HTMLInputElement).value.trim(); renderFleet(); });
 function closeForm() { form.hidden = true; editing = null; form.reset(); field('uid').readOnly = false; }
 $('#add-toggle').addEventListener('click', () => { closeForm(); form.hidden = false; field('uid').focus(); }); $('#edit-cancel').addEventListener('click', closeForm);
@@ -286,7 +305,8 @@ $('#tide-refresh').addEventListener('click',async()=>{
   finally {setBusy(false);render();}
 });
 window.addEventListener('online', connection); window.addEventListener('offline', connection);
-setBusy(true); try { const prepared=initializeFleet(await loadState()), archive=initializeMonthlyArchive(prepared.state); state=archive.state;const tideDays=mergeTideDays(tideArchive.days,state.tideDays),tidesChanged=JSON.stringify(tideDays)!==JSON.stringify(state.tideDays);state={...state,tideDays}; if (prepared.changed || archive.changed || tidesChanged) await saveState(state); if (prepared.seeded) say(`기본 선박 목록 적용 완료 · 전체 ${state.boats.length}척 · 선택 ${state.selectedUids.length}척. 티어와 순서를 유지했습니다.`); } catch { say('저장 자료를 읽거나 저장하지 못했습니다. 기본 목록·티어 복원 또는 백업 JSON 가져오기를 이용하세요.'); } finally { setBusy(false); render(); }
+setBusy(true); try { const prepared=initializeFleet(await loadState()), archive=initializeMonthlyArchive(prepared.state); state=archive.state;const tideDays=mergeTideDays(tideArchive.days,state.tideDays),tidesChanged=JSON.stringify(tideDays)!==JSON.stringify(state.tideDays);state={...state,tideDays,selectedPlatform:'all',selectedSpecies:'all',excludedSpeciesKeys:[]}; if (prepared.changed || archive.changed || tidesChanged) await saveState(state); if (prepared.seeded) say(`기본 선박 목록 적용 완료 · 전체 ${state.boats.length}척 · 선택 ${state.selectedUids.length}척. 개인 티어를 유지했습니다.`); } catch { say('저장 자료를 읽거나 저장하지 못했습니다. 기본 목록·티어 복원 또는 백업 JSON 가져오기를 이용하세요.'); } finally { setBusy(false); render(); }
 // Refresh freshness labels while visible; this never makes a network request.
 setInterval(()=>{if(!busy && document.visibilityState==='visible') render();},60000);
-if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { say('오프라인 화면 저장에 실패했습니다. 연결된 상태에서 다시 열어 주세요.'); });
+$('#apply-update').addEventListener('click',()=>{if(!busy) location.reload();});
+if ('serviceWorker' in navigator && import.meta.env.PROD) void watchAppUpdates(navigator.serviceWorker,import.meta.env.BASE_URL,()=>{$('#app-update').hidden=false;}).catch(()=>{say('화면 업데이트 확인에 실패했습니다. 온라인에서 새로고침해 주세요.');});

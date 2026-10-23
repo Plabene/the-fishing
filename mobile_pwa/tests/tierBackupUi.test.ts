@@ -21,9 +21,9 @@ test('the complete fleet is usable, platform filters keep every match, and tier 
     const last=orderedBoats(state).at(-1)!,row=()=>el(`.boat-row[data-uid="${last.uid}"]`);
     const select=row().querySelector('select')!;select.value='tier1';select.dispatchEvent(new Event('change'));await settle();
     expect((await loadState() as AppState).tiers.tier1).toContain(last.uid);
-    const platform=el('#platform-filter') as HTMLSelectElement;platform.value='sunsang24';platform.dispatchEvent(new Event('change'));await settle();
+    el('#platform-filter button[data-platform="sunsang24"]').click();await settle();
     expect(document.querySelectorAll('.boat-row')).toHaveLength(380);
-    platform.value='all';platform.dispatchEvent(new Event('change'));await settle();expect(document.querySelectorAll('.boat-row')).toHaveLength(state.boats.length);
+    el('#platform-filter button[data-platform="all"]').click();await settle();expect(document.querySelectorAll('.boat-row')).toHaveLength(state.boats.length);
     el('#tier-export').click();await vi.waitFor(()=>expect(saveJsonFile).toHaveBeenCalledOnce());
     const saved=vi.mocked(saveJsonFile).mock.calls[0];expect(saved[1]).toBe('thefishing-tiers');expect(JSON.parse(saved[0]).tiers.tier1).toContain(last.uid);expect(JSON.parse(saved[0]).events).toBeUndefined();
     await vi.waitFor(()=>expect(el('#message').textContent).toContain('다운로드를 요청'));

@@ -13,7 +13,7 @@ test('month query form, people filter, list/day views and empty month work end t
   (document.querySelector('#query-mode') as HTMLSelectElement).value='saved';document.querySelector('#query-mode')!.dispatchEvent(new Event('change'));
   const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
   const count=()=>Number((el('#summary').textContent || '').match(/(\d+)개 출조/)?.[1]);
-  expect(document.querySelector('h1')?.textContent).toBe('월별 예약 조회');
+  expect(document.querySelector('h1')?.textContent).toBe('어디로 출조할까요?');
   expect(el('#fleet-count').textContent).toContain(`${fleet.selectedUids.length}척 선택 / 전체 ${fleet.boats.length}척`);
   const baseline=count(); expect(baseline).toBeGreaterThan(0);
   expect(el('#query-status').textContent).toContain('2026. 10. 1.');

@@ -14,14 +14,14 @@ test('platform selector scopes both live sources, integrated calendar keeps name
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));await settle();
-    const change=async(s:string,value:string)=>{(el(s) as HTMLSelectElement).value=value;el(s).dispatchEvent(new Event('change'));await settle();};
+    const change=async(s:string,value:string)=>{if(s==='#platform-filter') el(`${s} button[data-platform="${value}"]`).click();else {(el(s) as HTMLSelectElement).value=value;el(s).dispatchEvent(new Event('change'));}await settle();};
     expect(el('#boats').querySelector('.platform-thefishing')).not.toBeNull();expect(el('#boats').querySelector('.platform-sunsang24')).not.toBeNull();
-    await change('#platform-filter','sunsang24');expect(el('#boats').textContent).not.toContain('기존 더피싱 시험호');
+    await change('#platform-filter','sunsang24');expect(el('#boats').textContent).not.toContain('기존 더피싱 시험호');expect(request).not.toHaveBeenCalled();
     el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await settle();expect(request).toHaveBeenCalledTimes(1);expect(el('#query-status').textContent).toContain('공개 예약표 연동 1척');expect(el('#summary').textContent).toContain('1개 출조');
     expect(el('.calendar-day[aria-label^="2026-10-25"]').textContent).toContain('자연피싱호');expect(el('.calendar-day[aria-label^="2026-10-25"]').querySelector('.platform-tag')).toBeNull();
     await change('#platform-filter','all');el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await settle();expect(request).toHaveBeenCalledTimes(3);expect(el('#summary').textContent).toContain('2개 출조');
     el('.calendar-day[aria-label^="2026-10-25"]').click();expect(el('#day-view').querySelector('.platform-thefishing')).not.toBeNull();expect(el('#day-view').textContent).toContain('3석');
-    await change('#platform-filter','thefishing');expect(el('#boats').querySelector('.platform-sunsang24')).toBeNull();
+    await change('#platform-filter','thefishing');expect(el('#boats').querySelector('.platform-sunsang24')).toBeNull();expect(request).toHaveBeenCalledTimes(3);
     await change('#month','2026-11');expect(el('#summary').textContent).toContain('0개 출조');el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await settle();expect(request).toHaveBeenCalledTimes(4);expect(String(request.mock.calls[3][0])).toContain('month=2026-11');
     expect((await loadState() as typeof state & {selectedPlatform:string}).selectedPlatform).toBe('thefishing');
   } finally {vi.unstubAllGlobals();}

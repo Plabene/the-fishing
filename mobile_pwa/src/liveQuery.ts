@@ -1,15 +1,20 @@
 import type { AppState, Boat } from './models';
 import type { AvailabilityProvider, ProviderResult } from './provider';
 import {boatPlatform} from './platforms';
+import {uniqueFleet} from './fleetList';
 export interface LiveRow {boat:Boat; result:ProviderResult}
 export async function collectMonth(provider:AvailabilityProvider,boats:Boat[],month:string,signal:AbortSignal,onProgress:(rows:LiveRow[],total:number)=>void=()=>{},concurrency=1) {
-  const unique=[...new Map(boats.map(boat=>[boat.uid,boat])).values()],completed:Array<LiveRow|undefined>=new Array(unique.length);
+  const unique=uniqueFleet(boats),completed:Array<LiveRow|undefined>=new Array(unique.length);
+  // Let both platforms start promptly even when every TheFishing boat precedes Sunsang24 in tier order.
+  // Completion rows retain the original order; only dispatch is interleaved and concurrency stays capped.
+  const groups=new Map<string,number[]>();unique.forEach((boat,index)=>{const key=boatPlatform(boat),group=groups.get(key) || [];group.push(index);groups.set(key,group);});
+  const queue:number[]=[];for(let offset=0;queue.length<unique.length;offset++) for(const group of groups.values()) if(offset<group.length) queue.push(group[offset]);
   let next=0,stopped=false,cancelled=false;const stoppedPlatforms=new Set<string>();
   const rows=()=>completed.filter((row):row is LiveRow=>!!row);
   async function worker() {
     while(next<unique.length) {
       if(signal.aborted) {cancelled=true;return;}
-      const index=next++,boat=unique[index];
+      const index=queue[next++],boat=unique[index];
       if(stoppedPlatforms.has(boatPlatform(boat))) continue;
       try {
         const result=await provider.readMonth(boat,month,signal);
