@@ -8,6 +8,7 @@ import { calculateTideMonth } from './tides';
 import { renderDayTide } from './tideView';
 import {matchesRegion,regionLabel} from './regions';
 import {matchesPlatform,platformBadge} from './platforms';
+import {calendarStatus} from './calendarStatus';
 
 export const STATUS_LABELS: Record<DisplayStatus, string> = { AVAILABLE: '확인된 잔여석', UNKNOWN: '확인 불가', STALE: '이전 자료', BLOCKED: '접근 제한', UNVERIFIED: '미검증', FULL: '확인된 인원 미달', DEMO: '예시 자료',UNAVAILABLE:'예약 가능 상태 아님' };
 export function el<K extends keyof HTMLElementTagNameMap>(tag: K, text = '', className = ''): HTMLElementTagNameMap[K] {
@@ -21,6 +22,7 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
   target.replaceChildren();
   const events = (result?.events ?? visibleEvents(state, tier, search,matchingOnly)).filter(e => e.date === day);
   target.append(el('h2', `${Number(day.slice(5, 7))}월 ${Number(day.slice(8))}일 · ${events.length}개 출조 일정`));
+  if(result) {const status=calendarStatus(state,result,day);const summary=el('p',`${status.label}${result.missingBoats.length?` · ${result.missingBoats.length}척 미확인`:''}`,'day-status');summary.dataset.availability=status.kind;target.append(summary);}
   if (!events.length) target.append(el('p', '선택한 조건에 맞는 조회 결과가 없습니다. 미조회·자료 없음은 예약 마감을 뜻하지 않습니다.', 'empty'));
   const order = orderedBoats(state).map(b => b.uid);
   for (const t of TIERS) {

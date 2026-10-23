@@ -3,6 +3,7 @@ import { orderedBoats, tierFor } from './tierStore';
 import { LABELS, TIERS, type AppState } from './models';
 import { matchesRegion } from './regions';
 import {matchesPlatform,boatPlatform,PLATFORM_LABELS} from './platforms';
+import {bookingAlias} from './bookingAliases';
 
 export function renderSourceAccess(target: HTMLElement, state: AppState, selectedUid: string, selectBoat:(uid:string)=>void): void {
   target.replaceChildren();
@@ -21,7 +22,7 @@ export function renderSourceAccess(target: HTMLElement, state: AppState, selecte
   }
   select.value=chosen?.uid || ''; select.disabled=!chosen;
   select.addEventListener('change',()=>selectBoat(select.value)); label.append(select); controls.append(label);
-  const link = chosen && sourceLink(chosen.url,chosen.uid);
+  const link = chosen && sourceLink(bookingAlias(chosen.uid)?.url || chosen.url,chosen.uid);
   if (link) { link.textContent='공식 예약 페이지 열기 ↗'; link.className='button primary'; controls.append(link); }
   else controls.append(el('p',chosen ? '저장된 공식 링크가 없습니다.' : '내 선박 관리에서 확인할 선박을 선택하세요.','muted'));
   target.append(heading,controls);

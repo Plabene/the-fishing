@@ -13,6 +13,7 @@ test('default query button actually reads the month and persists verified result
   const detail=`<script>var data='date6='+date6+'&st_uid=981&pa_uid=6130';$.ajax({url:'../reservation/list.view.view.1.ajax.new.php'});</script>`;
   const network=vi.fn<typeof fetch>().mockResolvedValueOnce(new Response(detail,{headers:{'Content-Type':'text/html'}})).mockResolvedValueOnce(new Response(calendar,{headers:{'Content-Type':'text/html'}}));
   vi.stubGlobal('fetch',network);await import('../src/main');
+  const month=document.querySelector('#month') as HTMLInputElement;month.value='2026-09';month.dispatchEvent(new Event('change'));await vi.waitFor(()=>expect(document.querySelector('#app')?.getAttribute('aria-busy')).toBe('false'));
   expect(network).not.toHaveBeenCalled();expect((document.querySelector('#query-mode') as HTMLSelectElement).value).toBe('api');(document.querySelector('#query-mode') as HTMLSelectElement).value='direct';
   document.querySelector('#query-form')!.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
   expect((document.querySelector('#stop-query') as HTMLElement).hidden).toBe(false);

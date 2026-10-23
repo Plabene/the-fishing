@@ -1,9 +1,9 @@
 import { type AppState, type Filter } from './models';
-import { eventStatus } from './availabilityStore';
 import { queryMonth } from './monthlyQuery';
 import { eventSpecies, speciesColor, speciesLabel } from './species';
 import { calculateTideMonth } from './tides';
 import { addTideToCell } from './tideView';
+import {calendarStatus} from './calendarStatus';
 
 export function visibleEvents(state: AppState, tier: Filter, search = '', matchingOnly=false) {
   return queryMonth(state,{month:state.month,requiredPeople:state.requiredPeople,tier,search,matchingOnly}).events;
@@ -20,7 +20,8 @@ export function monthDays(month: string): (string | null)[] {
 export function renderCalendar(target: HTMLElement, state: AppState, tier: Filter, search: string, selectedDay: string, onSelect: (day: string) => void, matchingOnly=false, result?:ReturnType<typeof queryMonth>): void {
   target.replaceChildren();
   const tide=calculateTideMonth(state.month,state.tideDays || []);
-  const events = result?.events ?? visibleEvents(state, tier, search,matchingOnly);
+  const query=result ?? queryMonth(state,{month:state.month,requiredPeople:state.requiredPeople,tier,search,matchingOnly});
+  const events = query.events;
   const byDay=new Map<string,typeof events>(),boats=new Map(state.boats.map(b=>[b.uid,b]));
   for(const event of events) {const day=byDay.get(event.date) || [];day.push(event);byDay.set(event.date,day);}
   for (const weekday of ['일', '월', '화', '수', '목', '금', '토']) {
@@ -29,13 +30,13 @@ export function renderCalendar(target: HTMLElement, state: AppState, tier: Filte
   for (const day of monthDays(state.month)) {
     if (!day) { const gap = document.createElement('span'); gap.className = 'calendar-gap'; target.append(gap); continue; }
     const records = byDay.get(day) || [];
-    const verified = records.filter(e => eventStatus(e, state) === 'AVAILABLE').length;
     const button = document.createElement('button'); button.className = 'calendar-day'; button.type = 'button';
     button.setAttribute('aria-label', `${day} · 일정 ${records.length}건`); button.setAttribute('aria-pressed', String(day === selectedDay));
     const num = document.createElement('span'); num.textContent = String(Number(day.slice(8))); button.append(num);
     addTideToCell(button,day,tide);
-    const count = document.createElement('small'); count.textContent = records.length ? `${records.length}건` : '—'; button.append(count);
-    if (verified) { const mark = document.createElement('i'); mark.textContent = '가능'; button.append(mark); }
+    const status=calendarStatus(state,query,day);button.dataset.availability=status.kind;
+    const count = document.createElement('small'); count.textContent = status.label;count.className='calendar-availability'; button.append(count);
+    button.setAttribute('aria-label',`${button.getAttribute('aria-label')} · ${status.label}${query.missingBoats.length?' · 미확인 선박 있음':''}`);
     for (const id of [...new Set(records.map(e=>e.uid))].slice(0,2)) {
       const trips=records.filter(e=>e.uid===id),keys=[...new Set(trips.map(eventSpecies))];
       const label=document.createElement('span'); label.className='calendar-boat';label.style.backgroundColor=speciesColor(keys[0]);

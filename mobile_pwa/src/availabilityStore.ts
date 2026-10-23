@@ -31,6 +31,18 @@ export async function loadState(): Promise<unknown> {
     tx.onerror = () => { db.close(); reject(tx.error); };
   });
 }
+export async function backupPreferences(state:AppState,version:string):Promise<void> {
+  const db=await database();return new Promise((resolve,reject)=>{
+    const tx=db.transaction('local','readwrite');tx.objectStore('local').put({tiers:structuredClone(state.tiers),selectedUids:[...state.selectedUids]},`preferences-before:${version}`);
+    tx.oncomplete=()=>{db.close();resolve();};tx.onerror=tx.onabort=()=>{db.close();reject(tx.error || new Error('설정 백업 실패'));};
+  });
+}
+export async function previousPreferences(version:string):Promise<Pick<AppState,'tiers'|'selectedUids'>|undefined> {
+  const db=await database();return new Promise((resolve,reject)=>{
+    const tx=db.transaction('local','readonly'),read=tx.objectStore('local').get(`preferences-before:${version}`);
+    tx.oncomplete=()=>{db.close();resolve(read.result);};tx.onerror=()=>{db.close();reject(tx.error);};
+  });
+}
 export async function saveState(state: AppState, signal?: AbortSignal): Promise<void> {
   signal?.throwIfAborted();
   const db = await database();

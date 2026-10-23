@@ -1,6 +1,7 @@
 import { el, sourceLink } from './dayView';
 import type { LiveRow } from './liveQuery';
 import {platformBadge,boatPlatform,PLATFORM_LABELS} from './platforms';
+import {bookingAlias} from './bookingAliases';
 
 const stageLabel={detail:'선박 상세 요청',calendar:'월 달력 요청',api:'조회 API 연결'};
 export function diagnosticReport(rows:LiveRow[],month:string,now=new Date()):string {
@@ -27,7 +28,7 @@ export function renderDiagnostics(target:HTMLElement,rows:LiveRow[]):void {
     row.append(el('p',`${boat.name} · ${result.message}`,result.status==='ALLOWED_READABLE' ? 'live-ok':'live-failure'));
     if(result.stage && !['PERMISSION_DENIED','UNSUPPORTED_SOURCE'].includes(result.status)) row.append(el('small',`실패 단계: ${stageLabel[result.stage]}${result.httpStatus ? ` · HTTP ${result.httpStatus}` : ' · HTTP 상태 확인 불가'}`));
     if(result.status!=='ALLOWED_READABLE') {
-      const link=sourceLink(boat.url,boat.uid);
+      const link=sourceLink(bookingAlias(boat.uid)?.url || boat.url,boat.uid);
       if(link) {link.textContent=`${boat.name} 공식 달력 확인 ↗`;link.className='button';row.append(link);}
     }
     target.append(row);

@@ -1,0 +1,45 @@
+// @vitest-environment jsdom
+import {expect,test,vi} from 'vitest';
+import 'fake-indexeddb/auto';
+import {defaultFleet} from '../src/defaultFleet';
+import {loadState,saveState} from '../src/availabilityStore';
+import {localMonth,type AppState} from '../src/models';
+import {applyPublishedPreferences,PUBLISHED_PREFERENCES_VERSION} from '../src/publishedPreferences';
+const team='external:3e13428ab1e484d50b7e';
+test('calendar opens on current month, aliases integrate with day view, and prior tiers can be restored without losing current results',async()=>{
+  const before=defaultFleet();before.boats=before.boats.filter(b=>['1441',team].includes(b.uid));
+  before.tiers={tier1:[],tier2:[team],tier3:['1441'],other:[]};before.selectedUids=[team];before.month='2025-03';await saveState(before);
+  document.body.innerHTML='<div id="app"></div>';localStorage.clear();
+  const network=vi.fn<typeof fetch>(async input=>{const url=new URL(String(input)),uid=url.searchParams.get('uid'),month=url.searchParams.get('month'),observedAt=new Date().toISOString();
+    return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:uid==='1441'?'direct-111111111111111111111111':'direct-222222222222222222222222',uid,date:month+'-02',remaining:8,trip:uid==='1441'?'주꾸미':'광어다운샷',observedAt}]});
+  });vi.stubGlobal('fetch',network);
+  await import('../src/main');
+  const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
+  const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
+  expect((el('#month') as HTMLInputElement).value).toBe(localMonth());expect(network).not.toHaveBeenCalled();
+  expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(false);
+  expect((el('#search-section') as HTMLDetailsElement).open).toBe(false);
+  el('a[href="#fleet-section"]').click();expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(true);
+  const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();
+  el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await settle();
+  expect(network).toHaveBeenCalledTimes(2);
+  expect(el('.calendar-day[aria-label^="2026-11-02"]').textContent).toContain('2척 가능');
+  el('.calendar-day[aria-label^="2026-11-02"]').click();expect(el('#day-view').textContent).toContain('청남호');expect(el('#day-view').textContent).toContain('팀한프로');
+  expect([...el('#day-view').querySelectorAll<HTMLAnchorElement>('a')].some(a=>a.href==='https://thefishing.kr/reservation/list.php?uid=5364')).toBe(true);
+  expect(el('#platform-results').closest('#results-section')).not.toBeNull();
+  expect(el('#platform-results').hidden).toBe(false);
+  const latestEvents=(await loadState() as AppState).events;
+  el('#restore-before-publish').click();await settle();
+  await vi.waitFor(async()=>expect((await loadState() as AppState).tiers).toEqual(before.tiers));
+  const restored=await loadState() as AppState;expect(restored.selectedUids).toEqual([team]);expect(restored.events).toEqual(latestEvents);
+  expect(el('.calendar-day[aria-label^="2026-11-02"]').textContent).toContain('1척 가능');
+  el('#next').click();await settle();expect(month.value).toBe('2026-12');expect(el('#summary').textContent).toContain('0개 출조');
+  el('#prev').click();await settle();expect(month.value).toBe('2026-11');expect(network).toHaveBeenCalledTimes(2);
+  // Older personal backups lack the preset marker; importing one must not trigger a later overwrite.
+  const imported={...restored,tiers:{tier1:['1441'],tier2:[],tier3:[team],other:[]},publishedPreferencesVersion:undefined};
+  const input=el('#import') as HTMLInputElement;
+  Object.defineProperty(input,'files',{value:[{size:100,text:async()=>JSON.stringify(imported)}],configurable:true});
+  input.dispatchEvent(new Event('change'));await settle();
+  const personal=await loadState() as AppState;expect(personal.tiers).toEqual(imported.tiers);expect(personal.publishedPreferencesVersion).toBe(PUBLISHED_PREFERENCES_VERSION);
+  expect(applyPublishedPreferences(personal)).toBe(personal);vi.unstubAllGlobals();
+});

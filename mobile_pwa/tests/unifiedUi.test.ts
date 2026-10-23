@@ -13,6 +13,7 @@ test('species become available only after collection; multi-select, platform, re
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));await settle();
+    const requestedMonth=el('#month') as HTMLInputElement;requestedMonth.value='2026-11';requestedMonth.dispatchEvent(new Event('change'));await settle();
     expect(el('[data-platform="all"]').getAttribute('aria-pressed')).toBe('true');
     expect(el('#species-filter').dataset.state).toBe('disabled');expect((el('#species-all') as HTMLButtonElement).disabled).toBe(true);
     expect(el('#search-section').querySelector('#species-filter')).toBeNull();

@@ -2,6 +2,7 @@ import sourceLinks from './data/sourceLinks.json';
 import type { TideDay } from './tides';
 import type {BoatRegion,RegionFilter} from './regions';
 import {sunsangLink,type PlatformFilter} from './platforms';
+import {bookingAlias} from './bookingAliases';
 export const TIERS = ['tier1', 'tier2', 'tier3', 'other'] as const;
 export type Tier = typeof TIERS[number];
 export type Filter = Tier | 'all';
@@ -30,6 +31,7 @@ export interface AppState {
   // Last published catalog, used to preserve personal edits and deliberately deleted boats.
   fleetBaseline?:Boat[];
   sunsangTierVersion?:string;
+  publishedPreferencesVersion?:string;
 }
 export function localMonth(now = new Date()): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).format(now);
@@ -58,6 +60,7 @@ export function officialDetail(value: unknown, expectedUid?: string): string {
 }
 /** Navigation only: exact saved external/fleet links never become collection endpoints. */
 export function reservationLink(value: unknown, expectedUid: string): string {
+  const alias=bookingAlias(expectedUid);if(alias && value===alias.url) return alias.url;
   const direct = officialDetail(value, expectedUid);
   if (direct) return direct;
   const sunsang=sunsangLink(value,expectedUid);if(sunsang) return sunsang;

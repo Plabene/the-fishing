@@ -3,6 +3,7 @@ import {boatPlatform,sunsangListing,type PlatformFilter} from './platforms';
 import {publicRouteForBoat} from './sunsang24PublicRoutes';
 import {officialDetail} from './models';
 import type {LiveRow} from './liveQuery';
+import {bookingAlias} from './bookingAliases';
 
 const korean=new Intl.Collator('ko-KR',{numeric:true,sensitivity:'base'});
 export function boatIdentity(boat:Boat):string {
@@ -19,7 +20,7 @@ export function alphabeticFleet(boats:Boat[]):Boat[] {
 export function platformCounts(boats:Boat[]):Record<PlatformFilter,number> {
   const unique=uniqueFleet(boats);return {all:unique.length,thefishing:unique.filter(b=>boatPlatform(b)==='thefishing').length,sunsang24:unique.filter(b=>boatPlatform(b)==='sunsang24').length};
 }
-export function supportsLive(boat:Boat):boolean {return boatPlatform(boat)==='sunsang24'?!!publicRouteForBoat(boat.uid):!!officialDetail(boat.url,boat.uid);}
+export function supportsLive(boat:Boat):boolean {return !!bookingAlias(boat.uid) || (boatPlatform(boat)==='sunsang24'?!!publicRouteForBoat(boat.uid):!!officialDetail(boat.url,boat.uid));}
 export function platformQueryStats(boats:Boat[],rows:LiveRow[]) {
   const byId=new Map(rows.map(row=>[boatIdentity(row.boat),row.result]));
   return (['thefishing','sunsang24','external'] as const).map(platform=>{

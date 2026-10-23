@@ -1,12 +1,14 @@
 import {appLayout} from './appLayout';
 import {alphabeticFleet,uniqueFleet,platformCounts,supportsLive,platformQueryStats} from './fleetList';
 import {watchAppUpdates} from './appUpdate';
-import { emptyState, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier, type Boat } from './models';
+import { emptyState, localMonth, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier, type Boat } from './models';
 import { importData, exportData } from './importLegacy';
 import {exportTierBackup,restoreTierBackup,isTierBackup} from './tierBackup';
 import {saveJsonFile,canShareJson} from './fileSave';
 import {applySunsangTiers,SUNSANG_TIER_COUNT} from './sunsang24Tiers';
-import { loadState, saveState } from './availabilityStore';
+import { loadState, saveState,backupPreferences,previousPreferences } from './availabilityStore';
+import {applyPublishedPreferences,PUBLISHED_PREFERENCES_VERSION,PUBLISHED_PREFERENCES_COUNTS} from './publishedPreferences';
+import {bookingAlias} from './bookingAliases';
 import { orderedBoats, moveBoat, removeBoat, tierFor } from './tierStore';
 import { renderCalendar } from './calendarView';
 import { el, renderDay, sourceLink } from './dayView';
@@ -72,7 +74,7 @@ async function commit(candidate: AppState, message: string): Promise<boolean> {
   catch { say('기기에 저장하지 못했습니다. 저장 공간을 확인하거나 백업을 내려받으세요. 변경은 적용되지 않았습니다.'); return false; }
   finally { setBusy(false); render(); }
 }
-function chooseDay(day: string) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result); }
+function chooseDay(day: string) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result);$('#day-view').scrollIntoView?.({block:'nearest',behavior:'smooth'}); }
 function fleetVisible() {const selected=new Set(state.selectedUids);return (fleetSort==='name'?alphabeticFleet(state.boats):uniqueFleet(orderedBoats(state))).filter(b=>matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (!selectedOnly || selected.has(b.uid)) && `${b.name} ${b.uid} ${b.port} ${regionLabel(b)} ${locationDescription(b)}`.toLowerCase().includes(fleetSearch.toLowerCase()));}
 function renderFleet() {
   const target = $('#boats'),fragment=document.createDocumentFragment();
@@ -80,6 +82,7 @@ function renderFleet() {
   const selected=new Set(state.selectedUids),duplicates=possibleDuplicateIds(state.boats);
   const tiers=new Map(TIERS.flatMap(t=>state.tiers[t].map(id=>[id,t] as const)));
   $('#fleet-count').textContent = `${state.selectedUids.length}척 선택 / 전체 ${state.boats.length}척 · 표시 ${boats.length}척 · ${regionSummary(state.selectedRegion)}`;
+  $('#fleet-brief').textContent=`${state.selectedUids.length}척 선택`;
   $('#selected-only').setAttribute('aria-pressed',String(selectedOnly));
   target.dataset.sort=fleetSort;
   const alive=new Set(state.boats.map(b=>b.uid));for(const id of fleetRows.keys()) if(!alive.has(id)) fleetRows.delete(id);
@@ -97,7 +100,7 @@ function renderFleet() {
     const capability=el('span',supportsLive(boat)?'일정 연동':'공식 페이지 확인',supportsLive(boat)?'live-capable':'link-only');metadata.append(region,capability);info.append(metadata);
     const details=el('details','','boat-more'),summary=el('summary','···');summary.setAttribute('aria-label',`${boat.name} 관리 메뉴`);details.append(summary);
     const extra=el('div','','boat-extra');extra.append(el('p',`UID ${boat.uid}`,'muted'));
-    const link=sourceLink(boat.url,boat.uid);if(link) extra.append(link);
+    const alias=bookingAlias(boat.uid),link=sourceLink(alias?.url || boat.url,boat.uid);if(link) {if(alias) link.textContent='연동 예약 페이지 ↗';extra.append(link);}
     const location=locationDescription(boat);if(location) extra.append(el('p',location,'location-evidence'));
     if(duplicates.has(boat.uid)) extra.append(el('p','다른 플랫폼에 같은 이름·출항지 항목이 있습니다. 예약정보는 플랫폼별로 구분합니다.','muted'));
     const controls = el('div', '', 'boat-actions'), select = el('select'); select.setAttribute('aria-label', `${boat.name} 티어`);
@@ -112,7 +115,8 @@ function renderFleet() {
 }
 function renderPlatformResults() {
   const target=$('#platform-results');target.replaceChildren();
-  if(!queryBoats.length || liveMonth!==state.month) {target.append(el('p','선박 목록은 기기에 저장된 목록입니다. 조회하기를 누르면 선택한 선박의 일정·잔여석을 새로 확인합니다.','muted'));return;}
+  target.hidden=!queryBoats.length || liveMonth!==state.month;
+  if(target.hidden) return;
   for(const item of platformQueryStats(queryBoats,liveRows)) {
     const card=el('div','','platform-result');card.dataset.platform=item.platform;
     card.append(el('strong',PLATFORM_LABELS[item.platform]),el('span',`${item.success}/${item.total}척 확인 · 일정 ${item.events}건`));
@@ -137,7 +141,7 @@ function render() {
   for(const button of $('#platform-filter').querySelectorAll<HTMLButtonElement>('button')) {const platform=readPlatform(button.dataset.platform);button.textContent=`${PLATFORM_LABELS[platform]} ${counts[platform]}`;button.setAttribute('aria-pressed',String(platform===(state.selectedPlatform || 'all')));}
   renderRegionFilter($('#region-filter'),state.boats,state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion,selectedSpecies:'all',excludedSpeciesKeys:[]},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
   const targets=orderedBoats(state).filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (tier==='all' || tierFor(state,b.uid)===tier)),targetCounts=platformCounts(targets);
-  $('#query-target').textContent=`조회 대상 ${targets.length}척 · 더피싱 ${targetCounts.thefishing} · 선상24 ${targetCounts.sunsang24} · 아래 목록에서 선박 선택을 바꿀 수 있습니다.`;
+  $('#query-target').textContent=`${targets.length}척 조회 대상 · ${regionSummary(state.selectedRegion)} · ${LABELS[tier]}`;
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
   $('#fleet-catalog-status').textContent=`더피싱 기본 목록 ${fleetSeed.state.boats.length}개${catalog ? ` · 확인 ${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}`:''} · 매주 월요일 오전 6:17 갱신 예정. 선상24 ${sunsangSeed.boats.length}개는 PC 공개 목록(2026년 8~9월 자료)이며 자동 갱신하지 않습니다. 기존 선상24 링크 4개는 중복 추가하지 않습니다. 새 항목은 선택 해제 상태이며 개인 티어·선택은 유지됩니다.`;
   renderTideSummary($('#tide-status'),calculateTideMonth(shown.month,shown.tideDays || []));
@@ -150,7 +154,10 @@ function render() {
     resultLimit=50;void commit({...state,selectedSpecies,excludedSpeciesKeys},'어종 필터를 적용했습니다. 원본 조회 결과는 유지합니다.');
   },speciesReason);
   $<HTMLDetailsElement>('#species-panel').open=panelOpen;
-  $('#reservation-filter-summary').textContent=`${LABELS[tier]} · ${regionSummary(state.selectedRegion)}`;
+  $('#species-toggle-label').textContent=speciesReason ? (liveController?'어종 · 조회 중':'어종 · 조회 후 선택'):`어종 · ${state.selectedSpecies==='all'?'전체':Array.isArray(state.selectedSpecies)?state.selectedSpecies.length+'개 선택':'선택'}`;
+  $('#species-toggle-label').setAttribute('aria-disabled',String(!!speciesReason));
+  $('#published-preferences-status').textContent=`제공한 기본 분류 · ${TIERS.map(t=>`${LABELS[t]} ${PUBLISHED_PREFERENCES_COUNTS[t]}척`).join(' / ')} · 이후 개인 수정은 유지됩니다.`;
+  $('#reservation-filter-summary').textContent=regionSummary(state.selectedRegion);
   $('#query-status').replaceChildren();
   const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && (c.source==='direct' || c.source==='api') && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
   $('#query-status').append(el('strong',demo ? '예시 조회 결과' : savedMode() ? '이전 자료 열람 · 현재 잔여석이 아닙니다' : `이번 조회 ${fresh}척 · 미확인 ${result.missingBoats.length}척`),el('p',result.latest ? `자료 기준 ${new Date(result.latest).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})} · 현재 잔여석은 공식 페이지에서 확인하세요.` : savedMode() ? '이 월의 저장 자료가 없습니다.' : '실시간 월 조회를 누르면 원본의 잔여석을 새로 확인합니다.'));
@@ -181,6 +188,8 @@ $<HTMLInputElement>('#import').addEventListener('change', async event => {
   try {
     let c = structuredClone(state); const warnings: string[] = [];
     for (const file of files) { if (file.size > 20_000_000) throw new Error('20MB 이하 JSON을 선택하세요.'); const data = JSON.parse(await file.text()); signal.throwIfAborted(); if(isTierBackup(data)) c=restoreTierBackup(data,c).state; else {const r = importData(data, c); c = r.state; warnings.push(...r.warnings);} }
+    // An explicit personal restore takes precedence over the already offered published preset.
+    c.publishedPreferencesVersion=PUBLISHED_PREFERENCES_VERSION;
     signal.throwIfAborted(); await saveState(c, signal); state = c; demo = false; selectedDay = state.events.find(e => e.date.startsWith(state.month))?.date || `${state.month}-01`; undoState = null; $('#undo').hidden = true;
     say(`가져오기 완료 · ${files.length}개 파일. ${warnings.slice(0, 4).join(' ')}`);
   } catch (error) { say(signal.aborted ? '가져오기를 취소했습니다. 기존 자료를 유지합니다.' : `가져오지 못했습니다. ${error instanceof Error ? error.message : 'JSON 형식을 확인하세요.'}`); }
@@ -305,7 +314,32 @@ $('#tide-refresh').addEventListener('click',async()=>{
   finally {setBusy(false);render();}
 });
 window.addEventListener('online', connection); window.addEventListener('offline', connection);
-setBusy(true); try { const prepared=initializeFleet(await loadState()), archive=initializeMonthlyArchive(prepared.state); state=archive.state;const tideDays=mergeTideDays(tideArchive.days,state.tideDays),tidesChanged=JSON.stringify(tideDays)!==JSON.stringify(state.tideDays);state={...state,tideDays,selectedPlatform:'all',selectedSpecies:'all',excludedSpeciesKeys:[]}; if (prepared.changed || archive.changed || tidesChanged) await saveState(state); if (prepared.seeded) say(`기본 선박 목록 적용 완료 · 전체 ${state.boats.length}척 · 선택 ${state.selectedUids.length}척. 개인 티어를 유지했습니다.`); } catch { say('저장 자료를 읽거나 저장하지 못했습니다. 기본 목록·티어 복원 또는 백업 JSON 가져오기를 이용하세요.'); } finally { setBusy(false); render(); }
+setBusy(true);
+try {
+  const prepared=initializeFleet(await loadState()),archive=initializeMonthlyArchive(prepared.state);
+  state=archive.state; // Keep readable personal data visible if creating the migration backup fails.
+  const next=applyPublishedPreferences(archive.state),changed=next!==archive.state;
+  if(changed) await backupPreferences(archive.state,PUBLISHED_PREFERENCES_VERSION);
+  const tideDays=mergeTideDays(tideArchive.days,next.tideDays),tidesChanged=JSON.stringify(tideDays)!==JSON.stringify(next.tideDays);
+  state={...next,tideDays,month:localMonth(),selectedPlatform:'all',selectedSpecies:'all',excludedSpeciesKeys:[]};
+  selectedDay=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul'}).format(new Date());liveMonth=state.month;
+  if(prepared.changed || archive.changed || tidesChanged || changed) await saveState(state);
+  if(changed) say('제공한 티어·선택 목록을 적용했습니다. 이전 설정은 기기에 백업했습니다.');
+} catch {say('기기 설정을 읽거나 저장하지 못했습니다. 백업 파일을 확인해 주세요.');}
+finally {setBusy(false);render();}
+$('#restore-before-publish').addEventListener('click',async()=>{
+  if(busy) return;
+  try {
+  const previous=await previousPreferences(PUBLISHED_PREFERENCES_VERSION);
+  if(!previous) {say('이 기기에 배포 전 설정 백업이 없습니다.');return;}
+  const ids=new Set(state.boats.map(b=>b.uid)),candidate={...state,tiers:structuredClone(previous.tiers),selectedUids:previous.selectedUids.filter(id=>ids.has(id))};
+  for(const tier of TIERS) candidate.tiers[tier]=candidate.tiers[tier].filter(id=>ids.has(id));
+  await commit(candidate,'기존 티어·선택을 복원했습니다. 최신 조회 자료는 유지합니다.');
+  } catch {say('기기 백업을 읽지 못했습니다. 현재 티어·선택은 유지합니다.');}
+});
+for(const link of document.querySelectorAll<HTMLAnchorElement>('.calendar-filter-row a')) link.addEventListener('click',()=>{
+  const panel=document.querySelector<HTMLDetailsElement>(link.hash);if(panel) panel.open=true;
+});
 // Refresh freshness labels while visible; this never makes a network request.
 setInterval(()=>{if(!busy && document.visibilityState==='visible') render();},60000);
 $('#apply-update').addEventListener('click',()=>{if(!busy) location.reload();});

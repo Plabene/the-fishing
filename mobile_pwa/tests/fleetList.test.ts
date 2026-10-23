@@ -19,7 +19,7 @@ test('mixed queries start both platforms early without changing result order or 
   expect(started.slice(0,3)).toEqual(['1','sunsang24:ship:698','2']);expect(peak).toBe(3);expect(result.rows.map(r=>r.boat.uid)).toEqual(boats.map(b=>b.uid));
 });
 test('legacy Sunsang aliases are deduplicated by native ship ID and public support is explicit',()=>{
-  const fleet=defaultFleet().boats,alias=fleet.find(b=>b.uid.startsWith('external:') && supportsLive(b));
+  const fleet=defaultFleet().boats,alias=fleet.find(b=>b.uid.startsWith('external:') && boatIdentity(b).startsWith('sunsang24:') && supportsLive(b));
   const linked=fleet.find(b=>b.uid==='sunsang24:ship:698')!;
   expect(supportsLive(linked)).toBe(true);
   expect(supportsLive({...linked,uid:'sunsang24:ship:99999999'})).toBe(false);

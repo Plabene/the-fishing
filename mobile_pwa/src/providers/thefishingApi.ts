@@ -3,6 +3,7 @@ import {boatPlatform} from '../platforms';
 import type { AvailabilityProvider, ProviderResult } from '../provider';
 import defaultEndpoint from '../data/apiEndpoint.json';
 import { eventSpecies, speciesLabel } from '../species';
+import {bookingAlias} from '../bookingAliases';
 
 const key='thefishing-availability-api';
 export function apiOrigin(value:string):string {
@@ -70,6 +71,12 @@ export class TheFishingApi implements AvailabilityProvider {
   private pending=new Map<string,Promise<ProviderResult>>();
   constructor(private origin:string,private request:typeof fetch=(...args)=>fetch(...args)) {if(origin) this.origin=apiOrigin(origin);}
   async readMonth(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
+    const alias=bookingAlias(boat.uid);
+    if(alias) {
+      // Read the established public booking provider. Do not retry the blocked independent homepage.
+      const result=await this.readMonth({...boat,uid:alias.uid,url:alias.url},month,signal);
+      return {...result,message:`더피싱 연동 예약표 · ${result.message}`,events:result.events.map(event=>({...event,uid:boat.uid,reservationUrl:alias.url}))};
+    }
     if(!this.origin) return failure('조회 API를 먼저 연결하세요.','API_NOT_CONFIGURED');
     if(!officialDetail(boat.url,boat.uid)) return {...failure('이 선박은 API 조회를 지원하지 않습니다. 공식 페이지를 이용하세요.','UNSUPPORTED_SOURCE'),stop:false};
     if(!/^20\d\d-(0[1-9]|1[0-2])$/.test(month)) return failure('조회 월을 확인하세요.','PARSER_UNSUPPORTED');
