@@ -34,4 +34,5 @@ test('recovery preview, exact apply, automatic history and month navigation pers
     const saved=await loadState() as AppState;expect(saved.tiers).toEqual(intentionallyEmpty.tiers);
     expect(initializePreferenceRecovery(saved,true).restored).toBe(0);
   } finally {vi.unstubAllGlobals();}
-});
+// This covers multiple IndexedDB transactions and full-catalog DOM renders on shared CI runners.
+},15000);
