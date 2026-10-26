@@ -36,9 +36,26 @@ test('HTTP restriction, redirects, security HTML and network failures stop colle
   }
 });
 test('persistent daily limit and invalid pages do not make upstream requests',async()=>{
-  const store=new MemoryStore(),now=Date.now(),request=vi.fn<typeof fetch>();await store.put('catalog-budget',{day:new Date(now).toISOString().slice(0,10),count:100,lastStart:0,blockedUntil:0});
+  const store=new MemoryStore(),now=Date.now(),request=vi.fn<typeof fetch>();await store.put('catalog-budget',{day:new Date(now).toISOString().slice(0,10),count:200,lastStart:0,blockedUntil:0});
   const service=new CatalogService(store,request,()=>now,0);
   for(const page of [0,1,101,1.1,NaN]) expect((await service.query(page)).status).toBe('UNAVAILABLE');expect(request).not.toHaveBeenCalled();
+});
+
+test('transient 503/network failures retry once while 403 and 429 never retry',async()=>{
+  for(const first of [new Response('',{status:503}),new TypeError('network')]) {
+    const request=vi.fn<typeof fetch>().mockImplementationOnce(async()=>{if(first instanceof Error) throw first;return first;}).mockResolvedValueOnce(response());
+    expect((await new CatalogService(new MemoryStore(),request,Date.now,0).query(1)).status).toBe('OK');expect(request).toHaveBeenCalledTimes(2);
+  }
+  const request=vi.fn<typeof fetch>().mockResolvedValue(new Response('',{status:429}));
+  expect((await new CatalogService(new MemoryStore(),request,Date.now,0).query(1)).status).toBe('UNAVAILABLE');expect(request).toHaveBeenCalledTimes(1);
+});
+test('regional requests accept only public form IDs and keep region caches separate',async()=>{
+  const request=vi.fn<typeof fetch>().mockImplementation(async input=>new Response(html()+(!String(input).includes('sa%5B%5D')?'<td class="label_mr"><label><input name="sa[]" value="7">군산</label></td>':''),{headers:{'content-type':'text/html'}}));
+  const service=new CatalogService(new MemoryStore(),request,Date.now,0);
+  expect((await service.query(1,'9999')).status).toBe('UNAVAILABLE');expect(request).toHaveBeenCalledTimes(1);
+  expect(await service.query(1,'7')).toMatchObject({status:'OK',area:'7',cached:false});
+  expect(new URL(String(request.mock.calls[1][0])).searchParams.get('sa[]')).toBe('7');
+  expect(await service.query(1,'7')).toMatchObject({status:'OK',area:'7',cached:true});expect(request).toHaveBeenCalledTimes(2);
 });
 test('catalog API validates exact parameters and routes into a separate coordinator with no arbitrary URL forwarding',async()=>{
   const coordinatorFetch=vi.fn().mockResolvedValue(Response.json({status:'OK'})),idFromName=vi.fn((name:string)=>name),env={ALLOWED_ORIGIN:'https://plabene.github.io',MONTHLY:{idFromName,get:()=>({fetch:coordinatorFetch})}} as any;

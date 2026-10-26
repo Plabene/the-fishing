@@ -1,9 +1,9 @@
 import type { DurableObjectNamespace, DurableObjectState, ExportedHandler } from '@cloudflare/workers-types';
 import { apiFailure, MonthlyService, validQuery, type Store } from './service';
 import { TideService } from './tides';
-import {CatalogService,validCatalogPage} from './catalog';
+import {CatalogService,validCatalogPage,validCatalogArea} from './catalog';
 import {Sunsang24Service,SUNSANG_AREAS} from './sunsang24';
-import {Sunsang24PublicService} from './sunsang24Public';
+import {Sunsang24PublicService,PUBLIC_CATALOG_SOURCES} from './sunsang24Public';
 import {publicRouteForShip,SUNSANG_PUBLIC_SHIP_COUNT} from '../src/sunsang24PublicRoutes';
 
 interface Env {MONTHLY:DurableObjectNamespace; ALLOWED_ORIGIN:string; KHOA_TIDE_API_KEY?:string}
@@ -17,10 +17,11 @@ export class MonthlyCoordinator {
   constructor(ctx:DurableObjectState,env:Env) {this.service=new MonthlyService(ctx.storage as unknown as Store);this.tides=new TideService(ctx.storage as unknown as Store,env.KHOA_TIDE_API_KEY);this.catalog=new CatalogService(ctx.storage as unknown as Store);this.sunsang=new Sunsang24Service(ctx.storage as unknown as Store);this.sunsangPublic=new Sunsang24PublicService(ctx.storage as unknown as Store);}
   async fetch(request:Request):Promise<Response> {
     const u=new URL(request.url);
+    if(u.pathname==='/v1/sunsang24/catalog') {const result=await this.sunsangPublic.catalog(u.searchParams.get('host') || '');return json(result,result.status==='OK'?200:503);}
     if(u.pathname==='/v1/sunsang24/public-month') return json(await this.sunsangPublic.query(u.searchParams.get('ship') || '',u.searchParams.get('month') || ''));
     if(u.pathname==='/v1/sunsang24/month') return json(await this.sunsang.query(u.searchParams.get('area') || '',u.searchParams.get('month') || ''));
     if(u.pathname==='/v1/catalog') {
-      try {const result=await this.catalog.query(Number(u.searchParams.get('page')));return json(result,result.status==='OK'?200:503);}
+      try {const result=await this.catalog.query(Number(u.searchParams.get('page')),u.searchParams.get('area') || '');return json(result,result.status==='OK'?200:503);}
       catch {return json({status:'UNAVAILABLE',message:'목록 처리 실패. 기존 목록을 유지합니다.'},503);}
     }
     try {return json(u.pathname==='/v1/tides' ? await this.tides.query(u.searchParams.get('month') || ''):await this.service.query(u.searchParams.get('uid') || '',u.searchParams.get('month') || ''));}
@@ -37,6 +38,12 @@ export async function handleRequest(request:Request,env:Env):Promise<Response> {
     return new Response(null,{status:204,headers:{...headers,'Access-Control-Allow-Methods':'GET, OPTIONS','Access-Control-Max-Age':'600'}});
   }
   if(request.method!=='GET') return json(apiFailure('API_UNAVAILABLE','GET 요청만 지원합니다.'),405,headers);
+  if(url.pathname==='/v1/sunsang24/catalog') {
+    const host=url.searchParams.get('host') || '';
+    if(!PUBLIC_CATALOG_SOURCES.has(host) || url.searchParams.getAll('host').length!==1 || [...url.searchParams.keys()].some(k=>k!=='host')) return json({status:'UNAVAILABLE',message:'검증된 공개 선사 주소만 지원합니다.'},400,headers);
+    try {const coordinator=env.MONTHLY.get(env.MONTHLY.idFromName('sunsang24-public-v1')),response=await coordinator.fetch(new Request(`https://coordinator/v1/sunsang24/catalog?host=${host}`) as never);return new Response(await response.text(),{status:response.status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});}
+    catch {return json({status:'UNAVAILABLE',message:'공개 선사 목록 서버 응답 실패. 기존 목록 유지'},503,headers);}
+  }
   if(url.pathname==='/health' && !url.search) return json({service:'thefishing-availability',schema:1,ready:!!env.MONTHLY,tidesReady:!!env.KHOA_TIDE_API_KEY,platforms:{thefishing:'enabled',sunsang24:'public_homepages',sunsang24CentralApi:'permission_required'},sunsang24PublicShips:SUNSANG_PUBLIC_SHIP_COUNT},env.MONTHLY ? 200:503,headers);
   if(url.pathname==='/v1/sunsang24/public-month') {
     const ship=url.searchParams.get('ship') || '',month=url.searchParams.get('month') || '';
@@ -49,10 +56,11 @@ export async function handleRequest(request:Request,env:Env):Promise<Response> {
   }
   if(url.pathname==='/v1/catalog') {
     const page=url.searchParams.get('page') || '';
-    if(!validCatalogPage(page) || url.searchParams.getAll('page').length!==1 || [...url.searchParams.keys()].some(k=>k!=='page')) return json({status:'UNAVAILABLE',message:'목록 페이지를 확인하세요.'},400,headers);
+    const area=url.searchParams.get('area') || '';
+    if(!validCatalogPage(page) || url.searchParams.getAll('page').length!==1 || url.searchParams.has('area') && (!validCatalogArea(area) || url.searchParams.getAll('area').length!==1) || [...url.searchParams.keys()].some(k=>!['page','area'].includes(k))) return json({status:'UNAVAILABLE',message:'목록 페이지·지역을 확인하세요.'},400,headers);
     try {
       const coordinator=env.MONTHLY.get(env.MONTHLY.idFromName('catalog-v1'));
-      const response=await coordinator.fetch(new Request(`https://coordinator/v1/catalog?page=${page}`) as never);
+      const response=await coordinator.fetch(new Request(`https://coordinator/v1/catalog?page=${page}${area?'&area='+area:''}`) as never);
       return new Response(await response.text(),{status:response.status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
     } catch {return json({status:'UNAVAILABLE',message:'목록 조회 서버에 연결하지 못했습니다.'},503,headers);}
   }

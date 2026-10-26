@@ -1,5 +1,6 @@
 import catalog from './data/sunsang24Fleet.json';
 import type { Boat } from './models';
+import {normalizeProvince,normalizeLocal} from './regionNames';
 
 export type Platform='thefishing'|'sunsang24'|'external';
 export type PlatformFilter='all'|'thefishing'|'sunsang24';
@@ -37,20 +38,20 @@ export function sunsangDateLink(uid:string,date:string):string {
 }
 export function departureNote(boat:Boat):string {
   const listing=sunsangListing(boat.uid);
-  return listing && !boat.port && listing.departureArea ? `원본 출항 구역 ${listing.departureArea} · 정확한 항구 미확인`:'';
+  return listing && 'regionBasis' in listing && listing.regionBasis==='public-provider-address' ? '공개 선사 주소 기준 등록 지역 · 실제 출항지는 일정별 공식 안내 확인':listing && !boat.port && listing.departureArea ? `원본 출항 구역 ${listing.departureArea} · 정확한 항구 미확인`:'';
 }
 /** A possible match is informational only: never merges inventory or seat counts. */
 export function duplicateCandidates(boat:Boat,boats:Boat[]):Boat[] {
   if(!boat.port || !boat.region?.province || !boat.region.local) return [];
   const name=(v:string)=>v.normalize('NFKC').replace(/\s/g,'').toLowerCase();
-  return boats.filter(b=>b.uid!==boat.uid && boatPlatform(b)!==boatPlatform(boat) && b.port===boat.port && b.region?.province===boat.region?.province && b.region?.local===boat.region?.local && name(b.name)===name(boat.name));
+  return boats.filter(b=>b.uid!==boat.uid && boatPlatform(b)!==boatPlatform(boat) && b.port.trim()===boat.port.trim() && normalizeProvince(b.region?.province || '')===normalizeProvince(boat.region!.province) && normalizeLocal(b.region?.local || '')===normalizeLocal(boat.region!.local) && name(b.name)===name(boat.name));
 }
 /** Index once for the full fleet, instead of scanning every vessel for every row. */
 export function possibleDuplicateIds(boats:Boat[]):Set<string> {
   const groups=new Map<string,Boat[]>(),result=new Set<string>();
   for(const boat of boats) {
     if(!boat.port || !boat.region?.province || !boat.region.local) continue;
-    const key=JSON.stringify([boat.name.normalize('NFKC').replace(/\s/g,'').toLowerCase(),boat.port,boat.region.province,boat.region.local]);
+    const key=JSON.stringify([boat.name.normalize('NFKC').replace(/\s/g,'').toLowerCase(),boat.port.trim(),normalizeProvince(boat.region.province),normalizeLocal(boat.region.local)]);
     const group=groups.get(key) || [];group.push(boat);groups.set(key,group);
   }
   for(const group of groups.values()) if(new Set(group.map(boatPlatform)).size>1) for(const boat of group) result.add(boat.uid);

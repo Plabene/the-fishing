@@ -1,5 +1,5 @@
 import type {Boat} from '../../src/models';
-export interface CatalogPage {total:number;lastPage:number;boats:Boat[]}
+export interface CatalogPage {total:number;lastPage:number;boats:Boat[];areas?:Array<{id:string;label:string}>}
 export interface CatalogResult {boats:Boat[];pages:number;total:number;listedCards:number;duplicates:number;conflicts:number}
 export const CATALOG_URL:string;
 export function parseCatalogPage(html:string,page?:number):CatalogPage;

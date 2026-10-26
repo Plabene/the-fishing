@@ -5,13 +5,13 @@ export function parseCatalogPage(html,page=1) {
   const doc=parseHTML(html).document;
   if(/access denied|captcha|cloudflare ray id|접근이 차단|비정상적인 접근/i.test(doc.querySelector('title')?.textContent || '') || doc.querySelector('form[action*="challenge"]')) throw new Error('카탈로그 접근 제한');
   const counts=doc.querySelector('.re_s_total')?.textContent || '',total=Number(counts.match(/검색\s*([\d,]+)\s*건/)?.[1]?.replaceAll(',',''));
-  if(!Number.isInteger(total) || total<1 || total>5000) throw new Error('전체 목록 건수를 확인하지 못했습니다.');
+  if(!Number.isInteger(total) || total<0 || total>5000) throw new Error('전체 목록 건수를 확인하지 못했습니다.');
   const section=doc.querySelector('.re_st_2')?.closest('article');
   if(!section || !section.querySelector('.re_st_2')?.textContent?.includes('예약')) throw new Error('예약 목록 영역이 없습니다.');
   const pageTitle=doc.querySelector('title')?.textContent?.match(/(\d+)페이지/);
   if(pageTitle && Number(pageTitle[1])!==page) throw new Error('응답 페이지 번호가 요청과 다릅니다.');
   const cards=[...section.querySelectorAll('.re_list > ul > li')],boats=[];
-  if(!cards.length || cards.length>100) throw new Error('선박 목록이 비어 있거나 형식이 달라졌습니다.');
+  if((!cards.length && total!==0) || cards.length>100) throw new Error('선박 목록이 비어 있거나 형식이 달라졌습니다.');
   for(const card of cards) {
     const link=card.querySelector('a[href]'),url=new URL(link?.getAttribute('href') || '',CATALOG_URL),uid=url.searchParams.get('uid');
     if(url.origin!=='https://thefishing.kr' || url.pathname!=='/reservation/list.php' || !/^\d{1,10}$/.test(uid || '') || url.search!==`?uid=${uid}` || url.hash || url.username || url.password) throw new Error('목록에 잘못된 상세 URL이 있습니다.');
@@ -21,16 +21,18 @@ export function parseCatalogPage(html,page=1) {
     const region={sea:(path[0] || '').slice(0,60),province:(path[1] || '').slice(0,60),local:(path[2] || '').slice(0,60)};
     boats.push({uid,name,port:(path[3] || '').slice(0,160),url:url.href,...(path.length ? {region}:{})});
   }
-  if(boats.every(b=>!b.name)) throw new Error('목록 이름 필드가 누락됐습니다.');
+  if(boats.length && boats.every(b=>!b.name)) throw new Error('목록 이름 필드가 누락됐습니다.');
   const last=section.querySelector('a.next10[href]'),lastPage=last ? Number(new URL(last.getAttribute('href'),CATALOG_URL).searchParams.get('page')):1;
   if(!Number.isInteger(lastPage) || lastPage<page || lastPage>100) throw new Error('마지막 페이지를 확인하지 못했습니다.');
-  return {total,lastPage,boats};
+  const areas=[...doc.querySelectorAll('td.label_mr input[name="sa[]"]')].map(input=>({id:input.getAttribute('value'),label:clean(input.parentElement?.textContent)}));
+  if(areas.some(a=>!/^\d{1,4}$/.test(a.id || '') || !a.label) || new Set(areas.map(a=>a.id)).size!==areas.length) throw new Error('지역 목록 형식 오류');
+  return {total,lastPage,boats,...(areas.length ? {areas}:{})};
 }
 export async function collectCatalog(readPage,onProgress=()=>{}) {
   return collectCatalogPages(async page=>parseCatalogPage(await readPage(page),page),onProgress);
 }
 export function validateCatalogPage(value,page) {
-  if(!value || !Number.isInteger(value.total) || value.total<1 || value.total>5000 || !Number.isInteger(value.lastPage) || value.lastPage<page || value.lastPage>100 || !Array.isArray(value.boats) || !value.boats.length || value.boats.length>100) throw new Error('목록 API 응답 형식 오류');
+  if(!value || !Number.isInteger(value.total) || value.total<0 || value.total>5000 || !Number.isInteger(value.lastPage) || value.lastPage<page || value.lastPage>100 || !Array.isArray(value.boats) || (!value.boats.length && value.total!==0) || value.boats.length>100 || (value.total===0 && (value.boats.length || value.lastPage!==1))) throw new Error('목록 API 응답 형식 오류');
   const boats=value.boats.map(b=>{
     if(!b || typeof b.uid!=='string' || !/^\d{1,10}$/.test(b.uid) || b.url!==`${CATALOG_URL}?uid=${b.uid}` || typeof b.name!=='string' || b.name.length>160 || typeof b.port!=='string' || b.port.length>160) throw new Error('목록 API 선박 정보 오류');
     let region;
@@ -40,15 +42,21 @@ export function validateCatalogPage(value,page) {
     }
     return {uid:b.uid,name:clean(b.name),port:clean(b.port),url:b.url,...(region ? {region}:{})};
   });
-  return {total:value.total,lastPage:value.lastPage,boats};
+  const areas=value.areas?.map(a=>{if(!/^\d{1,4}$/.test(a.id) || typeof a.label!=='string' || !a.label || a.label.length>60) throw new Error('지역 API 형식 오류');return {id:a.id,label:clean(a.label)};});
+  if(areas && (areas.length>100 || new Set(areas.map(a=>a.id)).size!==areas.length)) throw new Error('지역 API 중복 오류');
+  return {total:value.total,lastPage:value.lastPage,boats,...(areas ? {areas}:{})};
 }
 export async function collectCatalogPages(readPage,onProgress=()=>{}) {
   const first=validateCatalogPage(await readPage(1),1),boats=[...first.boats];
-  if(Math.ceil(first.total/first.boats.length)!==first.lastPage) throw new Error('전체 건수와 페이지 수가 맞지 않습니다.');
+  if(first.total && Math.ceil(first.total/first.boats.length)!==first.lastPage) throw new Error('전체 건수와 페이지 수가 맞지 않습니다.');
   onProgress(1,first.lastPage);
+  const fingerprints=new Set([first.boats.map(b=>b.uid).sort().join(',')]);
   for(let page=2;page<=first.lastPage;page++) {
     const result=validateCatalogPage(await readPage(page),page);
     if(result.total!==first.total || result.lastPage!==first.lastPage || (page<first.lastPage && result.boats.length!==first.boats.length)) throw new Error('수집 중 목록 건수 또는 페이지가 변경됐습니다. 기존 목록을 유지합니다.');
+    const fingerprint=result.boats.map(b=>b.uid).sort().join(',');
+    if(fingerprints.has(fingerprint)) throw new Error('같은 페이지가 반복 반환됐습니다. 기존 목록을 유지합니다.');
+    fingerprints.add(fingerprint);
     boats.push(...result.boats);onProgress(page,first.lastPage);
   }
   if(boats.length!==first.total) throw new Error(`목록 건수 불일치: 표시 ${first.total}, 수집 ${boats.length}`);
@@ -65,6 +73,25 @@ export async function collectCatalogPages(readPage,onProgress=()=>{}) {
   });
   // Public pages repeat cards and can reorder between requests. This verifies page coverage, not unique coverage.
   return {boats:unique,pages:first.lastPage,total:unique.length,listedCards:first.total,duplicates:boats.length-unique.length,conflicts};
+}
+/** Regional partitions use only area IDs found in the public search form. */
+export async function collectRegionalCatalog(readPage,onProgress=()=>{}) {
+  const first=validateCatalogPage(await readPage(1,''),1);
+  if(!first.areas?.length) throw new Error('공개 지역 목록을 확인하지 못했습니다. 기존 목록을 유지합니다.');
+  const all=await collectCatalogPages(page=>page===1?Promise.resolve(first):readPage(page,''),onProgress);
+  const combined=new Map(all.boats.map(b=>[b.uid,b])),regions=[];
+  for(const area of first.areas) {
+    const result=await collectCatalogPages(page=>readPage(page,area.id));
+    for(const boat of result.boats) {
+      // The card is authoritative; never assign the requested region to returned boats.
+      const old=combined.get(boat.uid);
+      if(old && ((old.name && boat.name && old.name!==boat.name) || (old.region && boat.region && JSON.stringify(old.region)!==JSON.stringify(boat.region)))) {all.conflicts++;continue;}
+      combined.set(boat.uid,{...boat,name:boat.name || old?.name || '',region:boat.region || old?.region,port:boat.port || (JSON.stringify(boat.region)===JSON.stringify(old?.region)?old?.port || '':'')});
+    }
+    regions.push({id:area.id,label:area.label,listed:result.total,listedCards:result.listedCards,pages:result.pages,duplicates:result.duplicates});
+    onProgress(area.id,area.label);
+  }
+  return {...all,boats:[...combined.values()],total:combined.size,nationalListed:all.total,regionalCards:regions.reduce((n,r)=>n+r.listedCards,0),regions,regionalAdded:combined.size-all.total,coverage:'public-pages-with-regional-partitions',complete:all.duplicates===0 && all.conflicts===0 && regions.every(r=>r.duplicates===0)};
 }
 export function mergePublishedFleet(previous,incoming) {
   const rows=new Map(previous.map(b=>[b.uid,{...b}]));

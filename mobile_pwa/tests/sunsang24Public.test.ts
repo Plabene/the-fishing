@@ -29,6 +29,11 @@ test('public parser preserves explicit seats, species, departure; never booked t
 test('wrong month, missing ship identity, duplicates and mismatching action IDs fail closed',()=>{
   for(const html of [page('', '2026-11'),page(card('99999')),page(card()+card()),page(card().replace('data-schedule_no="123"','data-schedule_no="456"')),page(card().replace('2026-10-25','2026-11-25'))]) expect(()=>parsePublicMonth(html,host,'2026-10',at())).toThrow();
 });
+test('copied calendars inside operator notices cannot override live seats or poison sibling vessel parsing',()=>{
+  const copied=card('1976','999','2026-09-01','ING',999);
+  const html=page(card('1976','123','2026-10-25','ING',4).replace('버릴 메모',`<div class="editor_memo_pc">${copied}</div>`));
+  const result=parsePublicMonth(html,host,'2026-10',at());expect(result.events).toHaveLength(1);expect(result.events[0]).toMatchObject({id:'sunsang24-schedule-123',remaining:4,date:'2026-10-25'});
+});
 test('robots specific groups, wildcard rules and longest allow exception are respected',()=>{
   expect(robotsAllows('User-agent: Googlebot\nAllow: /\nUser-agent: bingbot\nDisallow: /','/ship/schedule_fleet/202610')).toBe(true);
   expect(robotsAllows('User-agent: *\nDisallow: /','/ship/schedule_fleet/202610')).toBe(false);
@@ -95,4 +100,33 @@ test('default fetch keeps the runtime receiver instead of binding to the service
   } as typeof fetch;
   try {expect((await new Sunsang24PublicService(new Memory()).query('1976','2026-10')).status).toBe('ALLOWED_READABLE');}
   finally {globalThis.fetch=original;}
+});
+
+test('public catalog caches identity metadata only; a later seat query still reads the origin',async()=>{
+  const store=new Memory(),html=page(card('903'))+'<div class="col-xs-6">오시는길 : 전북 군산시</div>',request=vi.fn<typeof fetch>(async input=>String(input).endsWith('robots.txt')?response('User-agent: *\nAllow: /'):response(html));
+  const service=new Sunsang24PublicService(store,request),first=await service.catalog('blackpink.sunsang24.com');
+  expect(first).toMatchObject({status:'OK',cached:false,boats:[{shipId:'903',province:'전북특별자치도',local:'군산'}]});
+  expect(await service.catalog('blackpink.sunsang24.com')).toMatchObject({status:'OK',cached:true});expect(request).toHaveBeenCalledTimes(2);
+  expect(JSON.stringify([...store.data])).not.toMatch(/remaining|예약자|버릴/);
+  expect((await service.query('903','2026-10')).status).toBe('ALLOWED_READABLE');expect(request).toHaveBeenCalledTimes(3);
+  expect((await service.catalog('api.sunsang24.com')).status).toBe('UNAVAILABLE');expect(request).toHaveBeenCalledTimes(3);
+});
+test('large fleet public calendars are bounded at 12 MB instead of rejecting legitimate 4 MB pages',async()=>{
+  const large=page(card())+'<!--'+' '.repeat(4000001)+'-->',request=vi.fn<typeof fetch>(async input=>String(input).endsWith('robots.txt')?response('User-agent: *\nAllow: /'):response(large));
+  expect((await new Sunsang24PublicService(new Memory(),request).query('1976','2026-10')).status).toBe('ALLOWED_READABLE');
+});
+test('catalog worker validates fixed hosts, duplicate params and CORS',async()=>{
+  const fetch=vi.fn(async()=>Response.json({status:'OK'})),env={ALLOWED_ORIGIN:'https://plabene.github.io',MONTHLY:{idFromName:(x:string)=>x,get:()=>({fetch})}} as never;
+  for(const suffix of ['host=api.sunsang24.com','host=blackpink.sunsang24.com&host=gosu.sunsang24.com','host=blackpink.sunsang24.com&url=https://evil.test']) expect((await handleRequest(new Request('https://worker/v1/sunsang24/catalog?'+suffix),env)).status).toBe(400);
+  expect(fetch).not.toHaveBeenCalled();expect((await handleRequest(new Request('https://worker/v1/sunsang24/catalog?host=blackpink.sunsang24.com'),env)).status).toBe(200);
+});
+
+test('catalog retries a transient upstream 503 once but never retries an access restriction',async()=>{
+  const html=page(card('903'))+'<div class="col-xs-6">오시는길 : 전북 군산시</div>';
+  for(const status of [503,403]) {
+    let reads=0;
+    const request=vi.fn<typeof fetch>(async input=>String(input).endsWith('robots.txt')?response('User-agent: *\nAllow: /'):++reads===1?new Response('',{status}):response(html));
+    const result=await new Sunsang24PublicService(new Memory(),request).catalog('blackpink.sunsang24.com');
+    expect(result.status).toBe(status===503?'OK':'UNAVAILABLE');expect(reads).toBe(status===503?2:1);
+  }
 });

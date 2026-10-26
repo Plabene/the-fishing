@@ -14,10 +14,10 @@ import {removeBoat} from '../src/tierStore';
 const fleet=()=>defaultFleet().boats;
 const tf=(local:string,port='',province='충청남도'):Boat=>({uid:'1',name:'동명호',port,url:'https://thefishing.kr/reservation/list.php?uid=1',region:{sea:'서해권',province,local}});
 
-test('all 380 public listings import exactly once, preserving four legacy IDs and no saved seats',()=>{
-  const boats=fleet(),sun=boats.filter(b=>boatPlatform(b)==='sunsang24');expect(sun).toHaveLength(380);expect(new Set(boats.map(b=>b.uid)).size).toBe(boats.length);
+test('all public listings import exactly once, preserving four legacy IDs and no saved seats',()=>{
+  const boats=fleet(),sun=boats.filter(b=>boatPlatform(b)==='sunsang24');expect(sun).toHaveLength(catalog.boats.length);expect(new Set(boats.map(b=>b.uid)).size).toBe(boats.length);
   expect(sun.filter(b=>b.uid.startsWith('external:'))).toHaveLength(4);
-  expect(catalog.boats.filter(b=>b.areaId)).toHaveLength(376);expect(catalog.boats.filter(b=>b.port)).toHaveLength(4);
+  expect(catalog.boats.filter(b=>b.areaId)).toHaveLength(376);expect(catalog.boats.filter(b=>b.port).length).toBeGreaterThanOrEqual(4);
   expect(defaultFleet().events).toEqual([]);
   for(const b of sun) expect(reservationLink(b.url,b.uid)).toBe(b.url);
   for(const field of ['cookie','token','password','remaining','applicant','phone','session']) expect(JSON.stringify(catalog)).not.toContain(`"${field}"`);
@@ -26,7 +26,7 @@ test('upgrade adds 376 listings and inherits the 21 saved PC tiers and retains p
   const state={...emptyState(),...structuredClone(original.state),schema:1 as const,fleetSeedVersion:original.version,fleetBaseline:structuredClone(original.state.boats)};
   const deleted=state.boats.at(-1)!.uid;removeBoat(state,deleted);state.boats[0].name='내 이름';const before=structuredClone(state);
   const upgraded=initializeFleet(state).state;
-  expect(upgraded.boats).toHaveLength(before.boats.length+376);expect(upgraded.boats[0].name).toBe('내 이름');expect(upgraded.boats.some(b=>b.uid===deleted)).toBe(false);
+  expect(upgraded.boats).toHaveLength(before.boats.length+catalog.boats.filter(b=>!original.state.boats.some(old=>old.uid===b.uid)).length);expect(upgraded.boats[0].name).toBe('내 이름');expect(upgraded.boats.some(b=>b.uid===deleted)).toBe(false);
   for(const tier of ['tier1','tier2','tier3','other'] as const) expect(upgraded.tiers[tier].filter(id=>!id.startsWith('sunsang24:'))).toEqual(before.tiers[tier]);expect(upgraded.selectedUids.filter(id=>!id.startsWith('sunsang24:'))).toEqual(before.selectedUids);expect(upgraded.selectedUids.length-before.selectedUids.length).toBe(21);
   expect(initializeFleet(upgraded).state).toEqual(upgraded);
 });

@@ -46,9 +46,23 @@ for b in public:
         'url': route or f'https://www.sunsang24.com/ship/list?ship_no={ship_id}',
         'observedAt': b['source_updated_at'],
     })
+destination = root / 'mobile_pwa/src/data/sunsang24Fleet.json'
+existing = json.loads(destination.read_text(encoding='utf-8')) if destination.exists() else {}
+incoming = {b['shipId']: b for b in ships}
+# A later PC import must not erase independently verified public providers.
+for previous in existing.get('boats', []):
+    if previous['shipId'] not in incoming:
+        ships.append(previous)
+    elif previous.get('sourceUrl'):
+        item = incoming[previous['shipId']]
+        for key in ['sourceUrl', 'regionBasis', 'calendarObserved']:
+            if key in previous:
+                item[key] = previous[key]
+        if not item['port']:
+            item['port'] = previous.get('port', '')
 ships.sort(key=lambda b: int(b['shipId']))
 version = hashlib.sha256(json.dumps(ships, ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:16]
-output = {'version': version, 'source': 'public PC vessel catalog; no live seat data', 'boats': ships}
+output = {**existing, 'version': version, 'source': 'PC catalog plus verified public provider directories; no seat data', 'boats': ships}
 (root / 'mobile_pwa/src/data/sunsang24Fleet.json').write_text(json.dumps(output, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
 print(json.dumps({'boats': len(ships), 'new': sum(x['uid'].startswith('sunsang24:') for x in ships),
                   'exactAreaKnown': sum(bool(x['areaId']) for x in ships), 'exactPortKnown': sum(bool(x['port']) for x in ships),

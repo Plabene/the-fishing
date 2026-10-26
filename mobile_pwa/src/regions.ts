@@ -1,5 +1,6 @@
 import {text,type Boat} from './models';
 import {boatPlatform,departureNote} from './platforms';
+import {normalizeProvince,normalizeLocal} from './regionNames';
 export interface BoatRegion {sea:string;province:string;local:string}
 export interface RegionFilter extends BoatRegion {port:string}
 export const UNKNOWN_REGION='__unknown__';
@@ -13,14 +14,13 @@ export function readRegion(value:unknown):BoatRegion|undefined {
 }
 export function readRegionFilter(value:unknown):RegionFilter {
   const row=value && typeof value==='object' ? value as Record<string,unknown>:{};
-  return Object.fromEntries(REGION_FIELDS.map(key=>[key,text(row[key],160)])) as unknown as RegionFilter;
+  const result=Object.fromEntries(REGION_FIELDS.map(key=>[key,text(row[key],160)])) as unknown as RegionFilter;
+  result.province=normalizeProvince(result.province);result.local=normalizeLocal(result.local);return result;
 }
-const provinces:Record<string,string>={충남:'충청남도',전남:'전라남도',경기:'경기도',경남:'경상남도',경북:'경상북도',전북:'전북특별자치도',전라북도:'전북특별자치도',강원:'강원특별자치도',강원도:'강원특별자치도',인천:'인천광역시',부산:'부산광역시',울산:'울산광역시',제주:'제주특별자치도',제주도:'제주특별자치도'};
-const locals:Record<string,string[]>={충청남도:['보령','서천','태안','서산','당진','홍성'],경기도:['화성','시흥','안산','평택'],전라남도:['여수','고흥','강진','완도','목포','진도','해남','장흥'],경상남도:['사천','통영','거제'],전북특별자치도:['군산','부안'],인천광역시:['옹진']};
 export function commonRegion(boat:Boat):BoatRegion {
-  const raw=boat.region,province=provinces[raw?.province || ''] || raw?.province || '';
+  const raw=boat.region,province=normalizeProvince(raw?.province || '');
   const region={sea:raw?.sea || '',province,local:raw?.local || ''};
-  region.local=(locals[province] || []).find(k=>[k,k+'시',k+'군'].includes(region.local)) || region.local;
+  region.local=normalizeLocal(region.local);
   if(boatPlatform(boat)==='thefishing') {
     // The source's 경기 > 인천 category also contains Oido in Siheung.
     if(province==='경기도' && raw?.local==='인천') {
@@ -42,7 +42,7 @@ export function commonRegion(boat:Boat):BoatRegion {
   return region;
 }
 export function regionValue(boat:Boat,key:keyof RegionFilter):string {return (key==='port' ? boat.port:commonRegion(boat)[key]) || UNKNOWN_REGION;}
-export function matchesRegion(boat:Boat,filter?:Partial<RegionFilter>):boolean {return REGION_FIELDS.every(key=>!filter?.[key] || regionValue(boat,key)===filter[key]);}
+export function matchesRegion(boat:Boat,filter?:Partial<RegionFilter>):boolean {const normalized=readRegionFilter(filter);return REGION_FIELDS.every(key=>!normalized[key] || regionValue(boat,key)===normalized[key]);}
 export function regionLabel(boat:Boat):string {return Object.values(commonRegion(boat)).filter(Boolean).join(' · ') || '지역 미확인';}
 export function locationDescription(boat:Boat):string {
   const canonical=regionLabel(boat),raw=Object.values(boat.region || {}).filter(Boolean).join(' · ');
@@ -50,7 +50,9 @@ export function locationDescription(boat:Boat):string {
 }
 /** Translate old saved filters by the actual matching vessels, never by ambiguous label alone. */
 export function migrateRegionFilter(boats:Boat[],filter?:RegionFilter):RegionFilter|undefined {
-  if(!filter || boats.some(b=>matchesRegion(b,filter))) return filter;
+  if(!filter) return filter;
+  const normalized=readRegionFilter(filter);
+  if(boats.some(b=>matchesRegion(b,normalized))) return normalized;
   const old=boats.filter(b=>REGION_FIELDS.every(k=>!filter[k] || ((k==='port' ? b.port:b.region?.[k]) || UNKNOWN_REGION)===filter[k]));
   if(!old.length) return filter;
   const next={...filter};let reset=false;

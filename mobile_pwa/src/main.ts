@@ -33,7 +33,6 @@ import { QueryProgress } from './queryProgress';
 import { matchesRegion,readRegion,regionLabel,regionSummary } from './regions';
 import { renderRegionFilter } from './regionFilter';
 import fleetSeed from './data/defaultFleet.json';
-import sunsangSeed from './data/sunsang24Fleet.json';
 import {boatPlatform,matchesPlatform,platformBadge,readPlatform,PLATFORM_LABELS,possibleDuplicateIds} from './platforms';
 import {publicRouteForBoat} from './sunsang24PublicRoutes';
 import {locationDescription} from './regions';
@@ -81,7 +80,8 @@ function renderFleet() {
   const boats = fleetVisible();
   const selected=new Set(state.selectedUids),duplicates=possibleDuplicateIds(state.boats);
   const tiers=new Map(TIERS.flatMap(t=>state.tiers[t].map(id=>[id,t] as const)));
-  $('#fleet-count').textContent = `${state.selectedUids.length}척 선택 / 전체 ${state.boats.length}척 · 표시 ${boats.length}척 · ${regionSummary(state.selectedRegion)}`;
+  const total=uniqueFleet(state.boats),counts=platformCounts(boats),external=counts.all-counts.thefishing-counts.sunsang24;
+  $('#fleet-count').textContent = `전체 ${total.length}개 등록 항목 · 표시 ${boats.length}개 (더피싱 ${counts.thefishing} · 선상24 ${counts.sunsang24}${external?' · 외부 '+external:''}) · 일정 연동 ${boats.filter(supportsLive).length}개 · 선택 ${total.filter(b=>selected.has(b.uid)).length}개 · 티어 등록 ${total.filter(b=>tiers.has(b.uid)).length}개 · ${regionSummary(state.selectedRegion)}`;
   $('#fleet-brief').textContent=`${state.selectedUids.length}척 선택`;
   $('#selected-only').setAttribute('aria-pressed',String(selectedOnly));
   target.dataset.sort=fleetSort;
@@ -89,14 +89,14 @@ function renderFleet() {
   if (!boats.length) fragment.append(el('p', state.boats.length ? '검색 결과가 없습니다.' : '아직 등록한 선박이 없습니다. JSON을 가져오거나 선박을 추가하세요.', 'empty'));
   for (const boat of boats) {
     const signature=JSON.stringify([boat,duplicates.has(boat.uid)]),cached=fleetRows.get(boat.uid);
-    if(cached?.signature===signature) {cached.check.checked=selected.has(boat.uid);cached.select.value=tiers.get(boat.uid) || 'other';cached.row.classList.toggle('is-selected',cached.check.checked);fragment.append(cached.row);continue;}
+    if(cached?.signature===signature) {cached.check.checked=selected.has(boat.uid);cached.select.value=tiers.get(boat.uid) || '';cached.row.classList.toggle('is-selected',cached.check.checked);fragment.append(cached.row);continue;}
     const row = el('article', '', 'boat-row'), info = el('div', '', 'boat-info'), label = el('label', '', 'boat-selection'), check = el('input');
     row.dataset.uid=boat.uid;
     row.classList.toggle('is-selected',selected.has(boat.uid));
     check.type = 'checkbox'; check.checked = selected.has(boat.uid); check.setAttribute('aria-label', `${boat.name} 달력에 포함`);
     check.addEventListener('change', () => { const c = structuredClone(state); c.selectedUids = check.checked ? [...new Set([...c.selectedUids, boat.uid])] : c.selectedUids.filter(id => id !== boat.uid); void commit(c, '달력에 표시할 선박을 저장했습니다.'); });
     label.append(check, el('strong', boat.name),platformBadge(boat));info.append(label);
-    const metadata=el('p','','boat-meta'),region=el('span',`${regionLabel(boat)}${boat.port?` · ${boat.port}`:''}`);region.title=locationDescription(boat) || region.textContent || '';
+    const metadata=el('p','','boat-meta'),region=el('span',`${regionLabel(boat)} · ${boat.port || '출항지 미확인'}`);region.title=locationDescription(boat) || region.textContent || '';
     const capability=el('span',supportsLive(boat)?'일정 연동':'공식 페이지 확인',supportsLive(boat)?'live-capable':'link-only');metadata.append(region,capability);info.append(metadata);
     const details=el('details','','boat-more'),summary=el('summary','···');summary.setAttribute('aria-label',`${boat.name} 관리 메뉴`);details.append(summary);
     const extra=el('div','','boat-extra');extra.append(el('p',`UID ${boat.uid}`,'muted'));
@@ -104,7 +104,8 @@ function renderFleet() {
     const location=locationDescription(boat);if(location) extra.append(el('p',location,'location-evidence'));
     if(duplicates.has(boat.uid)) extra.append(el('p','다른 플랫폼에 같은 이름·출항지 항목이 있습니다. 예약정보는 플랫폼별로 구분합니다.','muted'));
     const controls = el('div', '', 'boat-actions'), select = el('select'); select.setAttribute('aria-label', `${boat.name} 티어`);
-    for (const t of TIERS) { const o = el('option', LABELS[t]); o.value = t; select.append(o); } select.value = tiers.get(boat.uid) || 'other';
+    const unregistered=el('option','티어 미등록');unregistered.value='';unregistered.disabled=true;select.append(unregistered);
+    for (const t of TIERS) { const o = el('option', LABELS[t]); o.value = t; select.append(o); } select.value = tiers.get(boat.uid) || '';
     select.addEventListener('change', () => { const c = structuredClone(state); moveBoat(c, boat.uid, select.value as Tier); void commit(c, '티어를 저장했습니다.'); }); controls.append(select);
     const reorder=el('div','','reorder-actions');
     for (const [caption, offset] of [['↑', -1], ['↓', 1]] as const) { const b = el('button', caption); b.type = 'button'; b.setAttribute('aria-label', `${boat.name} ${offset < 0 ? '위로' : '아래로'}`); b.addEventListener('click', () => { const c = structuredClone(state); moveBoat(c, boat.uid, tierFor(c, boat.uid), offset); void commit(c, '선박 순서를 저장했습니다.'); }); reorder.append(b); }extra.append(reorder);
@@ -137,13 +138,13 @@ function renderResults(shown:AppState,result=queryMonth(shown,{month:shown.month
 }
 function render() {
   const shown = active(), result = queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly}), records=result.events;
-  const counts=platformCounts(state.boats);
-  for(const button of $('#platform-filter').querySelectorAll<HTMLButtonElement>('button')) {const platform=readPlatform(button.dataset.platform);button.textContent=`${PLATFORM_LABELS[platform]} ${counts[platform]}`;button.setAttribute('aria-pressed',String(platform===(state.selectedPlatform || 'all')));}
+  const counts=platformCounts(state.boats.filter(b=>matchesRegion(b,state.selectedRegion))),allCounts=platformCounts(state.boats);
+  for(const button of $('#platform-filter').querySelectorAll<HTMLButtonElement>('button')) {const platform=readPlatform(button.dataset.platform);button.textContent=`${PLATFORM_LABELS[platform]} ${counts[platform]}`;button.title=`선택 지역 ${counts[platform]}개 · 전국 보유 목록 ${allCounts[platform]}개`;button.setAttribute('aria-pressed',String(platform===(state.selectedPlatform || 'all')));}
   renderRegionFilter($('#region-filter'),state.boats,state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion,selectedSpecies:'all',excludedSpeciesKeys:[]},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
   const targets=orderedBoats(state).filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (tier==='all' || tierFor(state,b.uid)===tier)),targetCounts=platformCounts(targets);
   $('#query-target').textContent=`${targets.length}척 조회 대상 · ${regionSummary(state.selectedRegion)} · ${LABELS[tier]}`;
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
-  $('#fleet-catalog-status').textContent=`더피싱 기본 목록 ${fleetSeed.state.boats.length}개${catalog ? ` · 확인 ${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}`:''} · 매주 월요일 오전 6:17 갱신 예정. 선상24 ${sunsangSeed.boats.length}개는 PC 공개 목록(2026년 8~9월 자료)이며 자동 갱신하지 않습니다. 기존 선상24 링크 4개는 중복 추가하지 않습니다. 새 항목은 선택 해제 상태이며 개인 티어·선택은 유지됩니다.`;
+  $('#fleet-catalog-status').textContent=`더피싱 보유 목록 ${allCounts.thefishing}개${catalog ? ` · 최근 원본 확인 ${catalog.listed}개 (${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})})`:''}. 선상24 보유 목록 ${allCounts.sunsang24}개 · PC 누적 목록과 검증된 공개 선사 목록. 두 목록은 매주 월요일 갱신을 시도하며 실패한 출처의 기존 항목은 보존합니다. 중앙 API 접근 제한·원본 페이지 중복으로 전국 완전 수집을 보장하지 않습니다. 같은 플랫폼·ID는 한 번 집계하며 플랫폼 간 동일 선박 후보는 예약정보를 합치지 않습니다. 새 항목은 선택 해제 상태이며 개인 티어·선택은 유지됩니다.`;
   renderTideSummary($('#tide-status'),calculateTideMonth(shown.month,shown.tideDays || []));
   if (!selectedDay.startsWith(shown.month)) selectedDay = records[0]?.date || `${shown.month}-01`;
   $<HTMLInputElement>('#month').value = shown.month; $<HTMLInputElement>('#people').value=String(shown.requiredPeople); $('#month-label').textContent = `${shown.month.slice(0, 4)}년 ${Number(shown.month.slice(5))}월`;

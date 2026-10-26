@@ -1,6 +1,6 @@
 {
-  "version": "ab2c5573fb937d39",
-  "source": "public PC vessel catalog; no live seat data",
+  "version": "8ef804e9f55ab91c",
+  "source": "PC catalog plus verified public provider directories; no seat data",
   "boats": [
     {
       "shipId": "61",
@@ -28,7 +28,25 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=64",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:43.771Z",
+      "sourceUrl": "https://nature.sunsang24.com/ship/schedule_fleet"
+    },
+    {
+      "shipId": "93",
+      "uid": "sunsang24:ship:93",
+      "name": "구룡호",
+      "port": "",
+      "departureArea": "",
+      "province": "제주특별자치도",
+      "local": "",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "제주권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=93",
+      "observedAt": "2026-10-26T02:08:01.040Z",
+      "sourceUrl": "https://ninedragon.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "115",
@@ -42,7 +60,25 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=115",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:16.056Z",
+      "sourceUrl": "https://rkclgh.sunsang24.com/ship/schedule_fleet"
+    },
+    {
+      "shipId": "164",
+      "uid": "sunsang24:ship:164",
+      "name": "에프원호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=164",
+      "observedAt": "2026-10-26T02:07:33.452Z",
+      "sourceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "193",
@@ -112,7 +148,8 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=299",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:23.126Z",
+      "sourceUrl": "https://ocpro.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "300",
@@ -126,7 +163,8 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=300",
-      "observedAt": "2026-08-11T08:19:01+09:00"
+      "observedAt": "2026-10-26T02:08:23.126Z",
+      "sourceUrl": "https://ocpro.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "307",
@@ -140,7 +178,8 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=307",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:23.126Z",
+      "sourceUrl": "https://ocpro.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "310",
@@ -168,7 +207,8 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=312",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:14.163Z",
+      "sourceUrl": "https://pigho.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "320",
@@ -182,7 +222,8 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=320",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:36.346Z",
+      "sourceUrl": "https://princeho.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "321",
@@ -197,6 +238,23 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=321",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "324",
+      "uid": "sunsang24:ship:324",
+      "name": "고수호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=324",
+      "observedAt": "2026-10-26T02:07:17.477Z",
+      "sourceUrl": "https://gosu.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "334",
@@ -224,7 +282,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=338",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:41.908Z",
+      "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "339",
@@ -266,7 +325,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=344",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:39.978Z",
+      "sourceUrl": "https://cjh.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "347",
@@ -308,7 +368,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=360",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:30.046Z",
+      "sourceUrl": "https://seojin.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "365",
@@ -381,6 +442,23 @@
       "observedAt": "2026-08-11T08:19:01+09:00"
     },
     {
+      "shipId": "405",
+      "uid": "sunsang24:ship:405",
+      "name": "먹깨비호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=405",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "409",
       "uid": "sunsang24:ship:409",
       "name": "무야호",
@@ -392,7 +470,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=409",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:41.908Z",
+      "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "412",
@@ -493,6 +572,23 @@
       "observedAt": "2026-08-11T08:19:01+09:00"
     },
     {
+      "shipId": "477",
+      "uid": "sunsang24:ship:477",
+      "name": "에메랄드호",
+      "port": "",
+      "departureArea": "",
+      "province": "경상남도",
+      "local": "통영",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=477",
+      "observedAt": "2026-10-26T02:07:50.006Z",
+      "sourceUrl": "https://emerald.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "478",
       "uid": "sunsang24:ship:478",
       "name": "아우라호",
@@ -563,6 +659,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "490",
+      "uid": "sunsang24:ship:490",
+      "name": "루시호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=490",
+      "observedAt": "2026-10-26T02:07:31.454Z",
+      "sourceUrl": "https://gunsan.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "493",
       "uid": "sunsang24:ship:493",
       "name": "파라호",
@@ -605,6 +718,40 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "496",
+      "uid": "sunsang24:ship:496",
+      "name": "팀루비나2호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=496",
+      "observedAt": "2026-10-26T02:07:17.477Z",
+      "sourceUrl": "https://gosu.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "506",
+      "uid": "sunsang24:ship:506",
+      "name": "신성호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=506",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "507",
       "uid": "sunsang24:ship:507",
       "name": "글로리호",
@@ -630,7 +777,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=512",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:35.059Z",
+      "sourceUrl": "https://seamanho.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "515",
@@ -1050,7 +1198,8 @@
       "areaId": "499",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=660",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:26.757Z",
+      "sourceUrl": "https://daebak.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "661",
@@ -1064,7 +1213,8 @@
       "areaId": "499",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=661",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:26.757Z",
+      "sourceUrl": "https://daebak.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "664",
@@ -1079,6 +1229,23 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=664",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "669",
+      "uid": "sunsang24:ship:669",
+      "name": "엔에스호",
+      "port": "신창항",
+      "departureArea": "",
+      "province": "",
+      "local": "",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=669",
+      "observedAt": "2026-10-26T02:08:04.709Z",
+      "sourceUrl": "https://ns.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "unknown",
+      "calendarObserved": true
     },
     {
       "shipId": "672",
@@ -1162,7 +1329,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=698",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:43.771Z",
+      "sourceUrl": "https://nature.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "699",
@@ -1191,6 +1359,23 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=700",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "709",
+      "uid": "sunsang24:ship:709",
+      "name": "만수르호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=709",
+      "observedAt": "2026-10-26T02:07:33.452Z",
+      "sourceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "711",
@@ -1403,6 +1588,23 @@
       "observedAt": "2026-08-11T13:36:11+09:00"
     },
     {
+      "shipId": "832",
+      "uid": "sunsang24:ship:832",
+      "name": "이배다호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=832",
+      "observedAt": "2026-10-26T02:07:34.994Z",
+      "sourceUrl": "https://ebeda.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "833",
       "uid": "sunsang24:ship:833",
       "name": "해운호",
@@ -1459,6 +1661,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "839",
+      "uid": "sunsang24:ship:839",
+      "name": "킹스타호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=839",
+      "observedAt": "2026-10-26T02:07:27.742Z",
+      "sourceUrl": "https://kingstarho.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "841",
       "uid": "sunsang24:ship:841",
       "name": "마이웨이호",
@@ -1484,7 +1703,42 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=850",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:39.978Z",
+      "sourceUrl": "https://cjh.sunsang24.com/ship/schedule_fleet"
+    },
+    {
+      "shipId": "853",
+      "uid": "sunsang24:ship:853",
+      "name": "자이언트호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=853",
+      "observedAt": "2026-10-26T02:07:25.498Z",
+      "sourceUrl": "https://giant.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "869",
+      "uid": "sunsang24:ship:869",
+      "name": "카니발호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=869",
+      "observedAt": "2026-10-26T02:07:21.338Z",
+      "sourceUrl": "https://carnival.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "870",
@@ -1526,7 +1780,8 @@
       "areaId": "498",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=884",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:21.328Z",
+      "sourceUrl": "https://jh.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "885",
@@ -1540,7 +1795,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://think.sunsang24.com/ship/schedule_fleet/202610",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:12.464Z",
+      "sourceUrl": "https://think.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "894",
@@ -1585,6 +1841,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "903",
+      "uid": "sunsang24:ship:903",
+      "name": "블랙핑크호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=903",
+      "observedAt": "2026-10-26T02:07:15.528Z",
+      "sourceUrl": "https://blackpink.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "905",
       "uid": "sunsang24:ship:905",
       "name": "해풍2호",
@@ -1627,6 +1900,40 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "918",
+      "uid": "sunsang24:ship:918",
+      "name": "어비스호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=918",
+      "observedAt": "2026-10-26T02:07:33.452Z",
+      "sourceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "921",
+      "uid": "sunsang24:ship:921",
+      "name": "부성피싱 7호",
+      "port": "",
+      "departureArea": "",
+      "province": "경상남도",
+      "local": "통영",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=921",
+      "observedAt": "2026-10-26T02:07:48.218Z",
+      "sourceUrl": "https://busung.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "924",
       "uid": "sunsang24:ship:924",
       "name": "영구피싱호",
@@ -1667,6 +1974,57 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=934",
       "observedAt": "2026-08-11T08:19:01+09:00"
+    },
+    {
+      "shipId": "944",
+      "uid": "sunsang24:ship:944",
+      "name": "닥스호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=944",
+      "observedAt": "2026-10-26T02:07:29.511Z",
+      "sourceUrl": "https://seo.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "946",
+      "uid": "sunsang24:ship:946",
+      "name": "뉴라이브호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=946",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "948",
+      "uid": "sunsang24:ship:948",
+      "name": "뚱스호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=948",
+      "observedAt": "2026-10-26T02:07:29.511Z",
+      "sourceUrl": "https://seo.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "960",
@@ -1751,6 +2109,57 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1037",
       "observedAt": "2026-08-11T08:19:01+09:00"
+    },
+    {
+      "shipId": "1039",
+      "uid": "sunsang24:ship:1039",
+      "name": "포인트호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1039",
+      "observedAt": "2026-10-26T02:07:29.511Z",
+      "sourceUrl": "https://seo.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1043",
+      "uid": "sunsang24:ship:1043",
+      "name": "뉴빅토리호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1043",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1047",
+      "uid": "sunsang24:ship:1047",
+      "name": "에르메스호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1047",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1050",
@@ -1851,6 +2260,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "1088",
+      "uid": "sunsang24:ship:1088",
+      "name": "갤럭시호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1088",
+      "observedAt": "2026-10-26T02:07:29.511Z",
+      "sourceUrl": "https://seo.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": false
+    },
+    {
       "shipId": "1099",
       "uid": "sunsang24:ship:1099",
       "name": "꿈에그린호",
@@ -1863,6 +2289,40 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1099",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "1108",
+      "uid": "sunsang24:ship:1108",
+      "name": "월광마린호",
+      "port": "",
+      "departureArea": "",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "동해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1108",
+      "observedAt": "2026-10-26T02:07:59.326Z",
+      "sourceUrl": "https://moonlight.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1117",
+      "uid": "sunsang24:ship:1117",
+      "name": "에메랄드 호",
+      "port": "",
+      "departureArea": "",
+      "province": "경상남도",
+      "local": "통영",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1117",
+      "observedAt": "2026-10-26T02:07:50.006Z",
+      "sourceUrl": "https://emerald.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": false
     },
     {
       "shipId": "1119",
@@ -1935,6 +2395,23 @@
       "observedAt": "2026-08-11T13:36:11+09:00"
     },
     {
+      "shipId": "1144",
+      "uid": "sunsang24:ship:1144",
+      "name": "나이스피싱",
+      "port": "",
+      "departureArea": "",
+      "province": "경상남도",
+      "local": "통영",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1144",
+      "observedAt": "2026-10-26T02:07:43.322Z",
+      "sourceUrl": "https://nice.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "1149",
       "uid": "sunsang24:ship:1149",
       "name": "피쉬헌터",
@@ -2005,6 +2482,40 @@
       "observedAt": "2026-09-11T17:29:52+09:00"
     },
     {
+      "shipId": "1172",
+      "uid": "sunsang24:ship:1172",
+      "name": "빈스1호",
+      "port": "",
+      "departureArea": "",
+      "province": "경상북도",
+      "local": "포항",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "동해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1172",
+      "observedAt": "2026-10-26T02:07:50.486Z",
+      "sourceUrl": "https://bins.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1173",
+      "uid": "sunsang24:ship:1173",
+      "name": "빈스2호",
+      "port": "",
+      "departureArea": "",
+      "province": "경상북도",
+      "local": "포항",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "동해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1173",
+      "observedAt": "2026-10-26T02:07:50.486Z",
+      "sourceUrl": "https://bins.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "1175",
       "uid": "sunsang24:ship:1175",
       "name": "킹스타호",
@@ -2030,7 +2541,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1188",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:31.505Z",
+      "sourceUrl": "https://hi.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1202",
@@ -2117,6 +2629,23 @@
       "observedAt": "2026-09-11T17:29:52+09:00"
     },
     {
+      "shipId": "1238",
+      "uid": "sunsang24:ship:1238",
+      "name": "엄지척호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1238",
+      "observedAt": "2026-10-26T02:07:23.197Z",
+      "sourceUrl": "https://thumb.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "1242",
       "uid": "sunsang24:ship:1242",
       "name": "뉴이일호",
@@ -2143,6 +2672,23 @@
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1251",
       "observedAt": "2026-08-11T11:01:15+09:00"
+    },
+    {
+      "shipId": "1252",
+      "uid": "sunsang24:ship:1252",
+      "name": "해룡호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1252",
+      "observedAt": "2026-10-26T02:07:29.511Z",
+      "sourceUrl": "https://seo.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1278",
@@ -2184,7 +2730,25 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1330",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:41.908Z",
+      "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
+    },
+    {
+      "shipId": "1331",
+      "uid": "sunsang24:ship:1331",
+      "name": "레인저호",
+      "port": "강릉항",
+      "departureArea": "",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "동해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1331",
+      "observedAt": "2026-10-26T02:07:55.657Z",
+      "sourceUrl": "https://ranger.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1335",
@@ -2201,6 +2765,40 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "1339",
+      "uid": "sunsang24:ship:1339",
+      "name": "샤크호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1339",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1341",
+      "uid": "sunsang24:ship:1341",
+      "name": "슈퍼마린호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1341",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "1342",
       "uid": "sunsang24:ship:1342",
       "name": "만쿨호",
@@ -2213,6 +2811,57 @@
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1342",
       "observedAt": "2026-09-14T19:51:21+09:00"
+    },
+    {
+      "shipId": "1343",
+      "uid": "sunsang24:ship:1343",
+      "name": "킹마린호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1343",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1344",
+      "uid": "sunsang24:ship:1344",
+      "name": "프로호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1344",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1345",
+      "uid": "sunsang24:ship:1345",
+      "name": "해무니호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1345",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1362",
@@ -2383,6 +3032,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "1413",
+      "uid": "sunsang24:ship:1413",
+      "name": "뉴한일호",
+      "port": "",
+      "departureArea": "",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "동해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1413",
+      "observedAt": "2026-10-26T02:07:53.865Z",
+      "sourceUrl": "https://newhanil.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "1418",
       "uid": "sunsang24:ship:1418",
       "name": "비제이호",
@@ -2394,7 +3060,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1418",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:28.745Z",
+      "sourceUrl": "https://bj.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1419",
@@ -2478,7 +3145,8 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1468",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:19.565Z",
+      "sourceUrl": "https://horeng2.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1472",
@@ -2493,6 +3161,57 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1472",
       "observedAt": "2026-08-11T13:36:11+09:00"
+    },
+    {
+      "shipId": "1491",
+      "uid": "sunsang24:ship:1491",
+      "name": "동원호",
+      "port": "",
+      "departureArea": "",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "동해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1491",
+      "observedAt": "2026-10-26T02:07:51.850Z",
+      "sourceUrl": "https://dongwon.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1494",
+      "uid": "sunsang24:ship:1494",
+      "name": "유강호",
+      "port": "",
+      "departureArea": "",
+      "province": "부산광역시",
+      "local": "서구",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1494",
+      "observedAt": "2026-10-26T02:07:41.322Z",
+      "sourceUrl": "https://yukangfishing.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1502",
+      "uid": "sunsang24:ship:1502",
+      "name": "개우럭호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "부안",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1502",
+      "observedAt": "2026-10-26T02:07:36.866Z",
+      "sourceUrl": "https://victor.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1507",
@@ -2590,7 +3309,8 @@
       "areaId": "497",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1530",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:08.229Z",
+      "sourceUrl": "https://doji.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1536",
@@ -2663,6 +3383,23 @@
       "observedAt": "2026-09-14T19:51:21+09:00"
     },
     {
+      "shipId": "1607",
+      "uid": "sunsang24:ship:1607",
+      "name": "아레나호",
+      "port": "",
+      "departureArea": "",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "동해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1607",
+      "observedAt": "2026-10-26T02:07:57.464Z",
+      "sourceUrl": "https://arena.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "1618",
       "uid": "sunsang24:ship:1618",
       "name": "샤크호",
@@ -2703,6 +3440,40 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1634",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "1645",
+      "uid": "sunsang24:ship:1645",
+      "name": "인해호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1645",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1647",
+      "uid": "sunsang24:ship:1647",
+      "name": "아리랑호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1647",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1651",
@@ -2814,7 +3585,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1710",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:41.908Z",
+      "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1726",
@@ -2884,7 +3656,8 @@
       "areaId": "456",
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1773",
-      "observedAt": "2026-09-14T19:51:21+09:00"
+      "observedAt": "2026-10-26T02:08:37.613Z",
+      "sourceUrl": "https://goldroger.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1783",
@@ -2899,6 +3672,40 @@
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1783",
       "observedAt": "2026-08-11T11:01:15+09:00"
+    },
+    {
+      "shipId": "1797",
+      "uid": "sunsang24:ship:1797",
+      "name": "아리울1호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1797",
+      "observedAt": "2026-10-26T02:07:33.452Z",
+      "sourceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "1798",
+      "uid": "sunsang24:ship:1798",
+      "name": "아리울2호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1798",
+      "observedAt": "2026-10-26T02:07:33.452Z",
+      "sourceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1799",
@@ -3010,7 +3817,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1846",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:28.745Z",
+      "sourceUrl": "https://bj.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1847",
@@ -3094,7 +3902,8 @@
       "areaId": "",
       "sea": "남해권",
       "url": "https://doublek.sunsang24.com/ship/schedule_fleet",
-      "observedAt": "2026-08-04T00:00:00+09:00"
+      "observedAt": "2026-10-26T02:08:09.642Z",
+      "sourceUrl": "https://doublek.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1869",
@@ -3122,7 +3931,8 @@
       "areaId": "",
       "sea": "남해권",
       "url": "https://doublek.sunsang24.com/ship/schedule_fleet",
-      "observedAt": "2026-08-04T00:00:00+09:00"
+      "observedAt": "2026-10-26T02:08:09.642Z",
+      "sourceUrl": "https://doublek.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1872",
@@ -3165,6 +3975,23 @@
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1906",
       "observedAt": "2026-09-14T19:51:21+09:00"
+    },
+    {
+      "shipId": "1907",
+      "uid": "sunsang24:ship:1907",
+      "name": "태헌호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1907",
+      "observedAt": "2026-10-26T02:07:29.511Z",
+      "sourceUrl": "https://seo.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "1915",
@@ -3262,7 +4089,8 @@
       "areaId": "499",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1971",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:33.275Z",
+      "sourceUrl": "https://metafishingclub.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "1975",
@@ -3290,7 +4118,25 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1976",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:24.937Z",
+      "sourceUrl": "https://akbari.sunsang24.com/ship/schedule_fleet"
+    },
+    {
+      "shipId": "1979",
+      "uid": "sunsang24:ship:1979",
+      "name": "꽃돼지호(참돔)",
+      "port": "",
+      "departureArea": "",
+      "province": "",
+      "local": "",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1979",
+      "observedAt": "2026-10-26T02:08:14.163Z",
+      "sourceUrl": "https://pigho.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "unknown",
+      "calendarObserved": false
     },
     {
       "shipId": "1982",
@@ -3405,6 +4251,23 @@
       "observedAt": "2026-08-11T13:36:11+09:00"
     },
     {
+      "shipId": "2012",
+      "uid": "sunsang24:ship:2012",
+      "name": "씨스타호",
+      "port": "신창항",
+      "departureArea": "",
+      "province": "제주특별자치도",
+      "local": "제주",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "제주권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2012",
+      "observedAt": "2026-10-26T02:08:06.566Z",
+      "sourceUrl": "https://jejuseastar.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "2017",
       "uid": "sunsang24:ship:2017",
       "name": "빅보스호",
@@ -3459,6 +4322,23 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2028",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "2030",
+      "uid": "sunsang24:ship:2030",
+      "name": "프로피싱",
+      "port": "",
+      "departureArea": "",
+      "province": "경상남도",
+      "local": "통영",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2030",
+      "observedAt": "2026-10-26T02:07:45.166Z",
+      "sourceUrl": "https://profishing.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "2033",
@@ -3542,7 +4422,8 @@
       "areaId": "498",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2065",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:17.825Z",
+      "sourceUrl": "https://eungabi.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "2068",
@@ -3613,6 +4494,23 @@
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2078",
       "observedAt": "2026-08-11T11:01:15+09:00"
+    },
+    {
+      "shipId": "2079",
+      "uid": "sunsang24:ship:2079",
+      "name": "바다하리호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2079",
+      "observedAt": "2026-10-26T02:07:33.452Z",
+      "sourceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "2083",
@@ -3783,6 +4681,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "2113",
+      "uid": "sunsang24:ship:2113",
+      "name": "원투피싱호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2113",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "2118",
       "uid": "sunsang24:ship:2118",
       "name": "와일드캣호",
@@ -3920,7 +4835,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2171",
-      "observedAt": "2026-09-17T13:06:03+09:00"
+      "observedAt": "2026-10-26T02:08:24.937Z",
+      "sourceUrl": "https://akbari.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "2175",
@@ -3949,6 +4865,23 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2183",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "2194",
+      "uid": "sunsang24:ship:2194",
+      "name": "제우스피싱",
+      "port": "",
+      "departureArea": "",
+      "province": "제주특별자치도",
+      "local": "제주",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "제주권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2194",
+      "observedAt": "2026-10-26T02:08:02.701Z",
+      "sourceUrl": "https://jejuzeus.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "2195",
@@ -4089,6 +5022,23 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2236",
       "observedAt": "2026-08-11T08:19:01+09:00"
+    },
+    {
+      "shipId": "2238",
+      "uid": "sunsang24:ship:2238",
+      "name": "김대영호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2238",
+      "observedAt": "2026-10-26T02:07:33.452Z",
+      "sourceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "2239",
@@ -4326,7 +5276,8 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2299",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:24.937Z",
+      "sourceUrl": "https://akbari.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "2314",
@@ -4354,7 +5305,8 @@
       "areaId": "",
       "sea": "남해권",
       "url": "https://nurifishing.sunsang24.com/ship/schedule_fleet/0",
-      "observedAt": "2026-08-04T00:00:00+09:00"
+      "observedAt": "2026-10-26T02:08:11.025Z",
+      "sourceUrl": "https://nurifishing.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "2323",
@@ -4368,7 +5320,8 @@
       "areaId": "",
       "sea": "남해권",
       "url": "https://nurifishing.sunsang24.com/ship/schedule_fleet/0",
-      "observedAt": "2026-08-04T00:00:00+09:00"
+      "observedAt": "2026-10-26T02:08:11.025Z",
+      "sourceUrl": "https://nurifishing.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "2325",
@@ -4553,6 +5506,159 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "2370",
+      "uid": "sunsang24:ship:2370",
+      "name": "그랜드호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2370",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2372",
+      "uid": "sunsang24:ship:2372",
+      "name": "포세이돈호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2372",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2373",
+      "uid": "sunsang24:ship:2373",
+      "name": "월명호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2373",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2374",
+      "uid": "sunsang24:ship:2374",
+      "name": "하이원피싱",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2374",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2380",
+      "uid": "sunsang24:ship:2380",
+      "name": "해신호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2380",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2381",
+      "uid": "sunsang24:ship:2381",
+      "name": "임마누엘호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2381",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2383",
+      "uid": "sunsang24:ship:2383",
+      "name": "아폴로호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2383",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2384",
+      "uid": "sunsang24:ship:2384",
+      "name": "창성호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2384",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2386",
+      "uid": "sunsang24:ship:2386",
+      "name": "왕우럭호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "부안",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2386",
+      "observedAt": "2026-10-26T02:07:36.866Z",
+      "sourceUrl": "https://victor.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "2387",
       "uid": "sunsang24:ship:2387",
       "name": "갈매기호",
@@ -4607,6 +5713,91 @@
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2409",
       "observedAt": "2026-09-14T19:51:21+09:00"
+    },
+    {
+      "shipId": "2413",
+      "uid": "sunsang24:ship:2413",
+      "name": "챔피언호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2413",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2414",
+      "uid": "sunsang24:ship:2414",
+      "name": "나드리호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2414",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2415",
+      "uid": "sunsang24:ship:2415",
+      "name": "범고래호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2415",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
+      "shipId": "2416",
+      "uid": "sunsang24:ship:2416",
+      "name": "동방피싱",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2416",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": false
+    },
+    {
+      "shipId": "2417",
+      "uid": "sunsang24:ship:2417",
+      "name": "포세이돈2호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2417",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "2421",
@@ -4693,6 +5884,23 @@
       "observedAt": "2026-09-14T19:51:21+09:00"
     },
     {
+      "shipId": "2442",
+      "uid": "sunsang24:ship:2442",
+      "name": "행복호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2442",
+      "observedAt": "2026-10-26T02:07:34.994Z",
+      "sourceUrl": "https://ebeda.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "2453",
       "uid": "sunsang24:ship:2453",
       "name": "해풍1호",
@@ -4760,7 +5968,8 @@
       "areaId": "499",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2459",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-26T02:08:26.757Z",
+      "sourceUrl": "https://daebak.sunsang24.com/ship/schedule_fleet"
     },
     {
       "shipId": "2463",
@@ -4803,6 +6012,23 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2468",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "2472",
+      "uid": "sunsang24:ship:2472",
+      "name": "참돔호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2472",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": false
     },
     {
       "shipId": "2476",
@@ -4875,6 +6101,23 @@
       "observedAt": "2026-08-11T13:36:11+09:00"
     },
     {
+      "shipId": "2495",
+      "uid": "sunsang24:ship:2495",
+      "name": "토르호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2495",
+      "observedAt": "2026-10-26T02:07:19.456Z",
+      "sourceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "2497",
       "uid": "sunsang24:ship:2497",
       "name": "현정호",
@@ -4943,6 +6186,23 @@
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2509",
       "observedAt": "2026-09-14T19:51:21+09:00"
+    },
+    {
+      "shipId": "2510",
+      "uid": "sunsang24:ship:2510",
+      "name": "닉스2호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2510",
+      "observedAt": "2026-10-26T02:07:25.498Z",
+      "sourceUrl": "https://giant.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
     },
     {
       "shipId": "2511",
@@ -5309,6 +6569,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "2623",
+      "uid": "sunsang24:ship:2623",
+      "name": "스마트호",
+      "port": "비응항",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2623",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "2624",
       "uid": "sunsang24:ship:2624",
       "name": "어복호",
@@ -5321,6 +6598,586 @@
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2624",
       "observedAt": "2026-09-03T12:01:07+09:00"
+    },
+    {
+      "shipId": "2632",
+      "uid": "sunsang24:ship:2632",
+      "name": "삼성호",
+      "port": "",
+      "departureArea": "",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "서해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2632",
+      "observedAt": "2026-10-26T02:07:14.084Z",
+      "sourceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": false
+    },
+    {
+      "shipId": "2663",
+      "uid": "sunsang24:ship:2663",
+      "name": "까치선장 까치호",
+      "port": "",
+      "departureArea": "",
+      "province": "",
+      "local": "",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2663",
+      "observedAt": "2026-10-26T02:08:16.056Z",
+      "sourceUrl": "https://rkclgh.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "unknown",
+      "calendarObserved": true
     }
-  ]
+  ],
+  "catalog": {
+    "checkedAt": "2026-10-26T02:08:43.959Z",
+    "coverage": "registered-public-providers-only",
+    "complete": false,
+    "listed": 111,
+    "retained": 344,
+    "conflicts": [],
+    "sources": [
+      {
+        "host": "gunsannaksi.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:14.084Z",
+        "listed": 20,
+        "shipIds": [
+          "2413",
+          "2414",
+          "2381",
+          "2623",
+          "2415",
+          "2372",
+          "2417",
+          "2416",
+          "2374",
+          "2384",
+          "2370",
+          "2373",
+          "946",
+          "1645",
+          "2380",
+          "2383",
+          "2113",
+          "1043",
+          "2632",
+          "2472"
+        ]
+      },
+      {
+        "host": "blackpink.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:15.528Z",
+        "listed": 1,
+        "shipIds": [
+          "903"
+        ]
+      },
+      {
+        "host": "gosu.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:17.477Z",
+        "listed": 2,
+        "shipIds": [
+          "324",
+          "496"
+        ]
+      },
+      {
+        "host": "pro.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:19.456Z",
+        "listed": 10,
+        "shipIds": [
+          "1339",
+          "1341",
+          "1343",
+          "1344",
+          "1345",
+          "506",
+          "405",
+          "1047",
+          "1647",
+          "2495"
+        ]
+      },
+      {
+        "host": "carnival.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:21.338Z",
+        "listed": 1,
+        "shipIds": [
+          "869"
+        ]
+      },
+      {
+        "host": "thumb.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:23.197Z",
+        "listed": 1,
+        "shipIds": [
+          "1238"
+        ]
+      },
+      {
+        "host": "giant.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:25.498Z",
+        "listed": 2,
+        "shipIds": [
+          "853",
+          "2510"
+        ]
+      },
+      {
+        "host": "kingstarho.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:27.742Z",
+        "listed": 1,
+        "shipIds": [
+          "839"
+        ]
+      },
+      {
+        "host": "seo.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:29.511Z",
+        "listed": 6,
+        "shipIds": [
+          "944",
+          "948",
+          "1088",
+          "1039",
+          "1907",
+          "1252"
+        ]
+      },
+      {
+        "host": "gunsan.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:31.454Z",
+        "listed": 1,
+        "shipIds": [
+          "490"
+        ]
+      },
+      {
+        "host": "mansour.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:33.452Z",
+        "listed": 7,
+        "shipIds": [
+          "709",
+          "1797",
+          "1798",
+          "918",
+          "164",
+          "2079",
+          "2238"
+        ]
+      },
+      {
+        "host": "ebeda.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:34.994Z",
+        "listed": 2,
+        "shipIds": [
+          "832",
+          "2442"
+        ]
+      },
+      {
+        "host": "victor.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:36.866Z",
+        "listed": 2,
+        "shipIds": [
+          "1502",
+          "2386"
+        ]
+      },
+      {
+        "host": "seil.sunsang24.com",
+        "status": "UNAVAILABLE",
+        "checkedAt": "2026-10-26T02:07:38.273Z",
+        "message": "HTTP 503"
+      },
+      {
+        "host": "haeinho.sunsang24.com",
+        "status": "UNAVAILABLE",
+        "checkedAt": "2026-10-26T02:07:39.465Z",
+        "message": "HTTP 503"
+      },
+      {
+        "host": "yukangfishing.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:41.322Z",
+        "listed": 1,
+        "shipIds": [
+          "1494"
+        ]
+      },
+      {
+        "host": "nice.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:43.322Z",
+        "listed": 1,
+        "shipIds": [
+          "1144"
+        ]
+      },
+      {
+        "host": "profishing.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:45.166Z",
+        "listed": 1,
+        "shipIds": [
+          "2030"
+        ]
+      },
+      {
+        "host": "hyunju.sunsang24.com",
+        "status": "UNAVAILABLE",
+        "checkedAt": "2026-10-26T02:07:46.585Z",
+        "message": "HTTP 503"
+      },
+      {
+        "host": "busung.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:48.218Z",
+        "listed": 1,
+        "shipIds": [
+          "921"
+        ]
+      },
+      {
+        "host": "emerald.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:50.006Z",
+        "listed": 2,
+        "shipIds": [
+          "477",
+          "1117"
+        ]
+      },
+      {
+        "host": "bins.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:50.486Z",
+        "listed": 2,
+        "shipIds": [
+          "1172",
+          "1173"
+        ]
+      },
+      {
+        "host": "dongwon.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:51.850Z",
+        "listed": 1,
+        "shipIds": [
+          "1491"
+        ]
+      },
+      {
+        "host": "newhanil.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:53.865Z",
+        "listed": 1,
+        "shipIds": [
+          "1413"
+        ]
+      },
+      {
+        "host": "ranger.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:55.657Z",
+        "listed": 1,
+        "shipIds": [
+          "1331"
+        ]
+      },
+      {
+        "host": "arena.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:57.464Z",
+        "listed": 1,
+        "shipIds": [
+          "1607"
+        ]
+      },
+      {
+        "host": "moonlight.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:07:59.326Z",
+        "listed": 1,
+        "shipIds": [
+          "1108"
+        ]
+      },
+      {
+        "host": "ninedragon.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:01.040Z",
+        "listed": 1,
+        "shipIds": [
+          "93"
+        ]
+      },
+      {
+        "host": "jejuzeus.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:02.701Z",
+        "listed": 1,
+        "shipIds": [
+          "2194"
+        ]
+      },
+      {
+        "host": "ns.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:04.709Z",
+        "listed": 1,
+        "shipIds": [
+          "669"
+        ]
+      },
+      {
+        "host": "jejuseastar.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:06.566Z",
+        "listed": 1,
+        "shipIds": [
+          "2012"
+        ]
+      },
+      {
+        "host": "doji.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:08.229Z",
+        "listed": 1,
+        "shipIds": [
+          "1530"
+        ]
+      },
+      {
+        "host": "doublek.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:09.642Z",
+        "listed": 2,
+        "shipIds": [
+          "1867",
+          "1870"
+        ]
+      },
+      {
+        "host": "nurifishing.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:11.025Z",
+        "listed": 2,
+        "shipIds": [
+          "2322",
+          "2323"
+        ]
+      },
+      {
+        "host": "think.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:12.464Z",
+        "listed": 1,
+        "shipIds": [
+          "885"
+        ]
+      },
+      {
+        "host": "pigho.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:14.163Z",
+        "listed": 2,
+        "shipIds": [
+          "312",
+          "1979"
+        ]
+      },
+      {
+        "host": "rkclgh.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:16.056Z",
+        "listed": 2,
+        "shipIds": [
+          "115",
+          "2663"
+        ]
+      },
+      {
+        "host": "eungabi.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:17.825Z",
+        "listed": 1,
+        "shipIds": [
+          "2065"
+        ]
+      },
+      {
+        "host": "horeng2.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:19.565Z",
+        "listed": 1,
+        "shipIds": [
+          "1468"
+        ]
+      },
+      {
+        "host": "jh.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:21.328Z",
+        "listed": 1,
+        "shipIds": [
+          "884"
+        ]
+      },
+      {
+        "host": "ocpro.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:23.126Z",
+        "listed": 3,
+        "shipIds": [
+          "300",
+          "299",
+          "307"
+        ]
+      },
+      {
+        "host": "akbari.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:24.937Z",
+        "listed": 3,
+        "shipIds": [
+          "1976",
+          "2171",
+          "2299"
+        ]
+      },
+      {
+        "host": "daebak.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:26.757Z",
+        "listed": 3,
+        "shipIds": [
+          "660",
+          "661",
+          "2459"
+        ]
+      },
+      {
+        "host": "bj.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:28.745Z",
+        "listed": 2,
+        "shipIds": [
+          "1418",
+          "1846"
+        ]
+      },
+      {
+        "host": "seojin.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:30.046Z",
+        "listed": 1,
+        "shipIds": [
+          "360"
+        ]
+      },
+      {
+        "host": "hi.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:31.505Z",
+        "listed": 1,
+        "shipIds": [
+          "1188"
+        ]
+      },
+      {
+        "host": "metafishingclub.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:33.275Z",
+        "listed": 1,
+        "shipIds": [
+          "1971"
+        ]
+      },
+      {
+        "host": "seamanho.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:35.059Z",
+        "listed": 1,
+        "shipIds": [
+          "512"
+        ]
+      },
+      {
+        "host": "princeho.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:36.346Z",
+        "listed": 1,
+        "shipIds": [
+          "320"
+        ]
+      },
+      {
+        "host": "goldroger.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:37.613Z",
+        "listed": 1,
+        "shipIds": [
+          "1773"
+        ]
+      },
+      {
+        "host": "cjh.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:39.978Z",
+        "listed": 2,
+        "shipIds": [
+          "344",
+          "850"
+        ],
+        "excludedNonVesselIds": [
+          "749"
+        ]
+      },
+      {
+        "host": "marineho.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:41.908Z",
+        "listed": 4,
+        "shipIds": [
+          "1330",
+          "409",
+          "1710",
+          "338"
+        ],
+        "excludedNonVesselIds": [
+          "408",
+          "1152"
+        ]
+      },
+      {
+        "host": "nature.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-26T02:08:43.771Z",
+        "listed": 2,
+        "shipIds": [
+          "698",
+          "64"
+        ]
+      }
+    ]
+  }
 }

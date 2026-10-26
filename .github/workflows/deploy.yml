@@ -50,8 +50,22 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Refresh public boat directory
+        id: fishing_catalog
+        continue-on-error: true
         if: github.event_name == 'schedule' || inputs.refresh_fleet == true
         run: node scripts/update-fleet.mjs --live --api
+
+      - name: Refresh registered Sunsang24 public directories
+        id: sunsang_catalog
+        continue-on-error: true
+        if: github.event_name == 'schedule' || inputs.refresh_fleet == true
+        run: node scripts/update-sunsang-fleet.mjs --live --api
+
+      - name: Report catalog refresh failure
+        if: steps.fishing_catalog.outcome == 'failure' || steps.sunsang_catalog.outcome == 'failure'
+        run: |
+          echo '::warning::One or more catalog updates failed; the last verified catalog is retained.'
+          echo '목록 갱신 실패: 이전 검증 목록을 보존했습니다. 수집 단계 로그를 확인하세요.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Test app
         run: pnpm test
@@ -71,7 +85,7 @@ jobs:
       - name: Save verified catalog to GitHub
         if: github.event_name == 'schedule' || inputs.refresh_fleet == true
         run: |
-          git add src/data/defaultFleet.json
+          git add src/data/defaultFleet.json src/data/sunsang24Fleet.json
           if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

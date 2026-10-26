@@ -1,0 +1,511 @@
+{
+  "schema": 1,
+  "note": "Reviewed public provider hosts only. Region is provider registration address; precise departure ports require per-vessel evidence. Unverified regions remain blank.",
+  "sources": [
+    {
+      "host": "gunsannaksi.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {
+        "2413": "비응항",
+        "2414": "비응항",
+        "2623": "비응항",
+        "2372": "비응항",
+        "2373": "비응항",
+        "2383": "비응항",
+        "2113": "비응항"
+      }
+    },
+    {
+      "host": "blackpink.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://blackpink.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "gosu.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://gosu.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "pro.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://pro.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "carnival.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://carnival.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "thumb.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://thumb.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "giant.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://giant.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "kingstarho.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://kingstarho.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "seo.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://seo.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {
+        "948": "비응항",
+        "1039": "비응항",
+        "1907": "비응항"
+      }
+    },
+    {
+      "host": "gunsan.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://gunsan.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "mansour.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://mansour.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {},
+      "excludeShipIds": [
+        "1796"
+      ]
+    },
+    {
+      "host": "ebeda.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://ebeda.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "victor.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "부안",
+      "locationToken": "부안군",
+      "regionEvidenceUrl": "https://victor.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "seil.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영시",
+      "regionEvidenceUrl": "https://seil.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "haeinho.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영시",
+      "regionEvidenceUrl": "https://haeinho.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "yukangfishing.sunsang24.com",
+      "sea": "남해권",
+      "province": "부산광역시",
+      "local": "서구",
+      "locationToken": "부산 서구",
+      "regionEvidenceUrl": "https://yukangfishing.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "nice.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영시",
+      "regionEvidenceUrl": "https://nice.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "profishing.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영시",
+      "regionEvidenceUrl": "https://profishing.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "hyunju.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영시",
+      "regionEvidenceUrl": "https://hyunju.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "busung.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영시",
+      "regionEvidenceUrl": "https://busung.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "emerald.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영시",
+      "regionEvidenceUrl": "https://emerald.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "bins.sunsang24.com",
+      "sea": "동해권",
+      "province": "경상북도",
+      "local": "포항",
+      "locationToken": "포항시",
+      "regionEvidenceUrl": "https://bins.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "dongwon.sunsang24.com",
+      "sea": "동해권",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "locationToken": "강릉시",
+      "regionEvidenceUrl": "https://dongwon.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "newhanil.sunsang24.com",
+      "sea": "동해권",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "locationToken": "강릉시",
+      "regionEvidenceUrl": "https://newhanil.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "ranger.sunsang24.com",
+      "sea": "동해권",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "locationToken": "강릉시",
+      "regionEvidenceUrl": "https://ranger.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {
+        "1331": "강릉항"
+      }
+    },
+    {
+      "host": "arena.sunsang24.com",
+      "sea": "동해권",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "locationToken": "강릉시",
+      "regionEvidenceUrl": "https://arena.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "moonlight.sunsang24.com",
+      "sea": "동해권",
+      "province": "강원특별자치도",
+      "local": "강릉",
+      "locationToken": "강릉시",
+      "regionEvidenceUrl": "https://moonlight.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "ninedragon.sunsang24.com",
+      "sea": "제주권",
+      "province": "제주특별자치도",
+      "local": "",
+      "locationToken": "제주시",
+      "regionEvidenceUrl": "https://ninedragon.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "jejuzeus.sunsang24.com",
+      "sea": "제주권",
+      "province": "제주특별자치도",
+      "local": "제주",
+      "locationToken": "제주시",
+      "regionEvidenceUrl": "https://jejuzeus.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "ns.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "계절별 출항지가 변경",
+      "regionEvidenceUrl": "https://ns.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {
+        "669": "신창항"
+      }
+    },
+    {
+      "host": "jejuseastar.sunsang24.com",
+      "sea": "제주권",
+      "province": "제주특별자치도",
+      "local": "제주",
+      "locationToken": "제주시",
+      "regionEvidenceUrl": "https://jejuseastar.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {
+        "2012": "신창항"
+      }
+    },
+    {
+      "host": "doji.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "doublek.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "nurifishing.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "think.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "pigho.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "rkclgh.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "eungabi.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "horeng2.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "jh.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "ocpro.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "akbari.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "daebak.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "bj.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "seojin.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "hi.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "metafishingclub.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "seamanho.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "princeho.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "goldroger.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "cjh.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {},
+      "excludeShipIds": [
+        "749"
+      ]
+    },
+    {
+      "host": "marineho.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {},
+      "excludeShipIds": [
+        "408",
+        "1152"
+      ]
+    },
+    {
+      "host": "nature.sunsang24.com",
+      "sea": "",
+      "province": "",
+      "local": "",
+      "locationToken": "",
+      "regionEvidenceUrl": "",
+      "portByShip": {}
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import seed from './data/defaultFleet.json';
 import legacy from './data/legacyFleet.json';
 import sunsang from './data/sunsang24Fleet.json';
-import {migrateRegionFilter} from './regions';
+import {migrateRegionFilter,readRegion} from './regions';
 import { importData } from './importLegacy';
 import { TIERS, type AppState,type Boat } from './models';
 import {applySunsangTiers,SUNSANG_TIER_VERSION} from './sunsang24Tiers';
@@ -10,7 +10,7 @@ export const FLEET_VERSION = seed.version.slice(0,8)+sunsang.version.slice(0,8);
 export function defaultFleet(): AppState {
   const state=importData(seed.state).state;
   const existing=new Set(state.boats.map(b=>b.uid));
-  state.boats.push(...sunsang.boats.filter(b=>!existing.has(b.uid)).map(b=>({uid:b.uid,name:b.name,port:b.port,url:b.url,region:{sea:b.sea,province:b.province,local:b.local}})));
+  state.boats.push(...sunsang.boats.filter(b=>!existing.has(b.uid)).map(b=>{const region=readRegion({sea:b.sea,province:b.province,local:b.local});return {uid:b.uid,name:b.name,port:b.port,url:b.url,...(region?{region}:{})};}));
   return applySunsangTiers({...state,fleetSeedVersion:FLEET_VERSION,fleetBaseline:structuredClone(state.boats)});
 }
 export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,baseline:Boat[]):AppState {

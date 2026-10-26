@@ -1,3 +1,5 @@
+import {robotsAllows} from '../scripts/lib/robots.mjs';
+export {robotsAllows} from '../scripts/lib/robots.mjs';
 import {parseHTML} from 'linkedom';
 import {dateOnly,text,type Observation} from '../src/models';
 import {eventSpecies,speciesLabel} from '../src/species';
@@ -5,6 +7,10 @@ import {SUNSANG_PUBLIC_ROUTES,publicRouteForShip,SUNSANG_PUBLIC_UNMAPPED} from '
 import type {ProviderResult} from '../src/provider';
 import {apiFailure,validQuery,type Store} from './service';
 import {scheduleStatus} from './sunsang24';
+import sources from '../src/data/sunsang24CatalogSources.json';
+import {parsePublicFleet,type PublicFleetSource,type PublicFleetBoat} from '../scripts/lib/public-fleet.mjs';
+export const PUBLIC_CATALOG_SOURCES=new Map<string,PublicFleetSource>(sources.sources.map(s=>[s.host,s]));
+type PublicCatalogReply={status:'OK';host:string;observedAt:string;cached:boolean;boats:PublicFleetBoat[]}|{status:'UNAVAILABLE';message:string};
 
 const AGENT='TheFishingAvailability';
 const UA=`${AGENT}/1.0 (+https://github.com/Plabene/the-fishing)`;
@@ -12,34 +18,15 @@ type PublicResult=ProviderResult & {host?:string;month?:string;shipIds?:string[]
 class SourceFailure extends Error {constructor(message:string,readonly status:ProviderResult['status']) {super(message);}}
 const failure=(status:ProviderResult['status'],message:string):PublicResult=>({...apiFailure(status,message),stop:false});
 
-/** RFC-style longest matching rule, with specific agent groups taking precedence. */
-export function robotsAllows(body:string,path:string):boolean {
-  const groups:Array<{agents:string[];rules:Array<{allow:boolean;path:string}>}>=[];
-  let group:typeof groups[number]|undefined,hasRules=false;
-  for(const raw of body.split(/\r?\n/)) {
-    const line=raw.split('#')[0].trim(),colon=line.indexOf(':');if(colon<0) continue;
-    const key=line.slice(0,colon).trim().toLowerCase(),value=line.slice(colon+1).trim();
-    if(key==='user-agent') {
-      if(!group || hasRules) {group={agents:[],rules:[]};groups.push(group);hasRules=false;}
-      group.agents.push(value.toLowerCase());
-    } else if(group) {hasRules=true;if((key==='allow' || key==='disallow') && value) group.rules.push({allow:key==='allow',path:value});}
-  }
-  const specific=groups.filter(g=>g.agents.some(a=>a!=='*' && AGENT.toLowerCase().includes(a)));
-  const selected=specific.length?specific:groups.filter(g=>g.agents.includes('*'));
-  let length=-1,allow=true;
-  for(const rule of selected.flatMap(g=>g.rules)) {
-    const pattern=rule.path.split('*').map(p=>p.replace(/[.+?^${}()|[\]\\]/g,'\\$&')).join('.*').replace(/\\\$$/,'$');
-    if(new RegExp('^'+pattern).test(path) && (rule.path.length>length || (rule.path.length===length && rule.allow))) {length=rule.path.length;allow=rule.allow;}
-  }
-  return allow;
-}
-
 /** Port the PC's ship_unit/date/fish/remaining selectors; never read reservation names or memos. */
 export function parsePublicMonth(html:string,host:string,month:string,observedAt:string):PublicResult {
   const route=SUNSANG_PUBLIC_ROUTES.get(host);if(!route || !validQuery('1',month)) throw new Error('확인되지 않은 공개 예약표');
   const {document}=parseHTML(html),nav=document.querySelector('.month_nav')?.textContent || '';
   const ym=/(20\d\d)년\s*(\d{1,2})월/.exec(nav);
   if(!ym || `${ym[1]}-${ym[2].padStart(2,'0')}`!==month) throw new Error('원본 예약표의 조회 월이 다릅니다.');
+  // Operator notices can embed copied old calendar HTML, including schedule IDs and seat counts.
+  // Remove those rich-text subtrees before selecting any structured reservation fields.
+  document.querySelectorAll('.small_event,.editor_memo_pc,.editor_memo_mobile').forEach(node=>node.remove());
   const events:Observation[]=[],shipIds=new Set<string>(),seen=new Set<string>();
   for(const table of document.querySelectorAll('table.ship_unit')) {
     const ship=/(?:^|\s)ship_unit_ship_no_(\d+)(?:\s|$)/.exec(table.className)?.[1];
@@ -75,8 +62,32 @@ export function parsePublicMonth(html:string,host:string,month:string,observedAt
 /** No persistent seat cache. Only in-flight responses and access policy metadata are shared. */
 export class Sunsang24PublicService {
   private pending=new Map<string,Promise<PublicResult>>();
+  private catalogPending=new Map<string,Promise<PublicCatalogReply>>();
   private budgetTail:Promise<unknown>=Promise.resolve();
   constructor(private store:Store,private request:typeof fetch=(...args)=>fetch(...args)) {}
+  catalog(host:string):Promise<PublicCatalogReply> {
+    const source=PUBLIC_CATALOG_SOURCES.get(host);if(!source) return Promise.resolve({status:'UNAVAILABLE',message:'검증되지 않은 공개 선사 주소'});
+    const existing=this.catalogPending.get(host);if(existing) return existing;
+    if(this.catalogPending.size>=2) return Promise.resolve({status:'UNAVAILABLE',message:'공개 선사 목록 확인 중'});
+    const work=(async():Promise<PublicCatalogReply>=>{
+      const key=`public-catalog-v1:${host}:${JSON.stringify(source)}`,cached=await this.store.get<{expires:number;result:PublicCatalogReply}>(key);
+      if(cached && cached.expires>Date.now() && cached.result.status==='OK') return {...cached.result,cached:true};
+      try {
+        const month=new Date(Date.now()+9*3600000).toISOString().slice(0,7),html=await this.readCatalogHtml(host,month),observedAt=new Date().toISOString();
+        const boats=parsePublicFleet(html,source,observedAt),result:PublicCatalogReply={status:'OK',host,observedAt,cached:false,boats};
+        await this.store.put(key,{expires:Date.now()+86400000,result});return result;
+      } catch(error) {return {status:'UNAVAILABLE',message:error instanceof SourceFailure?error.message:'공개 선박 목록·등록 지역을 확인하지 못했습니다. 기존 목록을 유지합니다.'};}
+    })().finally(()=>this.catalogPending.delete(host));this.catalogPending.set(host,work);return work;
+  }
+  private async readCatalogHtml(host:string,month:string):Promise<string> {
+    try {return await this.readHtml(host,month);}
+    catch(error) {
+      const transient=error instanceof TypeError || error instanceof Error && ['TimeoutError','AbortError'].includes(error.name) || error instanceof SourceFailure && error.status==='HTTP_ERROR' && /^공개 예약표 HTTP 50[0234]$/.test(error.message);
+      if(!transient) throw error;
+      // One retry for a metadata read only; access limits and parser failures never retry.
+      return this.readHtml(host,month);
+    }
+  }
   query(ship:string,month:string):Promise<PublicResult> {
     const route=publicRouteForShip(ship);
     if(!route) return Promise.resolve(failure('UNSUPPORTED_SOURCE',SUNSANG_PUBLIC_UNMAPPED));
@@ -109,9 +120,8 @@ export class Sunsang24PublicService {
     try {for(;;) {const part=await reader.read();if(part.done) break;count+=part.value.length;if(count>max) throw new Error('원본 응답 크기 초과');result+=decoder.decode(part.value,{stream:true});}return result+decoder.decode();}
     finally {await reader.cancel();}
   }
-  private async read(host:string,month:string):Promise<PublicResult> {
-    try {
-      if((await this.store.get<number>(`blocked:${host}`) || 0)>Date.now()) return failure('ACCESS_RESTRICTED','해당 선사의 원본 접근 제한이 해제될 때까지 조회를 중지합니다.');
+  private async readHtml(host:string,month:string):Promise<string> {
+      if((await this.store.get<number>(`blocked:${host}`) || 0)>Date.now()) throw new SourceFailure('해당 선사의 원본 접근 제한이 해제될 때까지 조회를 중지합니다.','ACCESS_RESTRICTED');
       const signal=AbortSignal.timeout(25000),path='/ship/schedule_fleet/'+month.replace('-','');
       let policy=await this.store.get<{at:number;body:string}>(`robots:${host}`);
       if(!policy || Date.now()-policy.at>=3600000) {
@@ -120,11 +130,15 @@ export class Sunsang24PublicService {
         policy={at:Date.now(),body:response.status===404?'':await this.body(response,100000)};
         await this.store.put(`robots:${host}`,policy);
       }
-      if(!robotsAllows(policy.body,path)) return failure('PERMISSION_DENIED','해당 선사 홈페이지의 접근 정책에 따라 자동 조회를 중지했습니다. 공식 페이지에서 확인하세요.');
+      if(!robotsAllows(policy.body,path)) throw new SourceFailure('해당 선사 홈페이지의 접근 정책에 따라 자동 조회를 중지했습니다. 공식 페이지에서 확인하세요.','PERMISSION_DENIED');
       const response=await this.get(host,path,signal);
       if(response.status!==200) throw new SourceFailure(`공개 예약표 HTTP ${response.status}`,'HTTP_ERROR');
       if(!response.headers.get('content-type')?.includes('text/html')) throw new Error('공개 예약표 HTML이 아닙니다.');
-      const html=await this.body(response,4000000);
+      return this.body(response,12000000);
+  }
+  private async read(host:string,month:string):Promise<PublicResult> {
+    try {
+      const html=await this.readHtml(host,month);
       return parsePublicMonth(html,host,month,new Date().toISOString());
     } catch(error) {
       return failure(error instanceof SourceFailure?error.status:error instanceof Error && /timeout|aborted/i.test(error.name)?'TIMEOUT':error instanceof TypeError?'NETWORK_OR_CORS':'PARSER_UNSUPPORTED',`선상24 공개 예약표 조회 미완료: ${error instanceof Error?error.message:'원본 확인 실패'}`);

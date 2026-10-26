@@ -3,6 +3,7 @@ import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
 import {saveState,loadState} from '../src/availabilityStore';
 import {defaultFleet} from '../src/defaultFleet';
+import {boatPlatform} from '../src/platforms';
 import {orderedBoats} from '../src/tierStore';
 import {saveJsonFile} from '../src/fileSave';
 import {exportTierBackup} from '../src/tierBackup';
@@ -22,7 +23,7 @@ test('the complete fleet is usable, platform filters keep every match, and tier 
     const select=row().querySelector('select')!;select.value='tier1';select.dispatchEvent(new Event('change'));await settle();
     expect((await loadState() as AppState).tiers.tier1).toContain(last.uid);
     el('#platform-filter button[data-platform="sunsang24"]').click();await settle();
-    expect(document.querySelectorAll('.boat-row')).toHaveLength(380);
+    expect(document.querySelectorAll('.boat-row')).toHaveLength(state.boats.filter(b=>boatPlatform(b)==='sunsang24').length);
     el('#platform-filter button[data-platform="all"]').click();await settle();expect(document.querySelectorAll('.boat-row')).toHaveLength(state.boats.length);
     el('#tier-export').click();await vi.waitFor(()=>expect(saveJsonFile).toHaveBeenCalledOnce());
     const saved=vi.mocked(saveJsonFile).mock.calls[0];expect(saved[1]).toBe('thefishing-tiers');expect(JSON.parse(saved[0]).tiers.tier1).toContain(last.uid);expect(JSON.parse(saved[0]).events).toBeUndefined();

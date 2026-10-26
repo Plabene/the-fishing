@@ -1,4 +1,4 @@
-export const APP_RELEASE='2026.10.23.4';
+export const APP_RELEASE='2026.10.26.1';
 /** Offer an explicit reload, preserving in-progress queries, form edits and local boat settings. */
 export async function watchAppUpdates(container:ServiceWorkerContainer,base:string,onReady:()=>void) {
   let controlled=!!container.controller;

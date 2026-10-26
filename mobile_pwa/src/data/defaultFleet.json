@@ -1,5 +1,5 @@
 {
-  "version": "17deeaea355f9141",
+  "version": "7adf36170437fbfd",
   "state": {
     "schema": 1,
     "boats": [
@@ -265,6 +265,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "보령시"
+        }
+      },
+      {
+        "uid": "456",
+        "name": "아파치호",
+        "port": "여수항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=456",
+        "region": {
+          "sea": "남해권",
+          "province": "전라남도",
+          "local": "여수,광양"
         }
       },
       {
@@ -1302,6 +1313,17 @@
         }
       },
       {
+        "uid": "1999",
+        "name": "빅토리호",
+        "port": "영흥도 진두항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=1999",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "영흥도"
+        }
+      },
+      {
         "uid": "2024",
         "name": "오천서해호",
         "port": "오천항",
@@ -2138,6 +2160,17 @@
         }
       },
       {
+        "uid": "3045",
+        "name": "보스호",
+        "port": "연안부두",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3045",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "3060",
         "name": "드래곤호",
         "port": "인천남항",
@@ -2267,6 +2300,17 @@
           "sea": "서해권",
           "province": "충청남도",
           "local": "서천군"
+        }
+      },
+      {
+        "uid": "3179",
+        "name": "빨강등대호(오전)",
+        "port": "오이도",
+        "url": "https://thefishing.kr/reservation/list.php?uid=3179",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
         }
       },
       {
@@ -4470,6 +4514,17 @@
         }
       },
       {
+        "uid": "5006",
+        "name": "야간 (낙지,갑이) 저녁7시~새벽1시",
+        "port": "삼천포항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=5006",
+        "region": {
+          "sea": "남해권",
+          "province": "경상남도",
+          "local": "사천"
+        }
+      },
+      {
         "uid": "5029",
         "name": "레전드호 (강선장님)",
         "port": "대천항",
@@ -4560,12 +4615,12 @@
       {
         "uid": "5085",
         "name": "NO21.일신호",
-        "port": "오이도",
+        "port": "",
         "url": "https://thefishing.kr/reservation/list.php?uid=5085",
         "region": {
           "sea": "서해권",
-          "province": "경기도",
-          "local": "인천"
+          "province": "충청남도",
+          "local": "보령시"
         }
       },
       {
@@ -6505,6 +6560,17 @@
         }
       },
       {
+        "uid": "6104",
+        "name": "럭키스타호",
+        "port": "격포항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6104",
+        "region": {
+          "sea": "서해권",
+          "province": "전라북도",
+          "local": "격포"
+        }
+      },
+      {
         "uid": "6113",
         "name": "오전배",
         "port": "오이도",
@@ -6968,7 +7034,7 @@
       },
       {
         "uid": "6201",
-        "name": "수성호",
+        "name": "홍원항 수성호",
         "port": "홍원항",
         "url": "https://thefishing.kr/reservation/list.php?uid=6201",
         "region": {
@@ -7055,6 +7121,17 @@
         }
       },
       {
+        "uid": "6233",
+        "name": "마루호",
+        "port": "인천남항",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6233",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
+      },
+      {
         "uid": "6244",
         "name": "드래곤호(블루피싱)",
         "port": "",
@@ -7079,8 +7156,13 @@
       {
         "uid": "6246",
         "name": "오전체험(7시~12시)",
-        "port": "",
-        "url": "https://thefishing.kr/reservation/list.php?uid=6246"
+        "port": "오이도",
+        "url": "https://thefishing.kr/reservation/list.php?uid=6246",
+        "region": {
+          "sea": "서해권",
+          "province": "경기도",
+          "local": "인천"
+        }
       },
       {
         "uid": "6247",
@@ -7845,14 +7927,317 @@
     "failures": []
   },
   "catalog": {
-    "checkedAt": "2026-10-25T23:15:07.796Z",
-    "completedAt": "2026-10-25T23:15:53.788Z",
+    "checkedAt": "2026-10-26T01:54:50.170Z",
+    "completedAt": "2026-10-26T01:57:21.118Z",
     "source": "https://thefishing.kr/reservation/list.php",
-    "listed": 440,
+    "listed": 603,
     "listedCards": 676,
-    "duplicates": 236,
-    "conflicts": 1,
+    "duplicates": 248,
+    "conflicts": 3,
     "pages": 34,
-    "retained": 257
+    "regions": [
+      {
+        "id": "25",
+        "label": "인천",
+        "listed": 53,
+        "listedCards": 76,
+        "pages": 4,
+        "duplicates": 23
+      },
+      {
+        "id": "27",
+        "label": "영흥도",
+        "listed": 27,
+        "listedCards": 43,
+        "pages": 3,
+        "duplicates": 16
+      },
+      {
+        "id": "26",
+        "label": "화성시",
+        "listed": 18,
+        "listedCards": 18,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "66",
+        "label": "평택시",
+        "listed": 12,
+        "listedCards": 12,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "49",
+        "label": "당진시",
+        "listed": 16,
+        "listedCards": 16,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "45",
+        "label": "서산시",
+        "listed": 20,
+        "listedCards": 21,
+        "pages": 2,
+        "duplicates": 1
+      },
+      {
+        "id": "54",
+        "label": "홍성군",
+        "listed": 7,
+        "listedCards": 7,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "13",
+        "label": "태안",
+        "listed": 38,
+        "listedCards": 55,
+        "pages": 3,
+        "duplicates": 17
+      },
+      {
+        "id": "12",
+        "label": "안면도",
+        "listed": 50,
+        "listedCards": 77,
+        "pages": 4,
+        "duplicates": 27
+      },
+      {
+        "id": "38",
+        "label": "보령시",
+        "listed": 123,
+        "listedCards": 199,
+        "pages": 10,
+        "duplicates": 76
+      },
+      {
+        "id": "20",
+        "label": "서천군",
+        "listed": 57,
+        "listedCards": 79,
+        "pages": 4,
+        "duplicates": 22
+      },
+      {
+        "id": "7",
+        "label": "군산",
+        "listed": 8,
+        "listedCards": 8,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "100",
+        "label": "격포",
+        "listed": 22,
+        "listedCards": 30,
+        "pages": 2,
+        "duplicates": 8
+      },
+      {
+        "id": "99",
+        "label": "신안/무안",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "34",
+        "label": "여수,광양",
+        "listed": 1,
+        "listedCards": 1,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "41",
+        "label": "목포",
+        "listed": 3,
+        "listedCards": 3,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "57",
+        "label": "고흥,녹동",
+        "listed": 4,
+        "listedCards": 4,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "63",
+        "label": "진도,해남",
+        "listed": 3,
+        "listedCards": 3,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "73",
+        "label": "장흥,완도",
+        "listed": 1,
+        "listedCards": 1,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "147",
+        "label": "강진",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "102",
+        "label": "부산",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "103",
+        "label": "진해",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "104",
+        "label": "마산",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "105",
+        "label": "거제",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "106",
+        "label": "통영",
+        "listed": 1,
+        "listedCards": 1,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "107",
+        "label": "고성",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "108",
+        "label": "사천",
+        "listed": 10,
+        "listedCards": 10,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "109",
+        "label": "남해",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "131",
+        "label": "서귀포시",
+        "listed": 2,
+        "listedCards": 2,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "132",
+        "label": "제주시",
+        "listed": 3,
+        "listedCards": 3,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "84",
+        "label": "고성,속초,강릉",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "85",
+        "label": "동해,삼척",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "86",
+        "label": "울진",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "87",
+        "label": "영덕",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "89",
+        "label": "울산",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "90",
+        "label": "경주",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      },
+      {
+        "id": "112",
+        "label": "포항",
+        "listed": 0,
+        "listedCards": 0,
+        "pages": 1,
+        "duplicates": 0
+      }
+    ],
+    "regionalAdded": 175,
+    "coverage": "public-pages-with-regional-partitions",
+    "complete": false,
+    "retained": 101,
+    "nationalListed": 428,
+    "regionalCards": 669
   }
 }
