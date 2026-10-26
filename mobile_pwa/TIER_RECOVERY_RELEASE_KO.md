@@ -105,7 +105,7 @@
 
 저장소 루트 `D:\the-fishing`에서 `mobile.cmd test --maxWorkers=2`, `PWA_BASE=/the-fishing/` 설정 후 `mobile.cmd run build`, `mobile.cmd run api:check`로 검증한다. Worker는 `mobile.cmd run api:deploy`, Pages는 main push 시 배포한다.
 
-수정 전 백업 브랜치는 `backup/pre-tier-recovery-20261026`이며 기준 커밋은 `d23e350`이다. 장애 시 변경 커밋을 revert한 뒤 같은 검증·배포를 수행할 수 있다. 다만 이전 앱은 보호 저장 기능을 모르는 버전이므로 개인 설정 JSON을 먼저 내보내고 운영해야 한다. 기기 IndexedDB 및 원본 백업 파일을 삭제할 필요는 없다.
+수정 전 백업 브랜치는 `backup/pre-tier-recovery-20261026`이며 기준 커밋은 `d23e350`이다. 장애 시 이번 변경 커밋들을 역순으로 revert한 뒤 같은 검증·배포를 수행할 수 있다. 다만 이전 앱은 보호 저장 기능을 모르는 버전이므로 개인 설정 JSON을 먼저 내보내고 운영해야 한다. 기기 IndexedDB 및 원본 백업 파일을 삭제할 필요는 없다.
 
 ## 배포 기록
 
@@ -114,5 +114,7 @@
 - 2026-10-26 12:04 KST 운영 점검: 홈런피싱 목록 5개, 리더낚시 실제 선박 2개가 원본 ID와 일치했다. 출조공지용 ID는 제외됐다.
 - 홈런피싱 10월 36개 일정(10월 27일 6개), 포인트피싱 10월 20개 일정(10월 27일 3개), 기존 더피싱 UID 1039의 10월 2개 일정이 HTTP 200 / `ALLOWED_READABLE`로 응답했다. 세 요청 모두 `fresh=true`, `cached=false`, `Cache-Control: no-store`와 운영 사이트 CORS 헤더를 확인했다. 일정 수는 예약 가능한 고유 선박 수를 뜻하지 않는다.
 - 중앙 API의 `robots.txt`를 같은 날 재확인했다: HTTP 200, `User-agent: *`, `Disallow: /`. 이 제한을 우회하는 수집은 활성화하지 않았다.
-- Pages 반영은 해당 코드 커밋의 GitHub Actions 결과와 운영 산출물 대조 후 기록한다.
+- 최종 소스 커밋: `d63febc623d4051af2f244c1e9c9155fc73b6309` (구현 `bd3dba0`, 명시적 빈 백업 보존 `7efaab3`, CI 통합 테스트 제한 `d63febc`). 앱 표시 버전 `2026.10.26.2`.
+- [최종 GitHub Actions 40267888605](https://github.com/Plabene/the-fishing/actions/runs/40267888605): 성공. **49개 파일·293개 테스트**, Worker 검사, 웹 빌드, Pages 배포 모두 통과했다.
+- 운영 HTML·JS(`index-apk6FUL9.js`)·CSS가 테스트한 로컬 산출물과 바이트 단위로 일치했다. manifest 값과 서비스 워커 로직·자산 목록도 일치했다. 운영 캐시 ID는 `thefishing-offline-345d77da8a4bd095`다.
 - 추가 회귀 검사 CI 실행에서 복구 UI 전체 시나리오가 기본 5초 제한을 초과했다. 검사 항목을 유지하고 이 다단계 통합 테스트에만 15초 제한을 지정했다. 실제 기능 응답 시간을 측정한 성능 수치로 해석하지 않는다.
