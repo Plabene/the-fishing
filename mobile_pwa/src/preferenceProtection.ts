@@ -3,6 +3,8 @@ import {emptyState,TIERS,uid,type AppState,type Boat} from './models';
 const DB='thefishing-mobile-a';
 export interface PreferenceSnapshot {
   tiers:AppState['tiers'];selectedUids:string[];boats?:Boat[];savedAt?:string;
+  // An explicitly supplied full backup can also record boats whose tier was cleared.
+  scopeUids?:string[];
   publishedPreferencesVersion?:string;sunsangTierVersion?:string;preferenceRecoveryVersion?:string;
 }
 export interface PreferenceBackup {key:string;value:PreferenceSnapshot}

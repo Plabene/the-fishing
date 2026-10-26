@@ -5,6 +5,7 @@ import type {PreferenceSnapshot} from './preferenceProtection';
 import {restoreTierBackup} from './tierBackup';
 export const RECOVERY_VERSION=supplied.version;
 export const RECOVERY_DATE=supplied.createdAt.slice(0,10);
+export const RECOVERY_LABEL=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(supplied.createdAt));
 export const suppliedPreferences:PreferenceSnapshot=supplied;
 export function recoveryPreview(state:AppState,backup:PreferenceSnapshot) {
   const assignments=new Map(TIERS.flatMap(t=>state.tiers[t].map(id=>[id,t] as const))),known=new Set([...state.boats,...backup.boats || []].map(b=>b.uid));
@@ -14,13 +15,16 @@ export function recoveryPreview(state:AppState,backup:PreferenceSnapshot) {
     else if(!assignments.has(id)) missing++;
     else if(assignments.get(id)!==tier) conflicts++;
   }
-  return {missing,conflicts,unresolved,total:TIERS.reduce((n,t)=>n+backup.tiers[t].length,0),selected:backup.selectedUids.length};
+  const backed=new Set(TIERS.flatMap(t=>backup.tiers[t])),scope=new Set(backup.scopeUids || [...backed,...backup.selectedUids]);
+  const cleared=[...assignments.keys()].filter(id=>scope.has(id) && !backed.has(id)).length;
+  return {missing,conflicts,unresolved,cleared,total:backed.size,selected:backup.selectedUids.length};
 }
 /** Recovery uses recorded IDs and names, never name-only matching or invented tiers. */
 export function recoverPreferences(current:AppState,backup:PreferenceSnapshot,mode:'missing'|'exact') {
   const known=new Map<string,Boat>([...(backup.boats || []),...current.boats].map(b=>[b.uid,b]));
   const assigned=new Set(TIERS.flatMap(t=>current.tiers[t]));
-  const scope=new Set([...TIERS.flatMap(t=>backup.tiers[t]),...backup.selectedUids].filter(id=>known.has(id) && (mode==='exact' || !assigned.has(id))));
+  const ids=[...TIERS.flatMap(t=>backup.tiers[t]),...backup.selectedUids];
+  const scope=new Set([...(mode==='exact'?backup.scopeUids || []:[]),...ids].filter(id=>known.has(id) && (mode==='exact' || !assigned.has(id))));
   const file={format:'thefishing-tier-backup',version:2,boats:[...scope].map(id=>known.get(id)!),tiers:Object.fromEntries(TIERS.map(t=>[t,backup.tiers[t].filter(id=>scope.has(id))])),selectedUids:backup.selectedUids.filter(id=>scope.has(id))};
   const result=restoreTierBackup(file,current);
   // Filling gaps must not clear any current selection, including currently unassigned boats.

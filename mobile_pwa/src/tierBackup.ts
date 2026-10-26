@@ -17,11 +17,11 @@ function cleanBoat(b:Boat):Boat {
   return {uid:id,name:text(b.name) || `UID ${id}`,port:text(b.port),url:reservationLink(b.url,id),...(region ? {region}:{})};
 }
 /** A portable tier list contains no seats, query history, API settings or device metadata. */
-export function exportTierBackup(state:AppState,now=new Date()):string {
+export function exportTierBackup(state:AppState,now=new Date(),scopeUids:readonly string[]=[]):string {
   const byId=new Map(state.boats.map(b=>[b.uid,b]));
   const tiers=normalizeTiers(state.tiers);
   for(const tier of TIERS) tiers[tier]=tiers[tier].filter(id=>byId.has(id));
-  const ids=[...new Set([...TIERS.flatMap(t=>tiers[t]),...state.selectedUids.filter(id=>byId.has(id))])];
+  const ids=[...new Set([...TIERS.flatMap(t=>tiers[t]),...state.selectedUids.filter(id=>byId.has(id)),...scopeUids.filter(id=>byId.has(id))])];
   return JSON.stringify({format:FORMAT,version:2,createdAt:now.toISOString(),
     boats:ids.map(id=>cleanBoat(byId.get(id)!)),
     tiers:Object.fromEntries(TIERS.map(t=>[t,tiers[t].map(identity)])),

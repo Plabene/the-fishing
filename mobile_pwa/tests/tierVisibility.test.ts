@@ -21,14 +21,14 @@ test('All starts the clicked tier; further clicks add/remove without inverting t
 test('last backup counts stay distinct from selection and filtered target counts without mutation',()=>{
   const state=recoverPreferences(emptyState(),suppliedPreferences,'exact').state,before=structuredClone(state);
   const all=tierVisibility(state,'all');
-  expect(all.counts).toEqual({tier1:17,tier2:25,tier3:31,other:56});
-  expect(all).toMatchObject({total:129,included:123,unselected:6,excludedTier:0,excludedLocation:0,missingBoat:0,unassignedSelected:10});
-  expect(tierVisibility(state,['tier1'])).toMatchObject({included:17,excludedTier:106,total:129});
-  expect(tierVisibility(state,[])).toMatchObject({included:0,excludedTier:123,total:129});
+  expect(all.counts).toEqual({tier1:16,tier2:21,tier3:31,other:167});
+  expect(all).toMatchObject({total:235,included:116,unselected:119,excludedTier:0,excludedLocation:0,missingBoat:0,unassignedSelected:10});
+  expect(tierVisibility(state,['tier1'])).toMatchObject({included:16,excludedTier:100,total:235});
+  expect(tierVisibility(state,[])).toMatchObject({included:0,excludedTier:116,total:235});
   state.selectedRegion={...emptyRegion(),province:'전라북도'};
   const limited=tierVisibility(state,['tier1']);
   expect(limited.included+limited.unselected+limited.excludedTier+limited.excludedLocation+limited.missingBoat).toBe(limited.total);
-  expect(limited.total).toBe(129);expect(limited.excludedLocation).toBeGreaterThan(0);
+  expect(limited.total).toBe(235);expect(limited.excludedLocation).toBeGreaterThan(0);
   expect(state.tiers).toEqual(before.tiers);expect(state.selectedUids).toEqual(before.selectedUids);
 });
 
