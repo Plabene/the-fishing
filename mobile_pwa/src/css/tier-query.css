@@ -3,6 +3,7 @@
 .query-selection>#region-toggle { flex:1 1 210px; min-width:0; margin:0; }
 .query-selection>#region-toggle[open] { flex-basis:100%; }
 .query-selection>#region-toggle>summary { display:flex; align-items:center; gap:6px; min-height:44px; padding:8px 10px; border:1px solid #afc4bd; border-radius:7px; cursor:pointer; font-size:13px; font-weight:650; background:#fff; }
+.query-selection .region-heading { flex:none; white-space:nowrap; }
 .query-selection>#region-toggle>summary::after { content:'⌄'; margin-left:auto; flex-shrink:0; }
 .query-selection>#region-toggle[open]>summary::after { content:'⌃'; }
 .query-selection>#region-toggle.has-selection>summary { color:#134e43; background:#e3f3ec; border-color:#207c65; box-shadow:inset 3px 0 #207c65; }
