@@ -21,6 +21,8 @@ test('calendar opens on current month, aliases integrate with day view, and prio
   expect((el('#search-section') as HTMLDetailsElement).open).toBe(false);
   el('a[href="#fleet-section"]').click();expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(true);
   const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();
+  expect((await loadState() as AppState).tiers).toEqual(before.tiers);
+  el('#select-all').click();await settle();
   el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await settle();
   expect(network).toHaveBeenCalledTimes(2);
   expect(el('.calendar-day[aria-label^="2026-11-02"]').textContent).toContain('2척 가능');

@@ -32,6 +32,7 @@ export interface AppState {
   fleetBaseline?:Boat[];
   sunsangTierVersion?:string;
   publishedPreferencesVersion?:string;
+  preferenceRecoveryVersion?:string;
 }
 export function localMonth(now = new Date()): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).format(now);

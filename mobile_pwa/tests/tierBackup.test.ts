@@ -60,7 +60,7 @@ test('restoring tiers merges included IDs, keeps custom names and observations a
 test('invalid or contradictory backups fail atomically; executable URLs never survive',()=>{
   const state=defaultFleet(),before=structuredClone(state),valid=JSON.parse(exportTierBackup(state));
   for(const mutate of [
-    (v:any)=>v.version=2,(v:any)=>v.tiers.tier2.push(v.tiers.tier1[0]),
+    (v:any)=>v.version=99,(v:any)=>v.tiers.tier2.push(v.tiers.tier1[0]),
     (v:any)=>v.tiers.tier1.push('missing'),(v:any)=>v.selectedUids.push('missing'),
     (v:any)=>v.boats.push(v.boats[0]),(v:any)=>v.boats[0].uid='invalid/id',
   ]) {const v=structuredClone(valid);mutate(v);expect(()=>restoreTierBackup(v,state)).toThrow();expect(state).toEqual(before);}

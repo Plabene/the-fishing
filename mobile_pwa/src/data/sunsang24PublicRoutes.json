@@ -453,6 +453,135 @@
       ],
       "evidenceUrl": "https://jejuseastar.sunsang24.com/ship/schedule_fleet",
       "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "homerun.sunsang24.com",
+      "ships": [
+        "2311",
+        "1253",
+        "2312",
+        "2021",
+        "155"
+      ],
+      "evidenceUrl": "https://homerun.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "bluestar.sunsang24.com",
+      "ships": [
+        "937"
+      ],
+      "evidenceUrl": "https://bluestar.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "pointfishing.sunsang24.com",
+      "ships": [
+        "2188",
+        "959"
+      ],
+      "evidenceUrl": "https://pointfishing.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "town.sunsang24.com",
+      "ships": [
+        "350"
+      ],
+      "evidenceUrl": "https://town.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "namyoung.sunsang24.com",
+      "ships": [
+        "758"
+      ],
+      "evidenceUrl": "https://namyoung.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "alice.sunsang24.com",
+      "ships": [
+        "655"
+      ],
+      "evidenceUrl": "https://alice.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "k1f.sunsang24.com",
+      "ships": [
+        "703",
+        "763"
+      ],
+      "evidenceUrl": "https://k1f.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "daon.sunsang24.com",
+      "ships": [
+        "563",
+        "997",
+        "727"
+      ],
+      "evidenceUrl": "https://daon.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "master.sunsang24.com",
+      "ships": [
+        "440"
+      ],
+      "evidenceUrl": "https://master.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "ksnaksi.sunsang24.com",
+      "ships": [
+        "2110",
+        "2106"
+      ],
+      "evidenceUrl": "https://ksnaksi.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "hookstar.sunsang24.com",
+      "ships": [
+        "1636"
+      ],
+      "evidenceUrl": "https://hookstar.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "signature.sunsang24.com",
+      "ships": [
+        "1033"
+      ],
+      "evidenceUrl": "https://signature.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "jayeonho.sunsang24.com",
+      "ships": [
+        "2533"
+      ],
+      "evidenceUrl": "https://jayeonho.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "smgfishing.sunsang24.com",
+      "ships": [
+        "2608"
+      ],
+      "evidenceUrl": "https://smgfishing.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "taepyoung.sunsang24.com",
+      "ships": [
+        "1394"
+      ],
+      "evidenceUrl": "https://taepyoung.sunsang24.com/ship/schedule_fleet",
+      "verifiedAt": "2026-10-26"
     }
   ]
 }

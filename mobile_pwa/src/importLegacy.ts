@@ -17,7 +17,8 @@ export function importData(input: unknown, current = emptyState()): { state: App
     Object.assign(state, emptyState()); delete state.fleetSeedVersion; delete state.monthlyArchiveVersion; delete state.monthChecks; delete state.selectedSpecies; delete state.excludedSpeciesKeys; delete state.tideDays;delete state.selectedRegion;delete state.fleetBaseline;
     delete state.sunsangTierVersion;
     delete state.publishedPreferencesVersion;
-    for (const key of ['fleetSeedVersion','monthlyArchiveVersion','sunsangTierVersion','publishedPreferencesVersion'] as const) if (typeof root[key] === 'string' && /^[a-f0-9]{16}$/.test(root[key])) state[key] = root[key];
+    delete state.preferenceRecoveryVersion;
+    for (const key of ['fleetSeedVersion','monthlyArchiveVersion','sunsangTierVersion','publishedPreferencesVersion','preferenceRecoveryVersion'] as const) if (typeof root[key] === 'string' && /^[a-f0-9]{16}$/.test(root[key])) state[key] = root[key];
   }
   const entries = backup ? arr(root.boats) : Object.values(obj(catalog.entries));
   for (const item of entries) {

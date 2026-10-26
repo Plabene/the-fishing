@@ -1,12 +1,14 @@
 import {appLayout} from './appLayout';
 import {alphabeticFleet,uniqueFleet,platformCounts,supportsLive,platformQueryStats} from './fleetList';
 import {watchAppUpdates} from './appUpdate';
+import {initializePreferenceRecovery} from './preferenceRecovery';
+import {installPreferenceRecovery} from './preferenceRecoveryView';
 import { emptyState, localMonth, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier, type Boat } from './models';
 import { importData, exportData } from './importLegacy';
 import {exportTierBackup,restoreTierBackup,isTierBackup} from './tierBackup';
 import {saveJsonFile,canShareJson} from './fileSave';
 import {applySunsangTiers,SUNSANG_TIER_COUNT} from './sunsang24Tiers';
-import { loadState, saveState,backupPreferences,previousPreferences } from './availabilityStore';
+import { loadState, saveState,backupPreferences,previousPreferences,StorageConflictError } from './availabilityStore';
 import {applyPublishedPreferences,PUBLISHED_PREFERENCES_VERSION,PUBLISHED_PREFERENCES_COUNTS} from './publishedPreferences';
 import {bookingAlias} from './bookingAliases';
 import { orderedBoats, moveBoat, removeBoat, tierFor } from './tierStore';
@@ -43,7 +45,7 @@ const root = document.querySelector<HTMLDivElement>('#app')!;
 root.innerHTML = appLayout(SUNSANG_TIER_COUNT);
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 let state = emptyState(), tier: Filter = 'all', search = '', fleetSearch = '', demo = false;
-let selectedDay = `${state.month}-01`, busy = false, editing: string | null = null;
+let selectedDay = `${state.month}-01`, busy = false, storageReady=false, editing: string | null = null;
 let sourceBoat = '', matchingOnly=true, listView=false, resultLimit=50;
 let importController: AbortController | null = null, undoState: AppState | null = null;
 let liveController:AbortController|null=null; const directProvider=new TheFishingDirect();
@@ -51,6 +53,7 @@ let liveRows:LiveRow[]=[], liveMonth=state.month;
 let queryBoats:Boat[]=[],fleetSort='name',selectedOnly=false;
 const fleetRows=new Map<string,{signature:string;row:HTMLElement;check:HTMLInputElement;select:HTMLSelectElement}>();
 let livePreview:AppState|null=null;
+let refreshRecovery:()=>void=()=>{};
 let configuredApi=loadApiOrigin();
 let apiProvider=new TheFishingApi(configuredApi), lastFleetKey='';
 function renderApiSettings() {
@@ -68,9 +71,9 @@ const active = () => demo ? {...fixtureState(state.month),requiredPeople:state.r
 function connection() { $('#connectivity').textContent = navigator.onLine ? '● 온라인 · 월별 조회 준비' : '○ 오프라인 · 이전 조회 결과 열람'; }
 function setBusy(value: boolean) { busy = value; root.setAttribute('aria-busy', String(value)); root.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>('input,button,select').forEach(n => { if (n.id !== 'cancel' && n.id!=='stop-query') n.disabled = n.dataset.locked==='true' || value && !(livePreview && (n.closest('#calendar,#month-results') || n.matches('#view-calendar,#view-list'))); }); }
 async function commit(candidate: AppState, message: string): Promise<boolean> {
-  if (busy) return false; setBusy(true);
+  if (busy || !storageReady) return false; setBusy(true);
   try { await saveState(candidate); state = candidate; undoState = null; $('#undo').hidden = true; say(message); return true; }
-  catch { say('기기에 저장하지 못했습니다. 저장 공간을 확인하거나 백업을 내려받으세요. 변경은 적용되지 않았습니다.'); return false; }
+  catch(error) { say(error instanceof StorageConflictError?error.message:'기기에 저장하지 못했습니다. 저장 공간을 확인하거나 백업을 내려받으세요. 변경은 적용되지 않았습니다.'); return false; }
   finally { setBusy(false); render(); }
 }
 function chooseDay(day: string) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result);$('#day-view').scrollIntoView?.({block:'nearest',behavior:'smooth'}); }
@@ -137,6 +140,7 @@ function renderResults(shown:AppState,result=queryMonth(shown,{month:shown.month
   else {renderCalendar($('#calendar'),shown,tier,search,selectedDay,chooseDay,matchingOnly,result);renderDay($('#day-view'),shown,selectedDay,tier,search,matchingOnly,result);}
 }
 function render() {
+  refreshRecovery();
   const shown = active(), result = queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly}), records=result.events;
   const counts=platformCounts(state.boats.filter(b=>matchesRegion(b,state.selectedRegion))),allCounts=platformCounts(state.boats);
   for(const button of $('#platform-filter').querySelectorAll<HTMLButtonElement>('button')) {const platform=readPlatform(button.dataset.platform);button.textContent=`${PLATFORM_LABELS[platform]} ${counts[platform]}`;button.title=`선택 지역 ${counts[platform]}개 · 전국 보유 목록 ${allCounts[platform]}개`;button.setAttribute('aria-pressed',String(platform===(state.selectedPlatform || 'all')));}
@@ -317,17 +321,22 @@ $('#tide-refresh').addEventListener('click',async()=>{
 window.addEventListener('online', connection); window.addEventListener('offline', connection);
 setBusy(true);
 try {
-  const prepared=initializeFleet(await loadState()),archive=initializeMonthlyArchive(prepared.state);
+  const saved=await loadState();storageReady=true;
+  const prepared=initializeFleet(saved),archive=initializeMonthlyArchive(prepared.state);
   state=archive.state; // Keep readable personal data visible if creating the migration backup fails.
-  const next=applyPublishedPreferences(archive.state),changed=next!==archive.state;
+  const next=applyPublishedPreferences(archive.state,prepared.seeded),changed=next!==archive.state;
   if(changed) await backupPreferences(archive.state,PUBLISHED_PREFERENCES_VERSION);
+  const recovered=initializePreferenceRecovery(next,saved!==undefined),recoveryChanged=recovered.state!==next;
   const tideDays=mergeTideDays(tideArchive.days,next.tideDays),tidesChanged=JSON.stringify(tideDays)!==JSON.stringify(next.tideDays);
-  state={...next,tideDays,month:localMonth(),selectedPlatform:'all',selectedSpecies:'all',excludedSpeciesKeys:[]};
+  const candidate={...recovered.state,tideDays,month:localMonth(),selectedPlatform:'all' as const,selectedSpecies:'all' as const,excludedSpeciesKeys:[]};
+  if(prepared.changed || archive.changed || tidesChanged || changed || recoveryChanged) await saveState(candidate);
+  state=candidate;
   selectedDay=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul'}).format(new Date());liveMonth=state.month;
-  if(prepared.changed || archive.changed || tidesChanged || changed) await saveState(state);
-  if(changed) say('제공한 티어·선택 목록을 적용했습니다. 이전 설정은 기기에 백업했습니다.');
+  if(changed) say(prepared.seeded?'제공한 티어·선택 목록을 처음 적용했습니다.':'기존 개인 티어·선택을 보존하고 설정 보호를 적용했습니다.');
+  if(recovered.restored) say(`비어 있던 티어 ${recovered.restored}개를 제공한 마지막 백업에서 복원했습니다. 복원 전 설정은 자동 보호 이력에 보관했습니다.`);
 } catch {say('기기 설정을 읽거나 저장하지 못했습니다. 백업 파일을 확인해 주세요.');}
-finally {setBusy(false);render();}
+finally {setBusy(false);render();if(!storageReady) {setBusy(true);say('기기 설정을 읽지 못해 변경과 저장을 중지했습니다. 저장소를 지우지 말고 새로고침해 주세요.');}}
+if(storageReady) refreshRecovery=installPreferenceRecovery($('.fleet-management'),()=>state,commit,say);
 $('#restore-before-publish').addEventListener('click',async()=>{
   if(busy) return;
   try {

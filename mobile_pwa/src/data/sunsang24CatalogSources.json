@@ -10,13 +10,13 @@
       "locationToken": "군산시",
       "regionEvidenceUrl": "https://gunsannaksi.sunsang24.com/ship/schedule_fleet",
       "portByShip": {
-        "2413": "비응항",
-        "2414": "비응항",
-        "2623": "비응항",
+        "2113": "비응항",
         "2372": "비응항",
         "2373": "비응항",
         "2383": "비응항",
-        "2113": "비응항"
+        "2413": "비응항",
+        "2414": "비응항",
+        "2623": "비응항"
       }
     },
     {
@@ -505,6 +505,192 @@
       "local": "",
       "locationToken": "",
       "regionEvidenceUrl": "",
+      "portByShip": {}
+    },
+    {
+      "host": "homerun.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://homerun.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "bluestar.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://bluestar.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "pointfishing.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://pointfishing.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "live.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://live.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "town.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://town.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "namyoung.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://namyoung.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "hifish.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://hifish.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "alice.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://alice.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "k1f.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://k1f.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "glutton.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://glutton.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {},
+      "excludeShipIds": [
+        "1338"
+      ]
+    },
+    {
+      "host": "hitfleet.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "daon.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://daon.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "master.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://master.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "ksnaksi.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://ksnaksi.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {},
+      "excludeShipIds": [
+        "2109"
+      ]
+    },
+    {
+      "host": "hookstar.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://hookstar.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "signature.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://signature.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "inhaefishing.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://inhaefishing.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "jayeonho.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://jayeonho.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "smgfishing.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://smgfishing.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "taepyoung.sunsang24.com",
+      "sea": "서해권",
+      "province": "전북특별자치도",
+      "local": "군산",
+      "locationToken": "군산시",
+      "regionEvidenceUrl": "https://taepyoung.sunsang24.com/ship/schedule_fleet",
       "portByShip": {}
     }
   ]

@@ -31,7 +31,7 @@ export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,b
 export function initializeFleet(saved: unknown): {state:AppState; seeded:boolean; changed:boolean} {
   if (!saved) return {state:defaultFleet(), seeded:true, changed:true};
   let state = importData(saved).state;
-  if (!state.fleetSeedVersion && !state.boats.length && !state.events.length && !state.failures.length)
+  if (!state.preferenceRecoveryVersion && !state.fleetSeedVersion && !state.boats.length && !state.events.length && !state.failures.length)
     return {state:defaultFleet(), seeded:true, changed:true};
   const catalogChanged=state.fleetSeedVersion!==FLEET_VERSION || !state.fleetBaseline;
   const tiersChanged=state.sunsangTierVersion!==SUNSANG_TIER_VERSION;
@@ -41,7 +41,8 @@ export function initializeFleet(saved: unknown): {state:AppState; seeded:boolean
     state=mergeFleetCatalog(state,defaults.boats,FLEET_VERSION,baseline);
     if(state.selectedRegion) state.selectedRegion=migrateRegionFilter(state.boats,state.selectedRegion);
   }
-  if(tiersChanged) state=applySunsangTiers(state);
+  // Once personal settings are protected, a later bundled PC preset must not fill intentional gaps.
+  if(tiersChanged) state=state.preferenceRecoveryVersion?{...state,sunsangTierVersion:SUNSANG_TIER_VERSION}:applySunsangTiers(state);
   return {state, seeded:false, changed:catalogChanged || tiersChanged};
 }
 /** Explicit restore replaces the PC fleet's order while retaining custom boats and observations. */

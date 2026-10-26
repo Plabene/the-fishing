@@ -13,46 +13,4 @@ export function eventStatus(event: Observation, state: AppState, now = Date.now(
   if (event.remaining === null) return 'UNKNOWN';
   return event.remaining >= state.requiredPeople ? 'AVAILABLE' : 'FULL';
 }
-const DB = 'thefishing-mobile-a';
-export function database(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB, 1);
-    request.onupgradeneeded = () => request.result.createObjectStore('local');
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => { request.result.onversionchange = () => request.result.close(); resolve(request.result); };
-    request.onblocked = () => reject(new Error('다른 탭을 닫고 다시 시도하세요.'));
-  });
-}
-export async function loadState(): Promise<unknown> {
-  const db = await database();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction('local', 'readonly'); const request = tx.objectStore('local').get('state');
-    tx.oncomplete = () => { db.close(); resolve(request.result); };
-    tx.onerror = () => { db.close(); reject(tx.error); };
-  });
-}
-export async function backupPreferences(state:AppState,version:string):Promise<void> {
-  const db=await database();return new Promise((resolve,reject)=>{
-    const tx=db.transaction('local','readwrite');tx.objectStore('local').put({tiers:structuredClone(state.tiers),selectedUids:[...state.selectedUids]},`preferences-before:${version}`);
-    tx.oncomplete=()=>{db.close();resolve();};tx.onerror=tx.onabort=()=>{db.close();reject(tx.error || new Error('설정 백업 실패'));};
-  });
-}
-export async function previousPreferences(version:string):Promise<Pick<AppState,'tiers'|'selectedUids'>|undefined> {
-  const db=await database();return new Promise((resolve,reject)=>{
-    const tx=db.transaction('local','readonly'),read=tx.objectStore('local').get(`preferences-before:${version}`);
-    tx.oncomplete=()=>{db.close();resolve(read.result);};tx.onerror=()=>{db.close();reject(tx.error);};
-  });
-}
-export async function saveState(state: AppState, signal?: AbortSignal): Promise<void> {
-  signal?.throwIfAborted();
-  const db = await database();
-  return new Promise((resolve, reject) => {
-    if (signal?.aborted) { db.close(); reject(new DOMException('취소되었습니다.', 'AbortError')); return; }
-    const tx = db.transaction('local', 'readwrite'); tx.objectStore('local').put(structuredClone(state), 'state');
-    const abort = () => { try { tx.abort(); } catch { /* already committed */ } };
-    signal?.addEventListener('abort', abort, { once: true });
-    const clean = () => { signal?.removeEventListener('abort', abort); db.close(); };
-    tx.oncomplete = () => { clean(); resolve(); };
-    tx.onabort = tx.onerror = () => { clean(); reject(tx.error || new Error('기기 저장 공간을 확인하세요.')); };
-  });
-}
+export {database,loadState,saveState,backupPreferences,previousPreferences,preferenceBackups,StorageConflictError} from './preferenceProtection';

@@ -19,10 +19,10 @@ function cleanBoat(b:Boat):Boat {
 /** A portable tier list contains no seats, query history, API settings or device metadata. */
 export function exportTierBackup(state:AppState,now=new Date()):string {
   const byId=new Map(state.boats.map(b=>[b.uid,b]));
-  const tiers=normalizeTiers(state.tiers,state.selectedUids);
+  const tiers=normalizeTiers(state.tiers);
   for(const tier of TIERS) tiers[tier]=tiers[tier].filter(id=>byId.has(id));
-  const ids=TIERS.flatMap(t=>tiers[t]);
-  return JSON.stringify({format:FORMAT,version:1,createdAt:now.toISOString(),
+  const ids=[...new Set([...TIERS.flatMap(t=>tiers[t]),...state.selectedUids.filter(id=>byId.has(id))])];
+  return JSON.stringify({format:FORMAT,version:2,createdAt:now.toISOString(),
     boats:ids.map(id=>cleanBoat(byId.get(id)!)),
     tiers:Object.fromEntries(TIERS.map(t=>[t,tiers[t].map(identity)])),
     selectedUids:state.selectedUids.filter(id=>byId.has(id)).map(identity)},null,2);
@@ -30,7 +30,7 @@ export function exportTierBackup(state:AppState,now=new Date()):string {
 /** Replace the included boats' tiers/selection; preserve other boats and all observations. */
 export function restoreTierBackup(value:unknown,current:AppState):{state:AppState;count:number} {
   const root=object(value);
-  if(!isTierBackup(root) || root.version!==1 || !Array.isArray(root.boats) || root.boats.length>10000 || !Array.isArray(root.selectedUids)) throw invalid();
+  if(!isTierBackup(root) || (root.version!==1 && root.version!==2) || !Array.isArray(root.boats) || root.boats.length>10000 || !Array.isArray(root.selectedUids)) throw invalid();
   const boats:Boat[]=[],scope=new Set<string>();
   for(const raw of root.boats) {
     const b=object(raw),id=identity(b.uid);
@@ -42,7 +42,7 @@ export function restoreTierBackup(value:unknown,current:AppState):{state:AppStat
     const values=rawTiers[tier];if(!Array.isArray(values) || values.length>10000) throw invalid();
     tiers[tier]=values.map(value=>{const id=identity(value);if(!scope.has(id) || assigned.has(id)) throw invalid();assigned.add(id);return id;});
   }
-  if(assigned.size!==scope.size || root.selectedUids.length>10000) throw invalid();
+  if(root.version===1 && assigned.size!==scope.size || root.selectedUids.length>10000) throw invalid();
   const selection=root.selectedUids.map(identity);
   if(new Set(selection).size!==selection.length || selection.some(id=>!scope.has(id))) throw invalid();
   const state=structuredClone(current),existing=new Set(state.boats.map(b=>b.uid));
@@ -50,5 +50,5 @@ export function restoreTierBackup(value:unknown,current:AppState):{state:AppStat
   state.boats.push(...boats.filter(b=>!existing.has(b.uid)));
   for(const tier of TIERS) state.tiers[tier]=[...tiers[tier],...state.tiers[tier].filter(id=>!scope.has(id))];
   state.selectedUids=[...selection,...state.selectedUids.filter(id=>!scope.has(id))];
-  return {state,count:scope.size};
+  return {state,count:assigned.size};
 }
