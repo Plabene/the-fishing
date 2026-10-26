@@ -1,7 +1,7 @@
 /* Scoped filter layout: native disclosure state, no absolute overlays or animated height. */
 .calendar-filter-row { gap:6px; align-items:flex-start; }
 .calendar-filter-row>.filter-panel, #species-toggle.filter-panel { flex:1 1 0; min-width:0; margin:0; }
-.calendar-filter-row>.filter-panel[open] { flex-basis:100%; order:4; }
+.calendar-filter-row>.filter-panel[open], #species-toggle.filter-panel[open] { flex-basis:100%; order:4; }
 .calendar-filter-row>.filter-panel>summary { display:flex; gap:6px; min-height:40px; }
 .calendar-filter-row>.filter-panel>summary::after { content:'⌄'; margin-left:auto; flex-shrink:0; }
 .calendar-filter-row>.filter-panel[open]>summary::after { content:'⌃'; }

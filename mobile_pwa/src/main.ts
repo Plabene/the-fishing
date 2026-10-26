@@ -14,7 +14,7 @@ import {applyPublishedPreferences,PUBLISHED_PREFERENCES_VERSION,PUBLISHED_PREFER
 import {bookingAlias} from './bookingAliases';
 import { orderedBoats, moveBoat, removeBoat, tierFor, selectBoats, matchesTier, readTierFilter, tierFilterLabel } from './tierStore';
 import {speciesOptions} from './species';
-import {installFilterPanels,finishFilterPanels} from './filterPanels';
+import {installFilterPanels,finishFilterPanels,type QueryOutcome} from './filterPanels';
 import { renderCalendar } from './calendarView';
 import { el, renderDay, sourceLink } from './dayView';
 import { fixtureState } from './providers/fixtures';
@@ -59,7 +59,7 @@ const fleetRows=new Map<string,{signature:string;row:HTMLElement;check:HTMLInput
 let livePreview:AppState|null=null;
 let refreshRecovery:()=>void=()=>{};
 let configuredApi=loadApiOrigin();
-let apiProvider=new TheFishingApi(configuredApi), lastFleetKey='';
+let apiProvider=new TheFishingApi(configuredApi), lastFleetKey='', lastRegionKey='';
 function renderApiSettings() {
   $<HTMLInputElement>('#api-url').value=configuredApi;
   $('#api-state').textContent=configuredApi ? new URL(configuredApi).hostname : '연결 안 됨';
@@ -150,7 +150,13 @@ function render() {
   const shown = active(), result = queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly}), records=result.events;
   const counts=platformCounts(state.boats.filter(b=>matchesRegion(b,state.selectedRegion))),allCounts=platformCounts(state.boats);
   for(const button of $('#platform-filter').querySelectorAll<HTMLButtonElement>('button')) {const platform=readPlatform(button.dataset.platform);button.textContent=`${PLATFORM_LABELS[platform]} ${counts[platform]}`;button.title=`선택 지역 ${counts[platform]}개 · 전국 보유 목록 ${allCounts[platform]}개`;button.setAttribute('aria-pressed',String(platform===(state.selectedPlatform || 'all')));}
-  renderRegionFilter($('#region-filter'),state.boats,state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
+  // Keep region controls and keyboard focus when only dates, tides or results change.
+  // Storage saves clone the state, so compare values instead of object identity.
+  const regionKey=JSON.stringify([state.boats,state.selectedRegion]);
+  if(lastRegionKey!==regionKey) {
+    renderRegionFilter($('#region-filter'),state.boats,state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
+    lastRegionKey=regionKey;
+  }
   const targets=orderedBoats(state).filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && matchesTier(tierFor(state,b.uid),tier)),targetCounts=platformCounts(targets);
   $('#query-target').textContent=`${targets.length}척 조회 대상 · ${regionSummary(state.selectedRegion)} · ${tierFilterLabel(tier)}`;
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
@@ -230,7 +236,7 @@ $('#query-form').addEventListener('submit',async event=>{
   liveController=new AbortController();livePreview=candidate;finishFilterPanels(root,'loading');render();setBusy(true); $('#stop-query').hidden=false;progress.start(boats.length);
   $('#live-diagnostics').hidden=true;$('#diagnostic-text').hidden=true;
   $('#live-progress').textContent=`${boats.length}척 조회 시작 · 완료된 선박부터 달력에 표시합니다.`;
-  const applied=new Set<string>();let previewTimer:ReturnType<typeof setTimeout>|undefined,lastPaint=-Infinity;
+  const applied=new Set<string>();let previewTimer:ReturnType<typeof setTimeout>|undefined,lastPaint=-Infinity,queryOutcome:QueryOutcome='error';
   const paint=()=>{previewTimer=undefined;if(livePreview) {renderResults(active());lastPaint=performance.now();}};
   try {
     const result=await collectMonth(provider,boats,month,liveController.signal,(rows,total)=>{
@@ -246,12 +252,12 @@ $('#query-form').addEventListener('submit',async event=>{
     const updated=applyLiveResults(candidate,month,result.rows); await saveState(updated);state=updated;undoState=null;$('#undo').hidden=true;
     const ok=result.rows.filter(r=>r.result.status==='ALLOWED_READABLE').length, failed=result.rows.length-ok, unattempted=result.total-result.rows.length;
     const complete=!result.cancelled && !result.stopped && !failed && !unattempted;
-    finishFilterPanels(root,complete ? queryMonth(updated,{month,requiredPeople,tier,search,matchingOnly}).events.length?'success':'empty':result.cancelled?'cancelled':ok?'partial':'error');
+    queryOutcome=complete ? queryMonth(updated,{month,requiredPeople,tier,search,matchingOnly}).events.length?'success':'empty':result.cancelled?'cancelled':ok?'partial':'error';
     const outcome=result.cancelled ? '조회 취소' : result.stopped ? '조회 중단' : failed || unattempted ? ok?'조회 일부 완료':'조회 실패':'조회 완료';progress.finish(outcome);
     const status=`${outcome} · 성공 ${ok}척 · 실패/미지원 ${failed}척 · 미조회 ${unattempted}척 · ${((performance.now()-started)/1000).toFixed(1)}초`;
     $('#live-progress').textContent=status; say(status+' · 이번에 확인한 잔여석만 표시합니다.');
-  } catch(error) {liveRows=[];finishFilterPanels(root,'error');progress.finish('조회 실패');$('#live-progress').textContent='최신 잔여석을 반영하지 못했습니다. 다시 조회하세요.';say(`조회 결과를 반영하지 못했습니다. ${error instanceof Error ? error.message : '다시 조회하세요.'}`);}
-  finally {if(previewTimer) clearTimeout(previewTimer);livePreview=null;liveController=null;$('#stop-query').hidden=true;setBusy(false);render();if(liveRows.some(row=>row.result.status!=='ALLOWED_READABLE')) $<HTMLDetailsElement>('#live-diagnostics').open=true;}
+  } catch(error) {liveRows=[];queryOutcome='error';progress.finish('조회 실패');$('#live-progress').textContent='최신 잔여석을 반영하지 못했습니다. 다시 조회하세요.';say(`조회 결과를 반영하지 못했습니다. ${error instanceof Error ? error.message : '다시 조회하세요.'}`);}
+  finally {if(previewTimer) clearTimeout(previewTimer);livePreview=null;liveController=null;$('#stop-query').hidden=true;setBusy(false);render();finishFilterPanels(root,queryOutcome);if(liveRows.some(row=>row.result.status!=='ALLOWED_READABLE')) $<HTMLDetailsElement>('#live-diagnostics').open=true;}
 });
 $('#copy-diagnostics').addEventListener('click',async()=>{
   const report=diagnosticReport(liveRows,liveMonth), fallback=$<HTMLTextAreaElement>('#diagnostic-text');

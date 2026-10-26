@@ -29,9 +29,9 @@ test('mixed options and multi-tier requests survive refresh; panels close only a
     const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();
     el('[data-tier="none"]').click();await settle();el('[data-tier="tier1"]').click();await settle();el('[data-tier="tier2"]').click();await settle();
     expect(el('#query-target').textContent).toContain('2척');expect(el('[data-tier="tier1"]').getAttribute('aria-pressed')).toBe('true');expect(el('[data-tier="tier3"]').getAttribute('aria-pressed')).toBe('false');
-    open();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(2));expect(panelIds.every(id=>panel(id).open)).toBe(true);expect(el('#app').dataset.queryState).toBe('loading');
+    open();el('#search').focus();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(2));expect(panelIds.every(id=>panel(id).open)).toBe(true);expect(el('#app').dataset.queryState).toBe('loading');
     expect(pending.some(p=>/uid=998[89]/.test(p.url))).toBe(false);respond(0);await settle();
-    expect(panelIds.some(id=>panel(id).open)).toBe(false);expect(el('#app').dataset.queryState).toBe('success');
+    expect(panelIds.some(id=>panel(id).open)).toBe(false);expect(el('#app').dataset.queryState).toBe('success');expect(document.activeElement).toBe(el('#query-submit'));
     panel('species-toggle').querySelector<HTMLElement>('summary')!.click();
     for(const key of ['주꾸미','갑오징어','주꾸미+갑오징어']) expect(el(`[data-species-choice="${key}"]`)).not.toBeNull();
     el('[data-species-choice="갑오징어"]').click();await settle();expect(el('#summary').textContent).toContain('1개 출조');
