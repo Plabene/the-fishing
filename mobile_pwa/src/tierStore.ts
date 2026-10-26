@@ -4,6 +4,14 @@ export function readTierFilter(value:unknown):Filter {
   return TIERS.includes(value as Tier)?value as Tier:'all';
 }
 export function matchesTier(tier:Tier,filter:Filter):boolean {return filter==='all' || (Array.isArray(filter)?filter.includes(tier):tier===filter);}
+/** From the All shortcut, start a selection rather than silently excluding the clicked tier. */
+export function toggleTierFilter(filter:Filter,choice:Tier|'all'|'none'):Filter {
+  if(choice==='all') return 'all';
+  if(choice==='none') return [];
+  const selected=TIERS.filter(t=>matchesTier(t,filter));
+  if(selected.length===TIERS.length) return [choice];
+  return selected.includes(choice)?selected.filter(t=>t!==choice):TIERS.filter(t=>selected.includes(t)||t===choice);
+}
 export function tierFilterLabel(filter:Filter):string {return Array.isArray(filter)?filter.length?filter.map(t=>LABELS[t]).join(' · '):'티어 선택 없음':LABELS[filter];}
 export function normalizeTiers(raw: unknown, selected: unknown[] = []): Record<Tier, string[]> {
   const data = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};

@@ -38,6 +38,11 @@ main .panel-close { min-height:36px; padding:4px 8px; font-size:12px; background
 .region-controls>#region-reset { min-height:32px; }
 .tier-tabs { grid-template-columns:repeat(6,minmax(0,1fr)); }
 main .tier-tabs button { min-height:40px; padding:4px 2px; }
+.tier-visibility { max-width:620px; margin:4px 0 6px; font-size:11px; color:var(--muted); overflow-wrap:anywhere; }
+.tier-visibility p { margin:3px 0; }
+.tier-visibility summary { cursor:pointer; min-height:32px; padding:6px 0; }
+.tier-visibility .actions { gap:5px; margin:4px 0; }
+main .tier-visibility button, main .tier-visibility .button { min-height:36px; padding:4px 8px; font-size:12px; text-decoration:none; }
 .calendar-fleet-actions { display:flex; justify-content:flex-start; margin:8px 0; }
 .calendar-fleet-actions .button { text-decoration:none; min-height:40px; }
 @media(max-width:760px) { .region-controls { grid-template-columns:repeat(2,minmax(0,1fr)); } }

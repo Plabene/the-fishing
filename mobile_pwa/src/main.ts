@@ -12,7 +12,8 @@ import {applySunsangTiers,SUNSANG_TIER_COUNT} from './sunsang24Tiers';
 import { loadState, saveState,backupPreferences,previousPreferences,StorageConflictError } from './availabilityStore';
 import {applyPublishedPreferences,PUBLISHED_PREFERENCES_VERSION,PUBLISHED_PREFERENCES_COUNTS} from './publishedPreferences';
 import {bookingAlias} from './bookingAliases';
-import { orderedBoats, moveBoat, removeBoat, tierFor, selectBoats, matchesTier, readTierFilter, tierFilterLabel } from './tierStore';
+import { orderedBoats, moveBoat, removeBoat, tierFor, selectBoats, matchesTier, readTierFilter, tierFilterLabel, toggleTierFilter } from './tierStore';
+import {tierVisibility} from './tierVisibility';
 import {speciesOptions} from './species';
 import {installFilterPanels,finishFilterPanels,type QueryOutcome} from './filterPanels';
 import { renderCalendar } from './calendarView';
@@ -159,6 +160,10 @@ function render() {
   }
   const targets=orderedBoats(state).filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && matchesTier(tierFor(state,b.uid),tier)),targetCounts=platformCounts(targets);
   $('#query-target').textContent=`${targets.length}척 조회 대상 · ${regionSummary(state.selectedRegion)} · ${tierFilterLabel(tier)}`;
+  const visibility=tierVisibility(state,tier);
+  $('#tier-saved-counts').textContent=`이 기기 저장 티어 ${visibility.total}척 · ${TIERS.map(t=>`${LABELS[t]} ${visibility.counts[t]}`).join(' / ')}`;
+  const hiddenReasons=[visibility.unselected?`선박 선택 해제 ${visibility.unselected}척`:'',visibility.excludedTier?`티어 필터 제외 ${visibility.excludedTier}척`:'',visibility.excludedLocation?`지역·플랫폼 제외 ${visibility.excludedLocation}척`:'',visibility.missingBoat?`선박 정보 없음 ${visibility.missingBoat}척`:''].filter(Boolean);
+  $('#tier-hidden-reasons').textContent=(visibility.total?`저장 티어 중 조회 대상 ${visibility.included}척${hiddenReasons.length?' · '+hiddenReasons.join(' · '):''}. 조회 결과와 저장된 티어 목록은 별개입니다.`:'이 기기에 저장된 티어가 없습니다. 티어·백업 확인에서 제공한 백업과 비교할 수 있습니다.')+(visibility.unassignedSelected?` 별도로 선택된 미분류 ${visibility.unassignedSelected}척은 기타 조건으로 조회합니다.`:'');
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
   $('#fleet-catalog-status').textContent=`더피싱 보유 목록 ${allCounts.thefishing}개${catalog ? ` · 최근 원본 확인 ${catalog.listed}개 (${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})})`:''}. 선상24 보유 목록 ${allCounts.sunsang24}개 · PC 누적 목록과 검증된 공개 선사 목록. 두 목록은 매주 월요일 갱신을 시도하며 실패한 출처의 기존 항목은 보존합니다. 중앙 API 접근 제한·원본 페이지 중복으로 전국 완전 수집을 보장하지 않습니다. 같은 플랫폼·ID는 한 번 집계하며 플랫폼 간 동일 선박 후보는 예약정보를 합치지 않습니다. 새 목록 항목은 기타 티어·선택 해제 상태이며 기존 개인 티어·선택은 유지됩니다.`;
   renderTideSummary($('#tide-status'),calculateTideMonth(shown.month,shown.tideDays || []));
@@ -192,10 +197,11 @@ function render() {
   renderPlatformResults();
   $('#demo-banner').hidden = !demo; $('#demo').textContent = demo ? '실제 조회 자료로 돌아가기' : '예시 둘러보기'; $('#fleet-section').hidden = demo;
   $('#tabs').replaceChildren();
+  const allTiers=TIERS.every(t=>matchesTier(t,tier));
   for (const t of ['all', ...TIERS, 'none'] as const) {
-    const checked=t==='all'?TIERS.every(v=>matchesTier(v,tier)):t==='none'?Array.isArray(tier)&&!tier.length:matchesTier(t,tier);
-    const b=el('button',`${checked?'✓ ':''}${t==='none'?'해제':LABELS[t]}`);b.type='button';b.dataset.tier=t;b.setAttribute('aria-pressed',String(checked));b.setAttribute('aria-label',t==='all'?'모든 티어 선택':t==='none'?'티어 선택 해제':`${LABELS[t]} 선택`);
-    b.addEventListener('click',()=>{const chosen=TIERS.filter(v=>matchesTier(v,tier));const selectedTiers:Filter=t==='all'?'all':t==='none'?[]:chosen.includes(t)?chosen.filter(v=>v!==t):TIERS.filter(v=>chosen.includes(v)||v===t);void commit({...state,selectedTiers},'조회할 티어를 변경했습니다. 선박에 지정한 티어는 유지합니다.');});$('#tabs').append(b);
+    const checked=t==='all'?allTiers:t==='none'?Array.isArray(tier)&&!tier.length:!allTiers && matchesTier(t,tier);
+    const b=el('button',`${checked?'✓ ':''}${t==='none'?'해제':LABELS[t]}`);b.type='button';b.dataset.tier=t;b.setAttribute('aria-pressed',String(checked));b.setAttribute('aria-label',t==='all'?'모든 티어 조회':t==='none'?'조회할 티어 선택 해제':`${LABELS[t]} ${allTiers?'조회 시작':'조회 선택'} · 기기 저장 ${visibility.counts[t]}척`);
+    b.addEventListener('click',()=>{void commit({...state,selectedTiers:toggleTierFilter(tier,t)},'조회할 티어를 변경했습니다. 선박에 지정한 티어는 유지합니다.');});$('#tabs').append(b);
   }
   $('#source-access').hidden = demo;
   renderSourceAccess($('#source-access'), state, sourceBoat, value => { sourceBoat=value; render(); });
@@ -275,6 +281,12 @@ $('#api-form').addEventListener('submit',async event=>{
 $('#api-clear').addEventListener('click',()=>{if(busy) return;try {clearApiOrigin();configuredApi='';renderApiSettings();say('이 기기의 API 연결을 해제했습니다.');} catch {say('기기 설정을 변경하지 못했습니다.');}});
 $('#matching-only').addEventListener('change',event=>{matchingOnly=(event.currentTarget as HTMLInputElement).checked; resultLimit=50; render();});
 $('#search-reset').addEventListener('click',async()=>{if(busy) return;const oldSearch=search;search='';if(await commit({...state,selectedTiers:'all',selectedRegion:emptyRegion(),selectedSpecies:'all',excludedSpeciesKeys:[]},'지역·티어·어종·검색어 필터를 초기화했습니다. 선택한 선박은 유지합니다.')) $<HTMLInputElement>('#search').value='';else {search=oldSearch;render();}});
+$('#tier-show-all').addEventListener('click',async()=>{
+  if(busy) return;const oldSearch=search;search='';
+  if(await commit({...state,selectedTiers:'all',selectedPlatform:'all',selectedRegion:emptyRegion(),selectedSpecies:'all',excludedSpeciesKeys:[]},'조회 필터를 해제했습니다. 저장 티어와 선박 선택은 그대로입니다. 새 잔여석은 조회하기를 눌러 확인하세요.')) $<HTMLInputElement>('#search').value='';
+  else {search=oldSearch;render();}
+});
+$('#tier-open-recovery').addEventListener('click',()=>{$<HTMLDetailsElement>('.fleet-management').open=true;});
 $('#view-calendar').addEventListener('click',()=>{listView=false;render();});
 $('#view-list').addEventListener('click',()=>{listView=true;render();});
 $('#cancel').addEventListener('click', () => importController?.abort());
