@@ -18,11 +18,10 @@ test('calendar opens on current month, aliases integrate with day view, and prio
   const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
   expect((el('#month') as HTMLInputElement).value).toBe(localMonth());expect(network).not.toHaveBeenCalled();
   expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(false);
-  expect((el('#search-section') as HTMLDetailsElement).open).toBe(false);
-  el('a[href="#fleet-section"]').click();expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(true);
+  expect(el('#search-section')).toBeNull();
+  el('#fleet-section>summary').click();expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(true);
   const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();
   expect((await loadState() as AppState).tiers).toEqual(before.tiers);
-  el('#select-all').click();await settle();
   el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await settle();
   expect(network).toHaveBeenCalledTimes(2);
   expect(el('.calendar-day[aria-label^="2026-11-02"]').textContent).toContain('2척 가능');
@@ -34,7 +33,7 @@ test('calendar opens on current month, aliases integrate with day view, and prio
   el('#restore-before-publish').click();await settle();
   await vi.waitFor(async()=>expect((await loadState() as AppState).tiers).toEqual(before.tiers));
   const restored=await loadState() as AppState;expect(restored.selectedUids).toEqual([team]);expect(restored.events).toEqual(latestEvents);
-  expect(el('.calendar-day[aria-label^="2026-11-02"]').textContent).toContain('1척 가능');
+  expect(el('.calendar-day[aria-label^="2026-11-02"]').textContent).toContain('2척 가능');
   el('#next').click();await settle();expect(month.value).toBe('2026-12');expect(el('#summary').textContent).toContain('0개 출조');
   el('#prev').click();await settle();expect(month.value).toBe('2026-11');expect(network).toHaveBeenCalledTimes(2);
   // Older personal backups lack the preset marker; importing one must not trigger a later overwrite.

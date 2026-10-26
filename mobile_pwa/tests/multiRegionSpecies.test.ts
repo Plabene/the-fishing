@@ -63,7 +63,7 @@ test('calendar, day and month agree on exact sets and preserve full source speci
 test('region panel precedes calendar and boat selection/management follows calendar',()=>{
   const root=document.createElement('div');root.innerHTML=appLayout(21);
   const before=(a:string,b:string)=>!!(root.querySelector(a)!.compareDocumentPosition(root.querySelector(b)!)&Node.DOCUMENT_POSITION_FOLLOWING);
-  expect(before('#search-section','#calendar-layout')).toBe(true);expect(before('#calendar-layout','#fleet-section')).toBe(true);expect(before('#fleet-section','.fleet-management')).toBe(true);
+  expect(before('#region-toggle','#calendar-layout')).toBe(true);expect(before('#calendar-layout','#fleet-section')).toBe(true);expect(before('#fleet-section','.fleet-management')).toBe(true);
 });
 test('latest backup upgrades only the unchanged old backup; later edits and intentional empty preferences survive',()=>{
   const base={...defaultFleet(),tiers:structuredClone(previous.tiers),selectedUids:[...previous.selectedUids],preferenceRecoveryVersion:previous.version};

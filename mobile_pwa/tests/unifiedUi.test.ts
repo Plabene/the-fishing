@@ -7,7 +7,7 @@ import {defaultFleet} from '../src/defaultFleet';
 
 test('species become available only after collection; multi-select, platform, region and ship changes reuse returned data',async()=>{
   const state=emptyState();state.month='2026-11';state.selectedPlatform='sunsang24';
-  state.boats=[{uid:'9986',name:'가나 시험호',port:'인천남항',region:{sea:'서해권',province:'인천',local:''},url:'https://thefishing.kr/reservation/list.php?uid=9986'},defaultFleet().boats.find(b=>b.uid==='sunsang24:ship:1530')!];state.selectedUids=state.boats.map(b=>b.uid);await saveState(state);
+  state.boats=[{uid:'9986',name:'가나 시험호',port:'인천남항',region:{sea:'서해권',province:'인천',local:''},url:'https://thefishing.kr/reservation/list.php?uid=9986'},defaultFleet().boats.find(b=>b.uid==='sunsang24:ship:1530')!];state.selectedUids=state.boats.map(b=>b.uid);state.tiers.tier1=['9986'];state.tiers.tier2=[state.boats[1].uid];await saveState(state);
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
   const responses:((response:Response)=>void)[]=[],request=vi.fn<typeof fetch>(()=>new Promise(resolve=>responses.push(resolve)));vi.stubGlobal('fetch',request);
   try {
@@ -16,7 +16,7 @@ test('species become available only after collection; multi-select, platform, re
     const requestedMonth=el('#month') as HTMLInputElement;requestedMonth.value='2026-11';requestedMonth.dispatchEvent(new Event('change'));await settle();
     expect(el('[data-platform="all"]').getAttribute('aria-pressed')).toBe('true');
     expect(el('#species-filter').dataset.state).toBe('disabled');expect((el('#species-all') as HTMLButtonElement).disabled).toBe(true);
-    expect(el('#search-section').querySelector('#species-filter')).toBeNull();
+    expect(el('#search-section')).toBeNull();
     el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(2));
     expect(el('#species-selection-summary').textContent).toContain('조회 중');
     const observedAt=new Date().toISOString();
@@ -34,7 +34,7 @@ test('species become available only after collection; multi-select, platform, re
     el('#region-province input[value="인천광역시"]').click();await settle();
     expect(el('#summary').textContent).toContain('0개 출조');expect(el('#boats').textContent).toContain('가나 시험호');expect(document.querySelector('[data-species-choice="문어"]')).toBeNull();
     expect((await loadState() as typeof state).selectedSpecies).toEqual({mode:'options',keys:['갑오징어+문어']});
-    el('#region-reset').click();await settle();el('.boat-row[data-uid="9986"] input').click();await settle();
+    el('#region-reset').click();await settle();el('[data-tier="tier2"]').click();await settle();
     expect(el('#summary').textContent).toContain('1개 출조');expect(document.querySelector('[data-species-choice="주꾸미"]')).toBeNull();expect(request).toHaveBeenCalledTimes(2);
     const month=el('#month') as HTMLInputElement;month.value='2026-12';month.dispatchEvent(new Event('change'));await settle();expect(el('#species-filter').dataset.state).toBe('disabled');expect(el('#summary').textContent).toContain('0개 출조');
   } finally {vi.unstubAllGlobals();}

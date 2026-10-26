@@ -34,7 +34,7 @@ test('new queries clear old seats, display 4 to 0 changes, and do not show old a
   const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();expect(el('#query-monitor').hidden).toBe(true);
   submit();await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(4));expect(String(request.mock.calls[3][0])).toContain('month=2026-11&fresh=1');
   resolve(Response.json(payload(2,'2026-11')));await settle();el('.calendar-day[aria-label^="2026-11-22"]').click();expect(el('#day-view').textContent).toContain('조회 당시 잔여 2석');
-  expect(el('#search-section').compareDocumentPosition(el('#fleet-section')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(el('#region-toggle').compareDocumentPosition(el('#fleet-section')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(el('#results-section').compareDocumentPosition(el('#fleet-section')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(el('#results-section').querySelector('#query-form')).not.toBeNull();
   expect(el('#species-filter').closest('#results-section')).not.toBeNull();

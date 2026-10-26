@@ -33,8 +33,8 @@ test('Gunsan platform counts match visible rows; tier registration, selection, m
     expect(document.querySelectorAll('.boat-row')).toHaveLength(counts.all);expect(el('[data-platform="sunsang24"]').textContent).toBe('선상24 '+counts.sunsang24);
     el('[data-platform="sunsang24"]').click();await settle();expect(document.querySelectorAll('.boat-row')).toHaveLength(counts.sunsang24);
     const row=el('.boat-row[data-uid="sunsang24:ship:903"]'),select=row.querySelector('select')!;expect(select.value).toBe('');expect(select.selectedOptions[0].textContent).toBe('티어 미등록');
-    select.value='tier2';select.dispatchEvent(new Event('change'));await settle();row.querySelector<HTMLInputElement>('input')!.click();await settle();
-    const saved=await loadState() as AppState;expect(saved.tiers.tier2).toContain('sunsang24:ship:903');expect(saved.selectedUids).toContain('sunsang24:ship:903');
+    select.value='tier2';select.dispatchEvent(new Event('change'));await settle();
+    const saved=await loadState() as AppState;expect(saved.tiers.tier2).toContain('sunsang24:ship:903');expect(saved.selectedUids).toEqual(state.selectedUids);expect(row.querySelector('input')).toBeNull();
     const month=el('#month') as HTMLInputElement;month.value='2027-02';month.dispatchEvent(new Event('change'));await settle();expect(document.querySelectorAll('.boat-row')).toHaveLength(counts.sunsang24);
     el('[data-platform="thefishing"]').click();await settle();expect(document.querySelectorAll('.boat-row')).toHaveLength(counts.thefishing);expect(request).not.toHaveBeenCalled();
   } finally {vi.unstubAllGlobals();}

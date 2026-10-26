@@ -16,7 +16,7 @@ test('mixed options and multi-tier requests survive refresh; panels close only a
   try {
     await import('../src/main');const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
-    const panelIds=['region-toggle','search-section','species-toggle'],panel=(id:string)=>el('#'+id) as HTMLDetailsElement;
+    const panelIds=['region-toggle','species-toggle'],panel=(id:string)=>el('#'+id) as HTMLDetailsElement;
     const open=()=>panelIds.forEach(id=>panel(id).open=true);
     const submit=()=>el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));
     const respond=(start:number,failTf=false)=>{
@@ -29,7 +29,7 @@ test('mixed options and multi-tier requests survive refresh; panels close only a
     const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();
     el('[data-tier="none"]').click();await settle();el('[data-tier="tier1"]').click();await settle();el('[data-tier="tier2"]').click();await settle();
     expect(el('#query-target').textContent).toContain('2척');expect(el('[data-tier="tier1"]').getAttribute('aria-pressed')).toBe('true');expect(el('[data-tier="tier3"]').getAttribute('aria-pressed')).toBe('false');
-    open();el('#search').focus();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(2));expect(panelIds.every(id=>panel(id).open)).toBe(true);expect(el('#app').dataset.queryState).toBe('loading');
+    open();el('[data-close-panel="region-toggle"]').focus();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(2));expect(panelIds.every(id=>panel(id).open)).toBe(true);expect(el('#app').dataset.queryState).toBe('loading');
     expect(pending.some(p=>/uid=998[89]/.test(p.url))).toBe(false);respond(0);await settle();
     expect(panelIds.some(id=>panel(id).open)).toBe(false);expect(el('#app').dataset.queryState).toBe('success');expect(document.activeElement).toBe(el('#query-submit'));
     panel('species-toggle').querySelector<HTMLElement>('summary')!.click();
@@ -50,8 +50,8 @@ test('mixed options and multi-tier requests survive refresh; panels close only a
     el('#species-none').click();await settle();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(8));respond(6);await settle();
     expect(el('#app').dataset.queryState).toBe('empty');expect(panelIds.some(id=>panel(id).open)).toBe(false);expect((await loadState() as AppState).selectedSpecies).toEqual([]);
     open();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(10));el('#stop-query').click();await settle();expect(el('#app').dataset.queryState).toBe('cancelled');expect(panelIds.every(id=>panel(id).open)).toBe(true);
-    el('#selected-boats').click();expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(true);
-    el('#search-reset').click();await settle();expect((await loadState() as AppState).selectedTiers).toBe('all');expect((await loadState() as AppState).selectedSpecies).toBe('all');expect((await loadState() as AppState).tiers).toEqual(state.tiers);expect((await loadState() as AppState).selectedUids).toEqual(state.selectedUids);
+    el('#fleet-section>summary').click();expect((el('#fleet-section') as HTMLDetailsElement).open).toBe(true);
+    el('#tier-show-all').click();await settle();expect((await loadState() as AppState).selectedTiers).toBe('all');expect((await loadState() as AppState).selectedSpecies).toBe('all');expect((await loadState() as AppState).tiers).toEqual(state.tiers);expect((await loadState() as AppState).selectedUids).toEqual(state.selectedUids);
     expect(network).toHaveBeenCalledTimes(10);
   } finally {vi.unstubAllGlobals();}
 });

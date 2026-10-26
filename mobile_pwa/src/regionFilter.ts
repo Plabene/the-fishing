@@ -16,7 +16,7 @@ export function renderRegionFilter(target:HTMLElement,boats:Boat[],selected:Regi
     const toolbar=el('div','','region-field-tools'),clear=el('button','전체');clear.type='button';clear.id=`region-${key}-all`;clear.className='region-all';clear.setAttribute('aria-label',`${REGION_LABELS[key]} 선택 초기화`);clear.addEventListener('click',()=>onChange(pruneRegionChildren(boats,{...filter,[key]:''},key)));toolbar.append(el('small','여러 곳 선택'),clear);field.append(toolbar);
     const options=el('fieldset','','region-options');options.id=`region-${key}`;options.append(el('legend',REGION_LABELS[key]+' 선택','sr-only'));
     for(const [value,count] of [...counts].sort(([a],[b])=>a===UNKNOWN_REGION ? 1:b===UNKNOWN_REGION ? -1:a.localeCompare(b,'ko'))) {
-      const label=el('label','','region-choice'),input=el('input');input.type='checkbox';input.value=value;input.dataset.regionChoice=key;input.checked=chosen.includes(value);
+      const label=el('label','','region-choice'),input=el('input');input.type='checkbox';input.value=value;input.dataset.regionChoice=key;input.checked=chosen.includes(value);label.classList.toggle('is-selected',input.checked);
       label.append(input,el('span',`${value===UNKNOWN_REGION?'미확인':value} (${count}척)`));
       input.addEventListener('change',()=>{const values=new Set(chosen);if(input.checked) values.add(value);else values.delete(value);onChange(pruneRegionChildren(boats,{...filter,[key]:regionSelection([...values])},key));});options.append(label);
     }

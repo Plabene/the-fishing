@@ -1,5 +1,5 @@
 export type QueryOutcome='loading'|'success'|'empty'|'partial'|'error'|'cancelled';
-const panels=['region-toggle','search-section','species-toggle'];
+const panels=['region-toggle','species-toggle'];
 export function finishFilterPanels(root:HTMLElement,outcome:QueryOutcome):void {
   root.dataset.queryState=outcome;
   if(outcome==='success' || outcome==='empty') {
@@ -7,7 +7,7 @@ export function finishFilterPanels(root:HTMLElement,outcome:QueryOutcome):void {
     const focused=document.activeElement;
     if(focused instanceof HTMLElement && focused.closest(panels.map(id=>'#'+id).join(','))) root.querySelector<HTMLButtonElement>('#query-submit')?.focus({preventScroll:true});
   } else if(outcome==='error' || outcome==='partial') {
-    const search=root.querySelector<HTMLDetailsElement>('#search-section');if(search) search.open=true;
+    const region=root.querySelector<HTMLDetailsElement>('#region-toggle');if(region) region.open=true;
   }
 }
 export function installFilterPanels(root:HTMLElement):void {

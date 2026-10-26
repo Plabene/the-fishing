@@ -6,7 +6,7 @@ import {saveState,loadState} from '../src/availabilityStore';
 import {defaultFleet} from '../src/defaultFleet';
 
 test('platform selector scopes both live sources, integrated calendar keeps names without tags, and month refreshes',async()=>{
-  const state=emptyState();state.month='2026-10';state.boats=[{uid:'9987',name:'기존 더피싱 시험호',port:'',url:'https://thefishing.kr/reservation/list.php?uid=9987'},defaultFleet().boats.find(b=>b.uid==='sunsang24:ship:698')!];state.selectedUids=state.boats.map(b=>b.uid);await saveState(state);
+  const state=emptyState();state.month='2026-10';state.boats=[{uid:'9987',name:'기존 더피싱 시험호',port:'',url:'https://thefishing.kr/reservation/list.php?uid=9987'},defaultFleet().boats.find(b=>b.uid==='sunsang24:ship:698')!];state.selectedUids=state.boats.map(b=>b.uid);state.tiers.other=[...state.selectedUids];await saveState(state);
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
   const request=vi.fn<typeof fetch>(async input=>{const u=new URL(String(input)),month=u.searchParams.get('month')!,observedAt=new Date().toISOString();
     if(u.pathname.includes('sunsang24')) return Response.json({status:'ALLOWED_READABLE',host:'nature.sunsang24.com',month,shipIds:['698'],fresh:true,cached:false,observedAt,events:[{id:'sunsang24-schedule-123',uid:'sunsang24:ship:698',date:`${month}-25`,trip:'갑오징어',remaining:4,departure:'05:00',observedAt,verified:true,reservationStatus:'available',reservationUrl:`https://www.sunsang24.com/ship/list?ship_no=698&sdate=${month}-25`}]});
