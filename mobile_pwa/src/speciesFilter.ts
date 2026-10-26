@@ -1,23 +1,24 @@
 import { el } from './dayView';
-import { speciesColor, speciesKey, speciesLabel, normalizeSpeciesSelection } from './species';
+import { speciesColor, speciesKey, speciesLabel, normalizeSpeciesSelection, matchesSpecies } from './species';
 
-export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>,selected:string|string[],excluded:string[],onChange:(selected:'all'|string[],excluded:string[])=>void,disabledReason='') {
+export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>,selected:string|string[],excluded:string[],onChange:(selected:'all'|string[],excluded:string[])=>void,disabledReason='',matchingCounts=counts) {
   const focused=target.contains(document.activeElement) ? document.activeElement as HTMLElement:null;
   const focusedChoice=focused?.dataset.speciesChoice,focusedId=focused?.id;
   target.replaceChildren();
   const selection=normalizeSpeciesSelection(selected),blocked=new Set(excluded),keys=[...counts.keys()].sort((a,b)=>speciesLabel(a).localeCompare(speciesLabel(b),'ko'));
-  const controls=el('div','','species-controls'),heading=el('strong','어종 선택 · 여러 개 선택 가능');
+  const controls=el('div','','species-controls'),heading=el('strong','어종 선택 · 정확히 일치');
   const reset=el('button','전체 어종');reset.type='button';reset.id='species-all';reset.setAttribute('aria-pressed',String(selection==='all'));reset.addEventListener('click',()=>onChange('all',[]));
   const clear=el('button','선택 해제');clear.type='button';clear.id='species-none';clear.addEventListener('click',()=>onChange([],[]));
   controls.append(heading,reset,clear);target.append(controls);
-  const status=el('p',disabledReason || (selection==='all' ? '전체 어종 표시 · 선택을 바꾸면 달력에 바로 적용됩니다.':selection.length ? `선택: ${selection.map(speciesLabel).join(', ')}`:'선택한 어종이 없습니다. 아래에서 원하는 어종을 선택하세요.'),'species-selection-summary');status.id='species-selection-summary';status.setAttribute('role','status');target.append(status);
+  const matched=[...matchingCounts].reduce((total,[key,count])=>total+(!blocked.has(key) && matchesSpecies(key,selection)?count:0),0);
+  const status=el('p',disabledReason || (selection==='all' ? '전체 어종 표시 · 1개 선택은 단독 출조, 여러 개 선택은 같은 어종 조합만 표시합니다.':selection.length ? `선택: ${selection.map(speciesLabel).join(', ')} · 같은 어종 조합 ${matched}건`:'선택한 어종이 없습니다. 아래에서 원하는 어종을 선택하세요.'),'species-selection-summary');status.id='species-selection-summary';status.setAttribute('role','status');target.append(status);
   const group=el('fieldset','','species-options');group.id='species-select';group.append(el('legend','조회할 어종 선택','sr-only'));
   const options=[...new Set(keys.flatMap(key=>key.split('+')))].sort((a,b)=>speciesLabel(a).localeCompare(speciesLabel(b),'ko'));
   for(const key of options) {
     const label=el('label','','species-option'),checkbox=el('input');checkbox.type='checkbox';checkbox.value=key;checkbox.dataset.speciesChoice=key;checkbox.checked=selection!=='all' && selection.includes(key);
     label.style.backgroundColor=speciesColor(key);
-    const count=[...counts].reduce((total,[source,n])=>total+(source===key || (!key.includes('+') && source.split('+').includes(key))?n:0),0);
-    label.append(checkbox,el('span',speciesLabel(key)),el('small',`${count}건`));
+    const count=blocked.has(key)?0:matchingCounts.get(key) || 0;
+    label.append(checkbox,el('span',speciesLabel(key)),el('small',`${key==='unknown'?'미확인':'단독'} ${count}건`));
     checkbox.addEventListener('change',()=>{const next=new Set(selection==='all' ? []:selection);if(checkbox.checked) next.add(key);else next.delete(key);onChange([...next],[]);});group.append(label);
   }
   if(!options.length) group.append(el('p','조회 자료가 있으면 어종을 선택할 수 있습니다.','muted'));

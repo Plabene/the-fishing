@@ -36,9 +36,9 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
       heading.append(el('h4',boat?.name || event.uid),el('p',`조회 당시 잔여 ${event.remaining === null ? '미확인' : event.remaining + '석'}`,'seats'));
       const tags=el('div','','event-tags');
       if(boat) tags.append(platformBadge(boat));
-      tags.append(speciesBadge(event,state.selectedSpecies),el('span',STATUS_LABELS[status],`badge status-${status.toLowerCase()}`));
+      tags.append(speciesBadge(event),el('span',STATUS_LABELS[status],`badge status-${status.toLowerCase()}`));
       const details=el('div','','event-details');
-      details.append(tripDescription(event,state.selectedSpecies),el('p',`${boat ? regionLabel(boat)+' · ':''}${event.port || boat?.port || '항구 미표시'} · ${event.departure || '시간 미표시'}`,'muted'));
+      details.append(tripDescription(event),el('p',`${boat ? regionLabel(boat)+' · ':''}${event.port || boat?.port || '항구 미표시'} · ${event.departure || '시간 미표시'}`,'muted'));
       const booking=el('div','','event-booking');
       if(event.price!==undefined && event.price!==null) booking.append(el('p',`${event.price.toLocaleString('ko-KR')}원 · 조회 당시 요금`,'muted'));
       if(event.reservationStatusLabel) booking.append(el('p',`원본 예약 상태 · ${event.reservationStatusLabel}`,'muted'));

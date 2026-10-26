@@ -23,7 +23,7 @@ export function renderMonthlyList(target:HTMLElement,state:AppState,result:Retur
     const boat=state.boats.find(b=>b.uid===event.uid), row=el('article','','monthly-result');
     const info=el('div'), status=eventStatus(event,state);
     if(boat) info.append(platformBadge(boat));
-    info.append(el('span',LABELS[tierFor(state,event.uid)],'result-tier'),el('h3',boat?.name || event.uid),speciesBadge(event,state.selectedSpecies),tripDescription(event,state.selectedSpecies),el('p',`${boat ? regionLabel(boat)+' · ':''}${event.port || boat?.port || '항구 미표시'} · ${event.departure || '시간 미표시'}`,'muted'));
+    info.append(el('span',LABELS[tierFor(state,event.uid)],'result-tier'),el('h3',boat?.name || event.uid),speciesBadge(event),tripDescription(event),el('p',`${boat ? regionLabel(boat)+' · ':''}${event.port || boat?.port || '항구 미표시'} · ${event.departure || '시간 미표시'}`,'muted'));
     const detail=el('div','','result-detail');
     detail.append(el('strong',event.remaining===null ? '잔여석 미확인' : `조회 당시 ${event.remaining}석`),el('span',STATUS_LABELS[status],`badge status-${status.toLowerCase()}`));
     if (event.price!==undefined && event.price!==null) detail.append(el('span',`${event.price.toLocaleString('ko-KR')}원`,'muted'));

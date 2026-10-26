@@ -29,8 +29,8 @@ test('raw trip takes precedence over stale derived species, without borrowing fi
   expect(eventSpecies({trip:'쭈/갑 (중식 미제공)',speciesKey:'쭈갑중식미제공'})).toBe(MIXED_SPECIES);
   expect(eventSpecies({trip:'문어',speciesKey:'갑오징어'})).toBe('문어');
   expect(eventSpecies({trip:'다운샷',speciesKey:'광어'})).toBe('unknown');
-  expect(eventSpecies({trip:'',speciesKey:'갑오징어'})).toBe('갑오징어');
-  expect(eventSpecies({trip:'기본 출조',speciesKey:'unknown',species:'문어'})).toBe('문어');
+  expect(eventSpecies({trip:'',speciesKey:'갑오징어'})).toBe('unknown');
+  expect(eventSpecies({trip:'기본 출조',speciesKey:'unknown',species:'문어'})).toBe('unknown');
 });
 
 const boat={uid:'563',name:'워너비호 막내선장',port:'',url:'https://thefishing.kr/reservation/list.php?uid=563'};
@@ -52,7 +52,8 @@ test('archive species migration corrects actual compound trips and keeps every o
   const q={month:'2026-10',requiredPeople:1,tier:'all' as const,search:'',matchingOnly:false};
   const expected=restored.events.filter(e=>e.uid===boat.uid && /쭈\/갑/.test(e.trip));
   expect(expected.length).toBeGreaterThan(0);
-  expect(queryMonth(restored,{...q,species:'갑오징어'}).events).toEqual(expected);
+  expect(queryMonth(restored,{...q,species:'갑오징어'}).events).toHaveLength(0);
+  expect(queryMonth(restored,{...q,species:['갑오징어','주꾸미']}).events).toEqual(expected);
 });
 
 test('obsolete method filters do not accidentally select or exclude all unknown species',()=>{

@@ -159,7 +159,7 @@ function render() {
   const speciesReason=liveController?'선박 조회 중입니다. 완료 후 수집된 어종을 선택할 수 있습니다.':!speciesCounts.size ? (liveRows.length || savedMode()?'현재 월·플랫폼·선택 선박에 어종을 선택할 출조 정보가 없습니다.':'먼저 조회하기를 눌러 출조 정보를 불러오세요.') : '';
   renderSpeciesFilter($('#species-filter'),speciesCounts,state.selectedSpecies || 'all',state.excludedSpeciesKeys || [],(selectedSpecies,excludedSpeciesKeys)=>{
     resultLimit=50;void commit({...state,selectedSpecies,excludedSpeciesKeys},'어종 필터를 적용했습니다. 원본 조회 결과는 유지합니다.');
-  },speciesReason);
+  },speciesReason,result.speciesCounts);
   $<HTMLDetailsElement>('#species-panel').open=panelOpen;
   $('#species-toggle-label').textContent=speciesReason ? (liveController?'어종 · 조회 중':'어종 · 조회 후 선택'):`어종 · ${state.selectedSpecies==='all'?'전체':Array.isArray(state.selectedSpecies)?state.selectedSpecies.length+'개 선택':'선택'}`;
   $('#species-toggle-label').setAttribute('aria-disabled',String(!!speciesReason));

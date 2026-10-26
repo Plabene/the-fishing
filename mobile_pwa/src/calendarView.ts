@@ -38,7 +38,7 @@ export function renderCalendar(target: HTMLElement, state: AppState, tier: Filte
     const count = document.createElement('small'); count.textContent = status.label;count.className='calendar-availability'; button.append(count);
     button.setAttribute('aria-label',`${button.getAttribute('aria-label')} · ${status.label}${query.missingBoats.length?' · 미확인 선박 있음':''}`);
     for (const id of [...new Set(records.map(e=>e.uid))].slice(0,2)) {
-      const trips=records.filter(e=>e.uid===id),keys=[...new Set(trips.map(e=>displayedSpecies(e,state.selectedSpecies)))];
+      const trips=records.filter(e=>e.uid===id),keys=[...new Set(trips.map(e=>displayedSpecies(e)))];
       const label=document.createElement('span'); label.className='calendar-boat';label.style.backgroundColor=speciesColor(keys[0]);
       const boatName=boats.get(id)?.name || id;
       const name=document.createElement('span');name.className='calendar-boat-name';name.textContent=boatName;name.title=boatName;

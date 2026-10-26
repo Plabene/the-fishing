@@ -47,17 +47,16 @@ test('selection assigns other once, preserves an existing tier, and unselect/res
   expect(state.tiers.tier3).toEqual(['2']);expect(state.tiers.other).toEqual([]);
   const restored=importData(JSON.parse(exportData(state))).state;expect(restored.tiers).toEqual(state.tiers);expect(restored.selectedUids).toEqual(['2']);
 });
-test('calendar, day and month badges show only selected tokens while raw compound trips remain available',()=>{
+test('calendar, day and month agree on exact sets and preserve full source species and trip wording',()=>{
   const state={...emptyState(),boats,month:'2026-10',selectedUids:['1','2']};state.tiers.tier1=['1','2'];
   state.events=['주꾸미, 갑오징어 출조','광어 우럭 출조'].map((trip,i)=>({id:String(i),uid:String(i+1),date:'2026-10-27',trip,port:boats[i].port,departure:'05:00',remaining:6,verified:true,source:'api',observedAt:new Date().toISOString()}));
   const original=JSON.stringify(state.events);
-  for(const [selected,label,count] of [[['갑오징어'],'갑오징어',1],[['주꾸미'],'주꾸미',1],[['갑오징어','주꾸미'],'쭈꾸미ㆍ갑오징어',1],[['우럭'],'우럭',1],[['갑오징어','우럭'],'갑오징어',2]] as const) {
+  for(const [selected,label,count] of [[['갑오징어'],'',0],[['주꾸미'],'',0],[['갑오징어','주꾸미'],'쭈꾸미ㆍ갑오징어',1],[['우럭'],'',0],[['광어','우럭'],'광어·우럭',1],[['갑오징어','우럭'],'',0]] as const) {
     state.selectedSpecies=[...selected];const result=queryMonth(state,{month:state.month,tier:'all',requiredPeople:1,search:'',matchingOnly:true});expect(result.events).toHaveLength(count);
     const cal=document.createElement('div'),day=document.createElement('div'),month=document.createElement('div');
     renderCalendar(cal,state,'all','','2026-10-27',()=>{},true,result);renderDay(day,state,'2026-10-27','all','',true,result);renderMonthlyList(month,state,result,50,()=>{},()=>{});
-    expect(cal.querySelector('.calendar-boat-species')?.textContent).toBe(label);
-    for(const target of [day,month]) expect(target.querySelector('.species-badge')?.textContent).toBe(`어종 · ${label}`);
-    if(selected.length===1) {expect(day.querySelector('details.original-trip')?.textContent).toContain(result.events[0].trip);expect(day.querySelector('details.original-trip')?.hasAttribute('open')).toBe(false);}
+    expect(cal.querySelector('.calendar-boat-species')?.textContent).toBe(count?label:undefined);
+    for(const target of [day,month]) {expect(target.querySelector('.species-badge')?.textContent).toBe(count?`어종 · ${label}`:undefined);if(count) expect(target.textContent).toContain(result.events[0].trip);}
   }
   expect(JSON.stringify(state.events)).toBe(original);
 });

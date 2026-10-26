@@ -11,7 +11,7 @@ test.each([['쭈꾸미','주꾸미'],['돌문어 출조','문어'],['쭈갑','�
 test('PC mixed species label and saved colors remain stable and unknown is explicit',()=>{
   expect(speciesLabel('쭈갑')).toBe('쭈꾸미ㆍ갑오징어');expect(speciesColor('쭈갑')).toBe('#F0E3FF');
   expect(speciesLabel('unknown')).toBe('기타/미확인');expect(eventSpecies({trip:'문어',species:'기타/미확인'})).toBe('문어');
-  expect(matchesSpecies('쭈갑','주꾸미')).toBe(true);expect(matchesSpecies('쭈갑','갑오징어')).toBe(true);expect(matchesSpecies('쭈갑','문어')).toBe(false);
+  expect(matchesSpecies('쭈갑','주꾸미')).toBe(false);expect(matchesSpecies('쭈갑','갑오징어')).toBe(false);expect(matchesSpecies('쭈갑','문어')).toBe(false);expect(matchesSpecies('쭈갑',['갑오징어','쭈꾸미'])).toBe(true);
 });
 const html=`<div data-month="2026-10"></div><table><tr><td><div class="re_status"><a onclick="t_popup('/member/popup.new.php?date=20261026&PA_N_UID=6130')">예약하기</a><p>남은인원 <span>20</span>명</p><div class="schedule">공지 출항:05시</div><ul class="schedule2"><ul class="schedule2"><li><a href="#">쭈/갑 (중식 미제공)</a><span class="fc_g"><span class="ico_d">대</span>100,000</span></li><li>문어 <span class="price">120,000원</span></li></ul></ul></div></td></tr></table>`;
 test('nested real-format product lists retain linked trip names, prices, species and departure in both DOMs',async()=>{
@@ -26,11 +26,12 @@ test('duplicate booking buttons cannot overwrite the scope that contains product
   const events=await parseCalendar(html+duplicate,boat,'2026-10',new Date().toISOString());
   expect(events.map(e=>e.speciesKey)).toEqual(['주꾸미+갑오징어','문어']);
 });
-test('species filters project results without corrupting raw records, coverage or month separation; backup keeps preferences',async()=>{
+test('exact species filters preserve raw records, coverage and month separation; backup keeps preferences',async()=>{
   const state=emptyState();state.boats=[boat];state.selectedUids=[boat.uid];state.tiers.tier1=[boat.uid];state.month='2026-10';
   state.events=await parseCalendar(html,boat,'2026-10',new Date().toISOString());
   const raw=JSON.stringify(state.events),q={month:'2026-10',requiredPeople:1,tier:'all' as const,search:'',matchingOnly:true};
-  expect(queryMonth(state,{...q,species:'갑오징어'}).events).toHaveLength(1);
+  expect(queryMonth(state,{...q,species:'갑오징어'}).events).toHaveLength(0);
+  expect(queryMonth(state,{...q,species:['갑오징어','주꾸미']}).events).toHaveLength(1);
   const empty=queryMonth(state,{...q,species:'갈치'});expect(empty.events).toHaveLength(0);expect(empty.checkedCount).toBe(1);expect(empty.missingBoats).toHaveLength(0);
   expect(queryMonth(state,{...q,excludedSpeciesKeys:['쭈갑']}).events[0].speciesKey).toBe('문어');
   expect(queryMonth(state,{...q,month:'2026-11'}).events).toHaveLength(0);expect(JSON.stringify(state.events)).toBe(raw);

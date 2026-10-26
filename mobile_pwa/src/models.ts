@@ -23,7 +23,7 @@ export interface AppState {
   schema: 1; boats: Boat[]; tiers: Record<Tier, string[]>; events: Observation[];
   failures: Failure[]; month: string; requiredPeople: number; selectedUids: string[]; fleetSeedVersion?: string;
   monthlyArchiveVersion?: string; monthChecks?: MonthCheck[];
-  // Legacy backups may contain one string; arrays select any matching species, [] selects none.
+  // Legacy backups may contain one string; arrays require the exact species set, [] selects none.
   selectedSpecies?: string | string[]; excludedSpeciesKeys?: string[];
   tideDays?: TideDay[];
   selectedRegion?:RegionFilter;
