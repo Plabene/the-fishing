@@ -1,5 +1,5 @@
 {
-  "version": "6f3f5eb2cd310d7c",
+  "version": "6ee2b117cce009a5",
   "source": "PC catalog plus verified public provider directories; no seat data",
   "boats": [
     {
@@ -75,7 +75,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=155",
-      "observedAt": "2026-10-26T02:54:43.308Z",
+      "observedAt": "2026-10-26T03:04:20.438Z",
       "sourceUrl": "https://homerun.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -92,7 +92,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=164",
-      "observedAt": "2026-10-26T02:54:43.754Z",
+      "observedAt": "2026-10-26T02:07:33.452Z",
       "sourceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -299,7 +299,7 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=338",
-      "observedAt": "2026-10-26T02:08:41.908Z",
+      "observedAt": "2026-10-26T02:18:43.517Z",
       "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
     },
     {
@@ -342,7 +342,7 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=344",
-      "observedAt": "2026-10-26T02:08:39.978Z",
+      "observedAt": "2026-10-26T05:30:25.004Z",
       "sourceUrl": "https://cjh.sunsang24.com/ship/schedule_fleet"
     },
     {
@@ -371,7 +371,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=350",
-      "observedAt": "2026-10-26T02:54:43.536Z",
+      "observedAt": "2026-10-26T05:30:34.994Z",
       "sourceUrl": "https://town.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -487,7 +487,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=405",
-      "observedAt": "2026-10-26T02:54:43.743Z",
+      "observedAt": "2026-10-26T02:07:19.456Z",
       "sourceUrl": "https://glutton.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -504,7 +504,7 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=409",
-      "observedAt": "2026-10-26T02:08:41.908Z",
+      "observedAt": "2026-10-26T02:18:43.517Z",
       "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
     },
     {
@@ -547,7 +547,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=440",
-      "observedAt": "2026-10-26T02:54:43.885Z",
+      "observedAt": "2026-10-26T05:30:48.617Z",
       "sourceUrl": "https://master.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -913,7 +913,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=563",
-      "observedAt": "2026-10-26T02:54:43.832Z",
+      "observedAt": "2026-10-26T05:30:46.776Z",
       "sourceUrl": "https://daon.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1252,7 +1252,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=655",
-      "observedAt": "2026-10-26T02:54:43.686Z",
+      "observedAt": "2026-10-26T05:30:39.611Z",
       "sourceUrl": "https://alice.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1457,7 +1457,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=703",
-      "observedAt": "2026-10-26T02:54:43.736Z",
+      "observedAt": "2026-10-26T05:30:41.423Z",
       "sourceUrl": "https://k1f.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1474,7 +1474,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=709",
-      "observedAt": "2026-10-26T02:54:43.754Z",
+      "observedAt": "2026-10-26T02:07:33.452Z",
       "sourceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1519,7 +1519,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=727",
-      "observedAt": "2026-10-26T02:54:43.832Z",
+      "observedAt": "2026-10-26T05:30:46.776Z",
       "sourceUrl": "https://daon.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1578,7 +1578,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=758",
-      "observedAt": "2026-10-26T02:54:43.583Z",
+      "observedAt": "2026-10-26T05:30:36.850Z",
       "sourceUrl": "https://namyoung.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1609,7 +1609,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=763",
-      "observedAt": "2026-10-26T02:54:43.736Z",
+      "observedAt": "2026-10-26T05:30:41.423Z",
       "sourceUrl": "https://k1f.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1752,7 +1752,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=832",
-      "observedAt": "2026-10-26T02:58:05.839Z",
+      "observedAt": "2026-10-26T02:07:34.994Z",
       "sourceUrl": "https://smgfishing.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -1856,7 +1856,7 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=850",
-      "observedAt": "2026-10-26T02:08:39.978Z",
+      "observedAt": "2026-10-26T05:30:25.004Z",
       "sourceUrl": "https://cjh.sunsang24.com/ship/schedule_fleet"
     },
     {
@@ -2064,7 +2064,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=918",
-      "observedAt": "2026-10-26T02:54:43.754Z",
+      "observedAt": "2026-10-26T02:07:33.452Z",
       "sourceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2140,7 +2140,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=937",
-      "observedAt": "2026-10-26T02:54:43.391Z",
+      "observedAt": "2026-10-26T05:30:29.761Z",
       "sourceUrl": "https://bluestar.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2174,7 +2174,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=946",
-      "observedAt": "2026-10-26T02:54:43.489Z",
+      "observedAt": "2026-10-26T02:07:14.084Z",
       "sourceUrl": "https://live.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2208,7 +2208,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=959",
-      "observedAt": "2026-10-26T02:54:43.438Z",
+      "observedAt": "2026-10-26T05:30:31.295Z",
       "sourceUrl": "https://pointfishing.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2281,7 +2281,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=997",
-      "observedAt": "2026-10-26T02:54:43.832Z",
+      "observedAt": "2026-10-26T05:30:46.776Z",
       "sourceUrl": "https://daon.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2312,7 +2312,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1033",
-      "observedAt": "2026-10-26T02:54:43.995Z",
+      "observedAt": "2026-10-26T05:30:52.829Z",
       "sourceUrl": "https://signature.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2377,7 +2377,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1047",
-      "observedAt": "2026-10-26T02:54:43.743Z",
+      "observedAt": "2026-10-26T02:07:19.456Z",
       "sourceUrl": "https://glutton.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2923,7 +2923,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1253",
-      "observedAt": "2026-10-26T02:54:43.308Z",
+      "observedAt": "2026-10-26T03:04:20.438Z",
       "sourceUrl": "https://homerun.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -2968,7 +2968,7 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1330",
-      "observedAt": "2026-10-26T02:08:41.908Z",
+      "observedAt": "2026-10-26T02:18:43.517Z",
       "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
     },
     {
@@ -3225,7 +3225,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1394",
-      "observedAt": "2026-10-26T02:58:05.896Z",
+      "observedAt": "2026-10-26T05:31:00.072Z",
       "sourceUrl": "https://taepyoung.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -3708,7 +3708,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1636",
-      "observedAt": "2026-10-26T02:54:43.945Z",
+      "observedAt": "2026-10-26T05:30:51.427Z",
       "sourceUrl": "https://hookstar.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -3725,7 +3725,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1645",
-      "observedAt": "2026-10-26T02:58:05.724Z",
+      "observedAt": "2026-10-26T02:07:14.084Z",
       "sourceUrl": "https://inhaefishing.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -3857,7 +3857,7 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1710",
-      "observedAt": "2026-10-26T02:08:41.908Z",
+      "observedAt": "2026-10-26T02:18:43.517Z",
       "sourceUrl": "https://marineho.sunsang24.com/ship/schedule_fleet"
     },
     {
@@ -3957,7 +3957,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1797",
-      "observedAt": "2026-10-26T02:54:43.754Z",
+      "observedAt": "2026-10-26T02:07:33.452Z",
       "sourceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -3974,7 +3974,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1798",
-      "observedAt": "2026-10-26T02:54:43.754Z",
+      "observedAt": "2026-10-26T02:07:33.452Z",
       "sourceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -4565,7 +4565,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2021",
-      "observedAt": "2026-10-26T02:54:43.308Z",
+      "observedAt": "2026-10-26T03:04:20.438Z",
       "sourceUrl": "https://homerun.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -4796,7 +4796,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2079",
-      "observedAt": "2026-10-26T02:54:43.754Z",
+      "observedAt": "2026-10-26T02:07:33.452Z",
       "sourceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -4981,7 +4981,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2106",
-      "observedAt": "2026-10-26T02:54:43.889Z",
+      "observedAt": "2026-10-26T03:04:23.881Z",
       "sourceUrl": "https://ksnaksi.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -4998,7 +4998,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2110",
-      "observedAt": "2026-10-26T02:54:43.889Z",
+      "observedAt": "2026-10-26T03:04:23.881Z",
       "sourceUrl": "https://ksnaksi.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -5201,7 +5201,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2188",
-      "observedAt": "2026-10-26T02:54:43.438Z",
+      "observedAt": "2026-10-26T05:30:31.295Z",
       "sourceUrl": "https://pointfishing.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -5375,7 +5375,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2238",
-      "observedAt": "2026-10-26T02:54:43.754Z",
+      "observedAt": "2026-10-26T02:07:33.452Z",
       "sourceUrl": "https://hitfleet.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -5631,7 +5631,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2311",
-      "observedAt": "2026-10-26T02:54:43.308Z",
+      "observedAt": "2026-10-26T03:04:20.438Z",
       "sourceUrl": "https://homerun.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -5648,7 +5648,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2312",
-      "observedAt": "2026-10-26T02:54:43.308Z",
+      "observedAt": "2026-10-26T03:04:20.438Z",
       "sourceUrl": "https://homerun.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -5942,7 +5942,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2374",
-      "observedAt": "2026-10-26T02:54:43.629Z",
+      "observedAt": "2026-10-26T02:07:14.084Z",
       "sourceUrl": "https://hifish.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -6269,7 +6269,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2442",
-      "observedAt": "2026-10-26T02:58:05.839Z",
+      "observedAt": "2026-10-26T02:07:34.994Z",
       "sourceUrl": "https://smgfishing.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -6604,7 +6604,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2533",
-      "observedAt": "2026-10-26T02:58:05.786Z",
+      "observedAt": "2026-10-26T05:30:56.404Z",
       "sourceUrl": "https://jayeonho.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -6915,7 +6915,7 @@
       "areaId": "",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=2608",
-      "observedAt": "2026-10-26T02:58:05.839Z",
+      "observedAt": "2026-10-26T05:30:58.272Z",
       "sourceUrl": "https://smgfishing.sunsang24.com/ship/schedule_fleet",
       "regionBasis": "public-provider-address",
       "calendarObserved": true
@@ -7043,7 +7043,7 @@
     }
   ],
   "catalog": {
-    "checkedAt": "2026-10-26T02:58:05.904Z",
+    "checkedAt": "2026-10-26T05:30:59.914Z",
     "coverage": "registered-public-providers-only",
     "complete": false,
     "listed": 135,
@@ -7213,13 +7213,13 @@
       {
         "host": "seil.sunsang24.com",
         "status": "UNAVAILABLE",
-        "checkedAt": "2026-10-26T02:07:38.273Z",
+        "checkedAt": "2026-10-26T05:29:44.122Z",
         "message": "HTTP 503"
       },
       {
         "host": "haeinho.sunsang24.com",
         "status": "UNAVAILABLE",
-        "checkedAt": "2026-10-26T02:07:39.465Z",
+        "checkedAt": "2026-10-26T05:29:46.892Z",
         "message": "HTTP 503"
       },
       {
@@ -7252,7 +7252,7 @@
       {
         "host": "hyunju.sunsang24.com",
         "status": "UNAVAILABLE",
-        "checkedAt": "2026-10-26T02:07:46.585Z",
+        "checkedAt": "2026-10-26T05:29:52.222Z",
         "message": "HTTP 503"
       },
       {
@@ -7550,30 +7550,23 @@
       {
         "host": "cjh.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:08:39.978Z",
+        "checkedAt": "2026-10-26T05:30:25.004Z",
         "listed": 2,
         "shipIds": [
           "344",
           "850"
-        ],
-        "excludedNonVesselIds": [
-          "749"
         ]
       },
       {
         "host": "marineho.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:08:41.908Z",
+        "checkedAt": "2026-10-26T02:18:43.517Z",
         "listed": 4,
         "shipIds": [
           "1330",
           "409",
           "1710",
           "338"
-        ],
-        "excludedNonVesselIds": [
-          "408",
-          "1152"
         ]
       },
       {
@@ -7589,7 +7582,7 @@
       {
         "host": "homerun.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.308Z",
+        "checkedAt": "2026-10-26T03:04:20.438Z",
         "listed": 5,
         "shipIds": [
           "2311",
@@ -7602,7 +7595,7 @@
       {
         "host": "bluestar.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.391Z",
+        "checkedAt": "2026-10-26T05:30:29.761Z",
         "listed": 1,
         "shipIds": [
           "937"
@@ -7611,7 +7604,7 @@
       {
         "host": "pointfishing.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.438Z",
+        "checkedAt": "2026-10-26T05:30:31.295Z",
         "listed": 2,
         "shipIds": [
           "2188",
@@ -7621,7 +7614,7 @@
       {
         "host": "live.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.489Z",
+        "checkedAt": "2026-10-26T05:30:33.179Z",
         "listed": 1,
         "shipIds": [
           "946"
@@ -7630,7 +7623,7 @@
       {
         "host": "town.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.536Z",
+        "checkedAt": "2026-10-26T05:30:34.994Z",
         "listed": 1,
         "shipIds": [
           "350"
@@ -7639,7 +7632,7 @@
       {
         "host": "namyoung.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.583Z",
+        "checkedAt": "2026-10-26T05:30:36.850Z",
         "listed": 1,
         "shipIds": [
           "758"
@@ -7648,7 +7641,7 @@
       {
         "host": "hifish.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.629Z",
+        "checkedAt": "2026-10-26T05:30:38.186Z",
         "listed": 1,
         "shipIds": [
           "2374"
@@ -7657,7 +7650,7 @@
       {
         "host": "alice.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.686Z",
+        "checkedAt": "2026-10-26T05:30:39.611Z",
         "listed": 1,
         "shipIds": [
           "655"
@@ -7666,7 +7659,7 @@
       {
         "host": "k1f.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.736Z",
+        "checkedAt": "2026-10-26T05:30:41.423Z",
         "listed": 2,
         "shipIds": [
           "703",
@@ -7676,7 +7669,7 @@
       {
         "host": "glutton.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.743Z",
+        "checkedAt": "2026-10-26T05:30:43.254Z",
         "listed": 2,
         "shipIds": [
           "405",
@@ -7686,7 +7679,7 @@
       {
         "host": "hitfleet.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.754Z",
+        "checkedAt": "2026-10-26T05:30:44.909Z",
         "listed": 7,
         "shipIds": [
           "1797",
@@ -7701,7 +7694,7 @@
       {
         "host": "daon.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.832Z",
+        "checkedAt": "2026-10-26T05:30:46.776Z",
         "listed": 3,
         "shipIds": [
           "563",
@@ -7712,7 +7705,7 @@
       {
         "host": "master.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.885Z",
+        "checkedAt": "2026-10-26T05:30:48.617Z",
         "listed": 1,
         "shipIds": [
           "440"
@@ -7721,7 +7714,7 @@
       {
         "host": "ksnaksi.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.889Z",
+        "checkedAt": "2026-10-26T03:04:23.881Z",
         "listed": 2,
         "shipIds": [
           "2110",
@@ -7731,7 +7724,7 @@
       {
         "host": "hookstar.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.945Z",
+        "checkedAt": "2026-10-26T05:30:51.427Z",
         "listed": 1,
         "shipIds": [
           "1636"
@@ -7740,7 +7733,7 @@
       {
         "host": "signature.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:54:43.995Z",
+        "checkedAt": "2026-10-26T05:30:52.829Z",
         "listed": 1,
         "shipIds": [
           "1033"
@@ -7749,7 +7742,7 @@
       {
         "host": "inhaefishing.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:58:05.724Z",
+        "checkedAt": "2026-10-26T05:30:54.619Z",
         "listed": 1,
         "shipIds": [
           "1645"
@@ -7758,7 +7751,7 @@
       {
         "host": "jayeonho.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:58:05.786Z",
+        "checkedAt": "2026-10-26T05:30:56.404Z",
         "listed": 1,
         "shipIds": [
           "2533"
@@ -7767,7 +7760,7 @@
       {
         "host": "smgfishing.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:58:05.839Z",
+        "checkedAt": "2026-10-26T05:30:58.272Z",
         "listed": 3,
         "shipIds": [
           "2442",
@@ -7778,7 +7771,7 @@
       {
         "host": "taepyoung.sunsang24.com",
         "status": "OK",
-        "checkedAt": "2026-10-26T02:58:05.896Z",
+        "checkedAt": "2026-10-26T05:31:00.072Z",
         "listed": 1,
         "shipIds": [
           "1394"

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test} from 'vitest';
 import {emptyState,type Boat} from '../src/models';
-import {emptyRegion,matchesRegion,readRegion,regionLabel,UNKNOWN_REGION} from '../src/regions';
+import {emptyRegion,matchesRegion,readRegion,regionLabel,UNKNOWN_REGION,type RegionFilter} from '../src/regions';
 import {renderRegionFilter} from '../src/regionFilter';
 import {queryMonth} from '../src/monthlyQuery';
 import {importData,exportData} from '../src/importLegacy';
@@ -17,7 +17,7 @@ test('exact hierarchical filtering distinguishes unknown regions without inferri
   expect(regionLabel(boats[0])).toBe('서해권 · 충청남도 · 보령');expect(regionLabel(boats[2])).toBe('지역 미확인');expect(readRegion({sea:''})).toBeUndefined();
 });
 test('region controls show all boats, restrict descendants and reset dependent selections',()=>{
-  const target=document.createElement('div');let selected={...emptyRegion(),sea:'서해권',province:'충청남도',local:'보령',port:'오천항'};
+  const target=document.createElement('div');let selected:RegionFilter={...emptyRegion(),sea:'서해권',province:'충청남도',local:'보령',port:'오천항'};
   const render=()=>renderRegionFilter(target,boats,selected,next=>{selected=next;render();});render();
   const sea=target.querySelector<HTMLSelectElement>('#region-sea')!;
   expect(sea.textContent).toContain('남해권 (1척)');expect(target.querySelector('#region-port')!.textContent).not.toContain('삼천포');

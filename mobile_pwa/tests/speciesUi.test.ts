@@ -22,8 +22,8 @@ test('species controls filter calendar/list/day, persist choices, switch months 
   const multiple=initializeFleet(await loadState()).state;expect(multiple.selectedSpecies).toEqual(['갑오징어','문어']);
   choice('문어').focus();choice('문어').click();await settle();expect(el('#summary').textContent).toContain('1개 출조');expect(document.activeElement).toBe(choice('문어'));
   await choose('갑오징어');expect(el('#summary').textContent).toContain('1개 출조');
-  expect(el('#calendar').textContent).toContain('쭈꾸미ㆍ갑오징어');el('#view-list').click();expect(el('#month-results').textContent).toContain('어종 · 쭈꾸미ㆍ갑오징어');expect(el('#month-results').textContent).not.toContain('어종 · 문어');
-  el('.month-date-heading').click();expect(el('#day-view').textContent).toContain('어종 · 쭈꾸미ㆍ갑오징어');
+  expect(el('#calendar').textContent).toContain('갑오징어');el('#view-list').click();expect(el('#month-results').textContent).toContain('어종 · 갑오징어');expect(el('#month-results').textContent).not.toContain('어종 · 문어');
+  el('.month-date-heading').click();expect(el('#day-view').textContent).toContain('어종 · 갑오징어');
   await choose('갑오징어','문어');
   const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();expect(el('#summary').textContent).toContain('1개 출조');expect(choice('갑오징어')).toBeNull();expect(el('#species-all').getAttribute('aria-pressed')).toBe('true');expect(choice('문어').checked).toBe(false);
   await choose('문어');expect(el('#summary').textContent).toContain('1개 출조');

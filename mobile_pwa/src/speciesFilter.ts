@@ -12,7 +12,7 @@ export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>
   controls.append(heading,reset,clear);target.append(controls);
   const status=el('p',disabledReason || (selection==='all' ? '전체 어종 표시 · 선택을 바꾸면 달력에 바로 적용됩니다.':selection.length ? `선택: ${selection.map(speciesLabel).join(', ')}`:'선택한 어종이 없습니다. 아래에서 원하는 어종을 선택하세요.'),'species-selection-summary');status.id='species-selection-summary';status.setAttribute('role','status');target.append(status);
   const group=el('fieldset','','species-options');group.id='species-select';group.append(el('legend','조회할 어종 선택','sr-only'));
-  const options=[...new Set(keys.flatMap(key=>[key,...key.split('+')]))].sort((a,b)=>speciesLabel(a).localeCompare(speciesLabel(b),'ko'));
+  const options=[...new Set(keys.flatMap(key=>key.split('+')))].sort((a,b)=>speciesLabel(a).localeCompare(speciesLabel(b),'ko'));
   for(const key of options) {
     const label=el('label','','species-option'),checkbox=el('input');checkbox.type='checkbox';checkbox.value=key;checkbox.dataset.speciesChoice=key;checkbox.checked=selection!=='all' && selection.includes(key);
     label.style.backgroundColor=speciesColor(key);

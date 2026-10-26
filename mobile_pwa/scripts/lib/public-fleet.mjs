@@ -29,16 +29,23 @@ export function parsePublicFleet(html,source,observedAt) {
   });
 }
 export function mergePublicFleet(previous,results) {
-  const rows=new Map(previous.map(b=>[b.shipId,{...b}])),conflicts=[];
-  for(const boat of results.flat()) {
+  const rows=new Map(previous.map(b=>[b.shipId,{...b}])),conflicts=[],observations=new Map();let changed=0;
+  for(const boat of results.flat()) {const group=observations.get(boat.shipId) || [];group.push(boat);observations.set(boat.shipId,group);}
+  for(const [id,group] of observations) {
+    const boat=group[0];
+    if(['name','province','local','sea'].some(field=>new Set(group.map(b=>b[field])).size>1) || new Set(group.map(b=>b.port).filter(Boolean)).size>1) {conflicts.push({shipId:id,field:'conflicting-public-sources'});continue;}
     const old=rows.get(boat.shipId);
     if(old) {
-      if(old.name!==boat.name) {conflicts.push({shipId:boat.shipId,field:'name'});continue;}
+      const sameSource=group.some(b=>b.sourceUrl===old.sourceUrl);
+      if(old.name!==boat.name && !sameSource) {conflicts.push({shipId:boat.shipId,field:'name'});continue;}
       // Keep PC region evidence, legacy UID aliases and personal navigation identity intact.
-      rows.set(boat.shipId,{...old,observedAt:boat.observedAt,sourceUrl:boat.sourceUrl,...(!old.province && boat.province ? {province:boat.province,local:boat.local,sea:boat.sea,regionBasis:boat.regionBasis}:{}),...(boat.port && !old.port ? {port:boat.port}:{})});
+      const verifiedPort=group.find(b=>b.port)?.port;
+      const next={...old,name:boat.name,observedAt:boat.observedAt,sourceUrl:sameSource?old.sourceUrl:boat.sourceUrl,...((!old.province || sameSource && old.regionBasis==='public-provider-address') && boat.province ? {province:boat.province,local:boat.local,sea:boat.sea,regionBasis:boat.regionBasis}:{}),...(verifiedPort && (!old.port || sameSource) ? {port:verifiedPort}:{})};
+      if(['name','port','province','local','sea'].some(field=>old[field]!==next[field])) changed++;
+      rows.set(boat.shipId,next);
     } else rows.set(boat.shipId,boat);
   }
-  return {boats:[...rows.values()].sort((a,b)=>Number(a.shipId)-Number(b.shipId)),conflicts};
+  return {boats:[...rows.values()].sort((a,b)=>Number(a.shipId)-Number(b.shipId)),conflicts,changed};
 }
 /** Independently validate a metadata API response before writing a published static catalog. */
 export function validatePublicFleet(value,source) {

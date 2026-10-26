@@ -1,8 +1,10 @@
 import supplied from './data/tierRecovery.json';
+import previousSupplied from './data/previousTierRecovery.json';
 import {TIERS,type AppState,type Boat} from './models';
 import type {PreferenceSnapshot} from './preferenceProtection';
 import {restoreTierBackup} from './tierBackup';
 export const RECOVERY_VERSION=supplied.version;
+export const RECOVERY_DATE=supplied.createdAt.slice(0,10);
 export const suppliedPreferences:PreferenceSnapshot=supplied;
 export function recoveryPreview(state:AppState,backup:PreferenceSnapshot) {
   const assignments=new Map(TIERS.flatMap(t=>state.tiers[t].map(id=>[id,t] as const))),known=new Set([...state.boats,...backup.boats || []].map(b=>b.uid));
@@ -29,7 +31,10 @@ export function initializePreferenceRecovery(current:AppState,existingDevice:boo
   if(current.preferenceRecoveryVersion===RECOVERY_VERSION) return {state:current,restored:0};
   // Only recover a known full catalog automatically; respect custom catalogs and intentionally deleted boats.
   const known=new Set(current.boats.map(b=>b.uid)),matchesBackup=TIERS.flatMap(t=>suppliedPreferences.tiers[t]).every(id=>known.has(id));
-  const result=existingDevice && matchesBackup && TIERS.every(t=>!current.tiers[t].length)?recoverPreferences(current,suppliedPreferences,'missing'):{state:structuredClone(current),count:0};
+  const unchangedPrevious=current.preferenceRecoveryVersion===previousSupplied.version && TIERS.every(t=>JSON.stringify(current.tiers[t])===JSON.stringify(previousSupplied.tiers[t])) && JSON.stringify(current.selectedUids)===JSON.stringify(previousSupplied.selectedUids);
+  // Only upgrade an exactly unchanged older backup. Any later personal edit needs explicit recovery.
+  const empty=TIERS.every(t=>!current.tiers[t].length) && !current.preferenceRecoveryVersion;
+  const result=existingDevice && matchesBackup && (empty || unchangedPrevious)?recoverPreferences(current,suppliedPreferences,unchangedPrevious?'exact':'missing'):{state:structuredClone(current),count:0};
   result.state.preferenceRecoveryVersion=RECOVERY_VERSION;
   return {state:result.state,restored:result.count};
 }

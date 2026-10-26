@@ -198,3 +198,15 @@ footer { padding:12px 16px; gap:8px; flex-wrap:wrap; font-size:11px; }
 @media(pointer:coarse) {
   :root { --control-height:40px; }
 }
+
+/* Multi-region controls remain above the calendar, with per-field resets. */
+.region-controls{grid-template-columns:repeat(4,minmax(0,1fr))}
+.region-controls select[multiple]{height:116px;padding:3px;max-width:100%}
+.region-controls select[multiple] option{padding:4px 6px;white-space:normal;overflow-wrap:anywhere}
+.region-controls .region-all{min-height:32px;font-size:12px;padding:4px 8px;width:100%}
+.region-controls>#region-reset{grid-column:1/-1;justify-self:end}
+.original-trip{font-size:12px;line-height:1.4}.original-trip summary{cursor:pointer;color:var(--muted)}
+.catalog-coverage{overflow-wrap:anywhere;font-size:12px}.catalog-coverage table{border-collapse:collapse;width:100%;table-layout:fixed}
+.catalog-coverage th,.catalog-coverage td{padding:5px 3px;text-align:right;border-bottom:1px solid var(--line)}
+.catalog-coverage th:first-child,.catalog-coverage td:first-child{text-align:left;width:28%}
+@media(max-width:620px){.region-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.region-controls select[multiple]{height:124px}}

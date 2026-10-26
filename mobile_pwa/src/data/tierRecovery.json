@@ -1,211 +1,13 @@
 {
-  "sourceFile": "thefishing-full-backup-2026-10-23T05-27-07-159Z.json",
-  "createdAt": "2026-10-23T05:27:07.159Z",
-  "version": "43befdefa91c95b8",
+  "sourceFile": "thefishing-tiers-2026-10-26T05-04-43-137Z.json",
+  "createdAt": "2026-10-26T05:04:43.136Z",
+  "version": "946687cefb70e09a",
   "boats": [
     {
-      "uid": "106",
-      "name": "조커호",
-      "port": "홍원항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=106",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서천군"
-      }
-    },
-    {
-      "uid": "349",
-      "name": "아인스호 화이선장님 [연락처 제외]",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=349",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "431",
-      "name": "씨빙이호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=431",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "530",
-      "name": "피싱마린호",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=530",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "560",
-      "name": "장현호 캡틴블랙",
-      "port": "남당항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=560",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "홍성군"
-      }
-    },
-    {
-      "uid": "563",
-      "name": "워너비호 막내선장",
-      "port": "남당항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=563",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "홍성군"
-      }
-    },
-    {
-      "uid": "732",
-      "name": "제우스호 (양선장,사무장)[연락처 제외]",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=732",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "733",
-      "name": "할리호 (보미선장,사무장)[연락처 제외]",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=733",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "788",
-      "name": "오디세이호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=788",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "799",
-      "name": "팀오디세이(미르)",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=799",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "861",
-      "name": "☆발키리호☆",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=861",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "911",
-      "name": "어게인호(스피드선장)",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=911",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1182",
-      "name": "팀프랜드호(25년 신조선)",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1182",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1190",
-      "name": "유진호(EUGENE)",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1190",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1297",
-      "name": "바이트호",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1297",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1325",
-      "name": "팀스텔스호",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1325",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1341",
-      "name": "투지호",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1341",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1378",
-      "name": "도깨비호",
-      "port": "홍원항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1378",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서천군"
-      }
-    },
-    {
-      "uid": "1441",
-      "name": "청남호",
-      "port": "대야도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1441",
+      "uid": "5268",
+      "name": "영차호(화니선장)",
+      "port": "백사장항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5268",
       "region": {
         "sea": "서해권",
         "province": "충청남도",
@@ -213,274 +15,10 @@
       }
     },
     {
-      "uid": "1442",
-      "name": "복성호",
-      "port": "대야도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1442",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "안면도"
-      }
-    },
-    {
-      "uid": "1444",
-      "name": "아일랜드호",
-      "port": "대야도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1444",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "안면도"
-      }
-    },
-    {
-      "uid": "1447",
-      "name": "뉴해풍호",
-      "port": "대야도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1447",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "안면도"
-      }
-    },
-    {
-      "uid": "1484",
-      "name": "나폴리(신조선)",
+      "uid": "4576",
+      "name": "카즈미호 ([연락처 제외])",
       "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1484",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1485",
-      "name": "뉴나폴리",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1485",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1487",
-      "name": "나폴리2",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1487",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1595",
-      "name": "뉴체이스호(22인승)",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1595",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "1615",
-      "name": "★블루호★",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=1615",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2065",
-      "name": "메가호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2065",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2283",
-      "name": "뉴 찬 스 호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2283",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2351",
-      "name": "페라리호",
-      "port": "홍원항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2351",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서천군"
-      }
-    },
-    {
-      "uid": "2356",
-      "name": "메르세데스호",
-      "port": "홍원항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2356",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서천군"
-      }
-    },
-    {
-      "uid": "2452",
-      "name": "타이탄",
-      "port": "홍원항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2452",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서천군"
-      }
-    },
-    {
-      "uid": "2506",
-      "name": "나폴리7",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2506",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2771",
-      "name": "캡틴호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2771",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2789",
-      "name": "야무진2호[깡선장][추첨식]",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2789",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2811",
-      "name": "하이피싱호 (이종진 선장)",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2811",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2829",
-      "name": "팀만수",
-      "port": "영흥도",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2829",
-      "region": {
-        "sea": "서해권",
-        "province": "경기도",
-        "local": "영흥도"
-      }
-    },
-    {
-      "uid": "2832",
-      "name": "썬가드호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2832",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2873",
-      "name": "까칠이1호 (까칠이선장)",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2873",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "2955",
-      "name": "승주호",
-      "port": "삼길포",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2955",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서산시"
-      }
-    },
-    {
-      "uid": "2987",
-      "name": "오아시스호",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=2987",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3007",
-      "name": "오션투어호[꼴배선장](추첨식)",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3007",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3288",
-      "name": "블레스호",
-      "port": "신진도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3288",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "3324",
-      "name": "범블비호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3324",
+      "url": "https://thefishing.kr/reservation/list.php?uid=4576",
       "region": {
         "sea": "서해권",
         "province": "충청남도",
@@ -499,193 +37,6 @@
       }
     },
     {
-      "uid": "3387",
-      "name": "껀모호",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3387",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3416",
-      "name": "배짱호_임남규선장",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3416",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3487",
-      "name": "독수리호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3487",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3515",
-      "name": "예린호",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3515",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3545",
-      "name": "☆발키리7호☆",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3545",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3570",
-      "name": "만석호",
-      "port": "삼길포",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3570",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서산시"
-      }
-    },
-    {
-      "uid": "3609",
-      "name": "헤라호",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3609",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3885",
-      "name": "갤럭시호",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3885",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3924",
-      "name": "라라",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3924",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3950",
-      "name": "양파호",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3950",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3969",
-      "name": "다운샷호 낙지선장",
-      "port": "남당항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3969",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "홍성군"
-      }
-    },
-    {
-      "uid": "3970",
-      "name": "깜보호_목지욱선장",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3970",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3973",
-      "name": "까칠이호 (싹쓰리선장)",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3973",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "3986",
-      "name": "모데라토호_이경태선장",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=3986",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "4443",
-      "name": "헌터호",
-      "port": "삼길포",
-      "url": "https://thefishing.kr/reservation/list.php?uid=4443",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "서산시"
-      }
-    },
-    {
-      "uid": "4576",
-      "name": "카즈미호 ([연락처 제외])",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=4576",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "4606",
-      "name": "바다용사호(김석훈선장)",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=4606",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
       "uid": "4607",
       "name": "루키호[루키선장][추첨식]",
       "port": "오천항",
@@ -697,333 +48,14 @@
       }
     },
     {
-      "uid": "4667",
-      "name": "하와이호(아쭈선장)",
-      "port": "당암포",
-      "url": "https://thefishing.kr/reservation/list.php?uid=4667",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "4691",
-      "name": "스파이더호 [연락처 제외] (김선장)",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=4691",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5268",
-      "name": "영차호(화니선장)",
-      "port": "백사장항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5268",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "안면도"
-      }
-    },
-    {
-      "uid": "5321",
-      "name": "블루오션호",
+      "uid": "1441",
+      "name": "청남호",
       "port": "대야도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5321",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1441",
       "region": {
         "sea": "서해권",
         "province": "충청남도",
         "local": "안면도"
-      }
-    },
-    {
-      "uid": "5367",
-      "name": "솔티가호",
-      "port": "신진도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5367",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "5383",
-      "name": "K-1호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5383",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5388",
-      "name": "타이푼호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5388",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5471",
-      "name": "슈퍼스타 (도니선장,사니사무장)[연락처 제외]",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5471",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5709",
-      "name": "페가수스호_조현길선장 신대식사무장",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5709",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5734",
-      "name": "히트호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5734",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5738",
-      "name": "해복호[자리추첨]",
-      "port": "영목항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5738",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "안면도"
-      }
-    },
-    {
-      "uid": "5807",
-      "name": "정든호 큰선장",
-      "port": "남당항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5807",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "홍성군"
-      }
-    },
-    {
-      "uid": "5846",
-      "name": "독한놈호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5846",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5856",
-      "name": "한프로호",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5856",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "5948",
-      "name": "팀바이트호 (쿄쿄선장)",
-      "port": "마검포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5948",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "안면도"
-      }
-    },
-    {
-      "uid": "5951",
-      "name": "뉴청남호",
-      "port": "대야도항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5951",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "안면도"
-      }
-    },
-    {
-      "uid": "5970",
-      "name": "이지스",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=5970",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6021",
-      "name": "메이저호 (이선장)[연락처 제외]",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6021",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6032",
-      "name": "볼트호 (황용기선장) [연락처 제외]",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6032",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6055",
-      "name": "팀배틀호",
-      "port": "무창포항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6055",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6120",
-      "name": "럭셔리호[용쥬르선장][추첨식]",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6120",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6127",
-      "name": "핏불호[앙선장] [추첨식]",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6127",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6130",
-      "name": "흑돼지호",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6130",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6131",
-      "name": "꺄오호 ([연락처 제외])",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6131",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6132",
-      "name": "[루피호] 선장_허정 사무장_쩡프로",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6132",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6133",
-      "name": "[슈퍼맨호] 선장_황선대 사무장_쭈니",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6133",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6161",
-      "name": "[팀루피호] 선장_김기영 사무장_대♡녀",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6161",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6173",
-      "name": "뚱이호 (낫띵선장)",
-      "port": "오천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6173",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6213",
-      "name": "브라더호 (현선장님)",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6213",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
-      }
-    },
-    {
-      "uid": "6356",
-      "name": "몬스터호(처리선장)[연락처 제외]",
-      "port": "대천항",
-      "url": "https://thefishing.kr/reservation/list.php?uid=6356",
-      "region": {
-        "sea": "서해권",
-        "province": "충청남도",
-        "local": "보령시"
       }
     },
     {
@@ -1038,31 +70,47 @@
       }
     },
     {
-      "uid": "thefishing-fleet:348:팀베테랑호",
-      "name": "팀베테랑호",
+      "uid": "3324",
+      "name": "범블비호",
       "port": "오천항",
-      "url": "https://thefishing.kr/site/site.php?uid=348"
-    },
-    {
-      "uid": "sunsang24:ship:115",
-      "name": "까치선장 자이언트호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=115",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3324",
       "region": {
         "sea": "서해권",
-        "province": "충남",
-        "local": "보령"
+        "province": "충청남도",
+        "local": "보령시"
       }
     },
     {
-      "uid": "sunsang24:ship:307",
-      "name": "가즈아호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=307",
+      "uid": "5846",
+      "name": "독한놈호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5846",
       "region": {
         "sea": "서해권",
-        "province": "충남",
-        "local": "보령"
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1615",
+      "name": "★블루호★",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1615",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1444",
+      "name": "아일랜드호",
+      "port": "대야도항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1444",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "안면도"
       }
     },
     {
@@ -1070,160 +118,6 @@
       "name": "꽃돼지호",
       "port": "",
       "url": "https://www.sunsang24.com/ship/list?ship_no=312",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "보령"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:320",
-      "name": "프린스호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=320",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "보령"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:344",
-      "name": "마검포 뉴패밀리호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=344",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:360",
-      "name": "신출항호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=360",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:409",
-      "name": "무야호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=409",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:512",
-      "name": "해맨호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=512",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:521",
-      "name": "파티호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=521",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:660",
-      "name": "뉴항구호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=660",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "서산"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:698",
-      "name": "자연피싱호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=698",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:884",
-      "name": "정환호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=884",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "홍성"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:960",
-      "name": "파라곤호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=960",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "서천"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:993",
-      "name": "동백호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=993",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "홍성"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:1188",
-      "name": "안녕하세호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=1188",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:1418",
-      "name": "비제이호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=1418",
-      "region": {
-        "sea": "서해권",
-        "province": "충남",
-        "local": "태안"
-      }
-    },
-    {
-      "uid": "sunsang24:ship:1468",
-      "name": "호랭이호",
-      "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=1468",
       "region": {
         "sea": "서해권",
         "province": "충남",
@@ -1242,21 +136,54 @@
       }
     },
     {
-      "uid": "sunsang24:ship:1657",
-      "name": "넘버원호",
+      "uid": "sunsang24:ship:1976",
+      "name": "악바리호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=1657",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1976",
       "region": {
         "sea": "서해권",
         "province": "충남",
-        "local": "서산"
+        "local": "태안"
       }
     },
     {
-      "uid": "sunsang24:ship:1773",
-      "name": "골드로저호",
+      "uid": "sunsang24:ship:115",
+      "name": "까치선장 자이언트호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=1773",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=115",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "보령"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:2065",
+      "name": "은가비호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2065",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "홍성"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:2021",
+      "name": "똥까호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2021",
+      "region": {
+        "sea": "서해권",
+        "province": "전북특별자치도",
+        "local": "군산"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1371",
+      "name": "보따리호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1371",
       "region": {
         "sea": "남해권",
         "province": "전남",
@@ -1264,10 +191,153 @@
       }
     },
     {
-      "uid": "sunsang24:ship:1971",
-      "name": "천마호",
+      "uid": "861",
+      "name": "☆발키리호☆",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=861",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "4667",
+      "name": "하와이호(아쭈선장)",
+      "port": "당암포",
+      "url": "https://thefishing.kr/reservation/list.php?uid=4667",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "2873",
+      "name": "까칠이1호 (까칠이선장)",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2873",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6130",
+      "name": "흑돼지호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6130",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5951",
+      "name": "뉴청남호",
+      "port": "대야도항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5951",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "안면도"
+      }
+    },
+    {
+      "uid": "3487",
+      "name": "독수리호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3487",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1182",
+      "name": "팀프랜드호(25년 신조선)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1182",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "349",
+      "name": "아인스호 화이선장님 [연락처 제외]",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=349",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3609",
+      "name": "헤라호",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3609",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5383",
+      "name": "K-1호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5383",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "563",
+      "name": "워너비호 막내선장",
+      "port": "남당항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=563",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "홍성군"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:2068",
+      "name": "가즈아호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=1971",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2068",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "보령"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:307",
+      "name": "가즈아호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=307",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "보령"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:660",
+      "name": "뉴항구호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=660",
       "region": {
         "sea": "서해권",
         "province": "충남",
@@ -1275,10 +345,351 @@
       }
     },
     {
-      "uid": "sunsang24:ship:1976",
-      "name": "악바리호",
+      "uid": "sunsang24:ship:1418",
+      "name": "비제이호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=1976",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1418",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:884",
+      "name": "정환호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=884",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "홍성"
+      }
+    },
+    {
+      "uid": "5321",
+      "name": "블루오션호",
+      "port": "대야도항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5321",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "안면도"
+      }
+    },
+    {
+      "uid": "3288",
+      "name": "블레스호",
+      "port": "신진도항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3288",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:997",
+      "name": "루미호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=997",
+      "region": {
+        "sea": "서해권",
+        "province": "전북특별자치도",
+        "local": "군산"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:948",
+      "name": "뚱스호",
+      "port": "비응항",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=948",
+      "region": {
+        "sea": "서해권",
+        "province": "전북특별자치도",
+        "local": "군산"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:944",
+      "name": "닥스호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=944",
+      "region": {
+        "sea": "서해권",
+        "province": "전북특별자치도",
+        "local": "군산"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:563",
+      "name": "다온호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=563",
+      "region": {
+        "sea": "서해권",
+        "province": "전북특별자치도",
+        "local": "군산"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1393",
+      "name": "백룡호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1393",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "고흥"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:870",
+      "name": "스페셜드림",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=870",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "고흥"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1004",
+      "name": "만진스타 1호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1004",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "여수"
+      }
+    },
+    {
+      "uid": "6132",
+      "name": "[루피호] 선장_허정 사무장_쩡프로",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6132",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6161",
+      "name": "[팀루피호] 선장_김기영 사무장_대♡녀",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6161",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3969",
+      "name": "다운샷호 낙지선장",
+      "port": "남당항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3969",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "홍성군"
+      }
+    },
+    {
+      "uid": "6120",
+      "name": "럭셔리호[용쥬르선장][추첨식]",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6120",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6133",
+      "name": "[슈퍼맨호] 선장_황선대 사무장_쭈니",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6133",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3416",
+      "name": "배짱호_임남규선장",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3416",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "2789",
+      "name": "야무진2호[깡선장][추첨식]",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2789",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3007",
+      "name": "오션투어호[꼴배선장](추첨식)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3007",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3973",
+      "name": "까칠이호 (싹쓰리선장)",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3973",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5471",
+      "name": "슈퍼스타 (도니선장,사니사무장)[연락처 제외]",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5471",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1190",
+      "name": "유진호(EUGENE)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1190",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "530",
+      "name": "피싱마린호",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=530",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "2811",
+      "name": "하이피싱호 (이종진 선장)",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2811",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1341",
+      "name": "투지호",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1341",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "732",
+      "name": "제우스호 (양선장,사무장)[연락처 제외]",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=732",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "911",
+      "name": "어게인호(스피드선장)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=911",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3545",
+      "name": "☆발키리7호☆",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3545",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3986",
+      "name": "모데라토호_이경태선장",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3986",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3970",
+      "name": "깜보호_목지욱선장",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3970",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:993",
+      "name": "동백호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=993",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "홍성"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:2299",
+      "name": "맥가이버호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2299",
       "region": {
         "sea": "서해권",
         "province": "충남",
@@ -1297,25 +708,570 @@
       }
     },
     {
-      "uid": "sunsang24:ship:2065",
-      "name": "은가비호",
+      "uid": "sunsang24:ship:2567",
+      "name": "안흥 스페이스호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=2065",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=2567",
       "region": {
         "sea": "서해권",
         "province": "충남",
-        "local": "홍성"
+        "local": "태안"
       }
     },
     {
-      "uid": "sunsang24:ship:2068",
-      "name": "가즈아호",
+      "uid": "sunsang24:ship:698",
+      "name": "자연피싱호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=2068",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=698",
       "region": {
         "sea": "서해권",
         "province": "충남",
-        "local": "보령"
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1971",
+      "name": "천마호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1971",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "서산"
+      }
+    },
+    {
+      "uid": "2356",
+      "name": "메르세데스호",
+      "port": "홍원항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2356",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서천군"
+      }
+    },
+    {
+      "uid": "1378",
+      "name": "도깨비호",
+      "port": "홍원항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1378",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서천군"
+      }
+    },
+    {
+      "uid": "2955",
+      "name": "승주호",
+      "port": "삼길포",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2955",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서산시"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:405",
+      "name": "먹깨비호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=405",
+      "region": {
+        "sea": "서해권",
+        "province": "전북특별자치도",
+        "local": "군산"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:769",
+      "name": "오션스타2호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=769",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "여수"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1251",
+      "name": "스페셜드림 6호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1251",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "고흥"
+      }
+    },
+    {
+      "uid": "3387",
+      "name": "껀모호",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3387",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1325",
+      "name": "팀스텔스호",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1325",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6127",
+      "name": "핏불호[앙선장] [추첨식]",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6127",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5388",
+      "name": "타이푼호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5388",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5709",
+      "name": "페가수스호_조현길선장 신대식사무장",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5709",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6055",
+      "name": "팀배틀호",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6055",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5948",
+      "name": "팀바이트호 (쿄쿄선장)",
+      "port": "마검포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5948",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "안면도"
+      }
+    },
+    {
+      "uid": "2832",
+      "name": "썬가드호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2832",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1297",
+      "name": "바이트호",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1297",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6356",
+      "name": "몬스터호(처리선장)[연락처 제외]",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6356",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6021",
+      "name": "메이저호 (이선장)[연락처 제외]",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6021",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3570",
+      "name": "만석호",
+      "port": "삼길포",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3570",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서산시"
+      }
+    },
+    {
+      "uid": "1484",
+      "name": "나폴리(신조선)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1484",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3885",
+      "name": "갤럭시호",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3885",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5856",
+      "name": "한프로호",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5856",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1487",
+      "name": "나폴리2",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1487",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "2506",
+      "name": "나폴리7",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2506",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1485",
+      "name": "뉴나폴리",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1485",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "2065",
+      "name": "메가호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2065",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3950",
+      "name": "양파호",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3950",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "733",
+      "name": "할리호 (보미선장,사무장)[연락처 제외]",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=733",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "thefishing-fleet:348:팀베테랑호",
+      "name": "팀베테랑호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/site/site.php?uid=348"
+    },
+    {
+      "uid": "6131",
+      "name": "꺄오호 ([연락처 제외])",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6131",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1447",
+      "name": "뉴해풍호",
+      "port": "대야도항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1447",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "안면도"
+      }
+    },
+    {
+      "uid": "1595",
+      "name": "뉴체이스호(22인승)",
+      "port": "무창포항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1595",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3924",
+      "name": "라라",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3924",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "1442",
+      "name": "복성호",
+      "port": "대야도항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=1442",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "안면도"
+      }
+    },
+    {
+      "uid": "6032",
+      "name": "볼트호 (황용기선장) [연락처 제외]",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6032",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6213",
+      "name": "브라더호 (현선장님)",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6213",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "431",
+      "name": "씨빙이호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=431",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5734",
+      "name": "히트호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5734",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "799",
+      "name": "팀오디세이(미르)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=799",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "2829",
+      "name": "팀만수",
+      "port": "영흥도",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2829",
+      "region": {
+        "sea": "서해권",
+        "province": "경기도",
+        "local": "영흥도"
+      }
+    },
+    {
+      "uid": "2771",
+      "name": "캡틴호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2771",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "560",
+      "name": "장현호 캡틴블랙",
+      "port": "남당항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=560",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "홍성군"
+      }
+    },
+    {
+      "uid": "5807",
+      "name": "정든호 큰선장",
+      "port": "남당항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5807",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "홍성군"
+      }
+    },
+    {
+      "uid": "5970",
+      "name": "이지스",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5970",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "788",
+      "name": "오디세이호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=788",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "4691",
+      "name": "스파이더호 [연락처 제외] (김선장)",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=4691",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "5367",
+      "name": "솔티가호",
+      "port": "신진도항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5367",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "4606",
+      "name": "바다용사호(김석훈선장)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=4606",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "6173",
+      "name": "뚱이호 (낫띵선장)",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=6173",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "2283",
+      "name": "뉴 찬 스 호",
+      "port": "오천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2283",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
       }
     },
     {
@@ -1330,10 +1286,10 @@
       }
     },
     {
-      "uid": "sunsang24:ship:2299",
-      "name": "맥가이버호",
+      "uid": "sunsang24:ship:409",
+      "name": "무야호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=2299",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=409",
       "region": {
         "sea": "서해권",
         "province": "충남",
@@ -1341,14 +1297,234 @@
       }
     },
     {
-      "uid": "sunsang24:ship:2567",
-      "name": "안흥 스페이스호",
+      "uid": "sunsang24:ship:360",
+      "name": "신출항호",
       "port": "",
-      "url": "https://www.sunsang24.com/ship/list?ship_no=2567",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=360",
       "region": {
         "sea": "서해권",
         "province": "충남",
         "local": "태안"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1188",
+      "name": "안녕하세호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1188",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:320",
+      "name": "프린스호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=320",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "보령"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:512",
+      "name": "해맨호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=512",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:344",
+      "name": "마검포 뉴패밀리호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=344",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1773",
+      "name": "골드로저호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1773",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "여수"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1468",
+      "name": "호랭이호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1468",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "보령"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1149",
+      "name": "피쉬헌터",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1149",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "고흥"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1119",
+      "name": "백호호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1119",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "여수"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1137",
+      "name": "바다낚시114 해마루호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1137",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "고흥"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:352",
+      "name": "레드폭스호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=352",
+      "region": {
+        "sea": "남해권",
+        "province": "전남",
+        "local": "여수"
+      }
+    },
+    {
+      "uid": "106",
+      "name": "조커호",
+      "port": "홍원항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=106",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서천군"
+      }
+    },
+    {
+      "uid": "2351",
+      "name": "페라리호",
+      "port": "홍원항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2351",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서천군"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:960",
+      "name": "파라곤호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=960",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "서천"
+      }
+    },
+    {
+      "uid": "2452",
+      "name": "타이탄",
+      "port": "홍원항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2452",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서천군"
+      }
+    },
+    {
+      "uid": "4443",
+      "name": "헌터호",
+      "port": "삼길포",
+      "url": "https://thefishing.kr/reservation/list.php?uid=4443",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "서산시"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:1657",
+      "name": "넘버원호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=1657",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "서산"
+      }
+    },
+    {
+      "uid": "sunsang24:ship:521",
+      "name": "파티호",
+      "port": "",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=521",
+      "region": {
+        "sea": "서해권",
+        "province": "충남",
+        "local": "태안"
+      }
+    },
+    {
+      "uid": "5738",
+      "name": "해복호[자리추첨]",
+      "port": "영목항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=5738",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "안면도"
+      }
+    },
+    {
+      "uid": "2987",
+      "name": "오아시스호",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=2987",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
+      }
+    },
+    {
+      "uid": "3515",
+      "name": "예린호",
+      "port": "대천항",
+      "url": "https://thefishing.kr/reservation/list.php?uid=3515",
+      "region": {
+        "sea": "서해권",
+        "province": "충청남도",
+        "local": "보령시"
       }
     }
   ],
@@ -1368,7 +1544,9 @@
       "sunsang24:ship:1530",
       "sunsang24:ship:1976",
       "sunsang24:ship:115",
-      "sunsang24:ship:2065"
+      "sunsang24:ship:2065",
+      "sunsang24:ship:2021",
+      "sunsang24:ship:1371"
     ],
     "tier2": [
       "861",
@@ -1388,7 +1566,14 @@
       "sunsang24:ship:1418",
       "sunsang24:ship:884",
       "5321",
-      "3288"
+      "3288",
+      "sunsang24:ship:997",
+      "sunsang24:ship:948",
+      "sunsang24:ship:944",
+      "sunsang24:ship:563",
+      "sunsang24:ship:1393",
+      "sunsang24:ship:870",
+      "sunsang24:ship:1004"
     ],
     "tier3": [
       "6132",
@@ -1418,7 +1603,10 @@
       "sunsang24:ship:1971",
       "2356",
       "1378",
-      "2955"
+      "2955",
+      "sunsang24:ship:405",
+      "sunsang24:ship:769",
+      "sunsang24:ship:1251"
     ],
     "other": [
       "3387",
@@ -1472,7 +1660,11 @@
       "sunsang24:ship:512",
       "sunsang24:ship:344",
       "sunsang24:ship:1773",
-      "sunsang24:ship:1468"
+      "sunsang24:ship:1468",
+      "sunsang24:ship:1149",
+      "sunsang24:ship:1119",
+      "sunsang24:ship:1137",
+      "sunsang24:ship:352"
     ]
   },
   "selectedUids": [
@@ -1574,7 +1766,6 @@
     "sunsang24:ship:320",
     "sunsang24:ship:512",
     "sunsang24:ship:344",
-    "sunsang24:ship:1773",
     "sunsang24:ship:993",
     "sunsang24:ship:2299",
     "sunsang24:ship:1982",
@@ -1593,6 +1784,22 @@
     "sunsang24:ship:521",
     "5738",
     "2987",
-    "3515"
+    "3515",
+    "sunsang24:ship:563",
+    "sunsang24:ship:944",
+    "sunsang24:ship:2021",
+    "sunsang24:ship:948",
+    "sunsang24:ship:997",
+    "sunsang24:ship:405",
+    "sunsang24:ship:352",
+    "sunsang24:ship:1004",
+    "sunsang24:ship:1137",
+    "sunsang24:ship:1393",
+    "sunsang24:ship:1119",
+    "sunsang24:ship:1371",
+    "sunsang24:ship:870",
+    "sunsang24:ship:1251",
+    "sunsang24:ship:769",
+    "sunsang24:ship:1149"
   ]
 }

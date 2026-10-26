@@ -8,9 +8,9 @@ import seed from '../src/data/publishedPreferences.json';
 test('published backup applies exact tier order and selection without changing vessel attributes or injecting reservations',()=>{
   const before=defaultFleet(),after=applyPublishedPreferences(before,true);
   expect(after.tiers).toEqual(seed.tiers);expect(after.selectedUids).toEqual(seed.selectedUids);
-  expect(Object.values(after.tiers).map(ids=>ids.length)).toEqual([15,18,28,52]);expect(after.selectedUids).toHaveLength(118);
+  expect(Object.values(after.tiers).map(ids=>ids.length)).toEqual([17,25,31,56]);expect(after.selectedUids).toHaveLength(133);
   expect(after.boats).toEqual(before.boats);expect(after.events).toEqual(before.events);
-  expect(new Set(seed.boatUids).size).toBe(1057);
+  expect(new Set(seed.boatUids).size).toBe(seed.boatUids.length);expect([...Object.values(seed.tiers).flat(),...seed.selectedUids].every(id=>seed.boatUids.includes(id))).toBe(true);
   expect(Object.keys(seed).sort()).toEqual(['boatUids','selectedUids','tiers','version']);
 });
 test('migration is one-time, persists through backup and keeps custom vessels and deleted vessel choices',()=>{

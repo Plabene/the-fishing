@@ -18,15 +18,16 @@ test('selection labels, badges and inclusion chips retain the established specie
   const draw=(selection:string|string[])=>renderSpeciesFilter(root,counts,selection,[],onChange);
   for(const selection of ['all',['문어'],[]]) {
     draw(selection);
-    for(const [key,color] of [['문어','rgb(220, 238, 255)'],['광어','rgb(255, 224, 230)'],['unknown','rgb(232, 232, 232)'],['주꾸미+갑오징어','rgb(240, 227, 255)']]) {
+    for(const [key,color] of [['문어','rgb(220, 238, 255)'],['광어','rgb(255, 224, 230)'],['unknown','rgb(232, 232, 232)'],['주꾸미','rgb(229, 215, 211)'],['갑오징어','rgb(236, 222, 221)']]) {
       const input=root.querySelector<HTMLInputElement>(`[data-species-choice="${key}"]`)!;
       expect(getComputedStyle(input.parentElement!).backgroundColor).toBe(color);
-      expect(getComputedStyle(root.querySelector(`[data-species="${key}"]`)!).backgroundColor).toBe(color);
+      const chip=root.querySelector(`[data-species="${key}"]`);if(chip) expect(getComputedStyle(chip).backgroundColor).toBe(color);
       const badge=speciesBadge(observation({trip:key,speciesKey:key,species:key}));main.append(badge);expect(getComputedStyle(badge).backgroundColor).toBe(color);badge.remove();
       expect(input.checked).toBe(Array.isArray(selection)&&selection.includes(key));
       expect(getComputedStyle(input).width).toBe('16px');expect(input.disabled).toBe(false);
     }
   }
+  expect(getComputedStyle(root.querySelector('[data-species="주꾸미+갑오징어"]')!).backgroundColor).toBe('rgb(240, 227, 255)');
   draw('all');root.querySelector<HTMLInputElement>('[data-species-choice="문어"]')!.click();expect(onChange).toHaveBeenLastCalledWith(['문어'],[]);
   draw(['문어']);root.querySelector<HTMLInputElement>('[data-species-choice="문어"]')!.click();expect(onChange).toHaveBeenLastCalledWith([],[]);
   root.querySelector<HTMLButtonElement>('#species-all')!.click();expect(onChange).toHaveBeenLastCalledWith('all',[]);

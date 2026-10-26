@@ -6,10 +6,10 @@ import {RECOVERY_VERSION,initializePreferenceRecovery,recoverPreferences,supplie
 import {exportTierBackup,restoreTierBackup} from '../src/tierBackup';
 import {importData,exportData} from '../src/importLegacy';
 
-test('last supplied backup retains exact 113 tier assignments and 118 selections including 10 unassigned boats',()=>{
+test('last supplied backup retains exact 129 tier assignments and 133 selections including 10 unassigned boats',()=>{
   const result=recoverPreferences(emptyState(),suppliedPreferences,'exact');
-  expect(result.count).toBe(113);expect(result.unresolved).toBe(0);expect(result.state.boats).toHaveLength(123);
-  expect(TIERS.map(t=>result.state.tiers[t].length)).toEqual([15,18,28,52]);
+  expect(result.count).toBe(129);expect(result.unresolved).toBe(0);expect(result.state.boats).toHaveLength(139);
+  expect(TIERS.map(t=>result.state.tiers[t].length)).toEqual([17,25,31,56]);
   expect(result.state.tiers).toEqual(suppliedPreferences.tiers);expect(result.state.selectedUids).toEqual(suppliedPreferences.selectedUids);
   expect(result.state.selectedUids.filter(id=>!TIERS.some(t=>result.state.tiers[t].includes(id)))).toHaveLength(10);
   const portable=restoreTierBackup(JSON.parse(exportTierBackup(result.state)),emptyState()).state;
@@ -31,7 +31,7 @@ test('gap recovery preserves conflicting personal tiers and selections; exact re
 });
 test('only empty matching catalogs recover automatically once; later intentional clears and custom catalogs stay empty',()=>{
   const current=defaultFleet();current.tiers={tier1:[],tier2:[],tier3:[],other:[]};current.selectedUids=[];
-  const recovered=initializePreferenceRecovery(current,true);expect(recovered.restored).toBe(113);
+  const recovered=initializePreferenceRecovery(current,true);expect(recovered.restored).toBe(129);
   recovered.state.tiers={tier1:[],tier2:[],tier3:[],other:[]};expect(initializePreferenceRecovery(recovered.state,true).restored).toBe(0);
   expect(initializePreferenceRecovery(emptyState(),true).restored).toBe(0);
   const restored=importData(JSON.parse(exportData(recovered.state))).state;expect(restored.preferenceRecoveryVersion).toBe(RECOVERY_VERSION);

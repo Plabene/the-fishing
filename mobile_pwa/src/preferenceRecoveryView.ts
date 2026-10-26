@@ -1,7 +1,7 @@
 import {el} from './dayView';
 import {emptyState,TIERS,type AppState,LABELS} from './models';
 import {preferenceBackups,type PreferenceSnapshot} from './preferenceProtection';
-import {suppliedPreferences,recoveryPreview,recoverPreferences} from './preferenceRecovery';
+import {suppliedPreferences,recoveryPreview,recoverPreferences,RECOVERY_DATE} from './preferenceRecovery';
 import {exportTierBackup} from './tierBackup';
 import {saveJsonFile} from './fileSave';
 
@@ -9,7 +9,7 @@ export function installPreferenceRecovery(target:HTMLElement,current:()=>AppStat
   const panel=el('section','','tier-backup'),title=el('strong','티어 복구 · 자동 보호 이력'),select=el('select'),label=el('label','복구 자료'),status=el('p'),actions=el('div','','actions');
   panel.id='tier-recovery';select.id='recovery-source';status.id='recovery-preview';label.append(select);
   let values:PreferenceSnapshot[]=[suppliedPreferences];
-  const option=el('option','2026-10-23 마지막 백업 · 113개 티어 / 118개 선택');option.value='0';select.append(option);
+  const option=el('option',`${RECOVERY_DATE} 마지막 백업 · ${TIERS.reduce((n,t)=>n+suppliedPreferences.tiers[t].length,0)}개 티어 / ${suppliedPreferences.selectedUids.length}개 선택`);option.value='0';select.append(option);
   const refresh=()=>{const source=values[Number(select.value)] || suppliedPreferences,p=recoveryPreview(current(),source);status.textContent=`현재 ${TIERS.map(t=>`${LABELS[t]} ${current().tiers[t].length}`).join(' · ')} / 백업 티어 ${p.total}개 · 누락 ${p.missing}개 · 다른 분류 ${p.conflicts}개${p.unresolved?' · 선박 정보 없는 '+p.unresolved+'개':''}. 복구 전 설정은 자동 보관합니다.`;};
   for(const [id,caption,mode] of [['recover-missing','누락 티어만 복구','missing'],['recover-exact','백업 분류·선택 적용','exact']] as const) {
     const button=el('button',caption);button.id=id;button.type='button';button.addEventListener('click',async()=>{

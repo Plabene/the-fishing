@@ -16,7 +16,7 @@ test('published catalog merges metadata without changing selections, tiers, dele
   expect(next.boats.find(b=>b.uid==='2')).toMatchObject({name:'개인 별명',port:'개인 항구'});
   expect(next.boats.find(b=>b.uid==='3')?.region?.local).toBe('개인 지역');
   expect(next.boats.map(b=>b.uid)).toEqual(['1','2','3','99','5']);
-  expect(next.selectedUids).toEqual(state.selectedUids);expect(next.tiers).toEqual(state.tiers);
+  expect(next.selectedUids).toEqual(state.selectedUids);expect(next.tiers).toEqual({...state.tiers,other:['5']});
   expect(next.selectedRegion).toEqual(state.selectedRegion);expect(next.events).toEqual(state.events);expect(state).toEqual(before);
   expect(mergeFleetCatalog(next,incoming,'new-version',next.fleetBaseline!)).toEqual(next);
   const removed={...next,boats:next.boats.filter(b=>b.uid!=='5')};
@@ -29,7 +29,7 @@ test('first migration of the original PC catalog enriches regions and adds new b
   state.selectedUids=[enriched.uid];state.tiers.tier3=[enriched.uid];state.boats.find(b=>b.uid===enriched.uid)!.name='개인 이름';
   const result=initializeFleet(state);expect(result.changed).toBe(true);expect(result.state.fleetSeedVersion).toBe(FLEET_VERSION);
   expect(result.state.boats.find(b=>b.uid===enriched.uid)).toMatchObject({name:'개인 이름',region:enriched.region});
-  expect(result.state.boats.some(b=>b.uid===deleted.uid)).toBe(false);expect(result.state.selectedUids.filter(id=>!id.startsWith('sunsang24:'))).toEqual(state.selectedUids);for(const tier of ['tier1','tier2','tier3','other'] as const) expect(result.state.tiers[tier].filter(id=>!id.startsWith('sunsang24:'))).toEqual(state.tiers[tier]);
+  expect(result.state.boats.some(b=>b.uid===deleted.uid)).toBe(false);expect(result.state.selectedUids.filter(id=>!id.startsWith('sunsang24:'))).toEqual(state.selectedUids);for(const tier of ['tier1','tier2','tier3','other'] as const) expect(result.state.tiers[tier].filter(id=>state.boats.some(b=>b.uid===id))).toEqual(state.tiers[tier]);
   const restored=importData(JSON.parse(exportData(result.state))).state;
   expect(restored.fleetBaseline).toEqual(result.state.fleetBaseline);expect(initializeFleet(restored).changed).toBe(false);
 });

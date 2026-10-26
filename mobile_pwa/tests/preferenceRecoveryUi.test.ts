@@ -25,7 +25,7 @@ test('recovery preview, exact apply, automatic history and month navigation pers
     expect(old).toBeDefined();source.value=old.value;source.dispatchEvent(new Event('change'));
     el('#recover-exact').click();await settle();
     const restored=await loadState() as AppState;expect(restored.tiers.tier2).toContain(suppliedPreferences.tiers.tier1[0]);
-    expect(TIERS.reduce((n,t)=>n+restored.tiers[t].length,0)).toBe(113);expect(request).not.toHaveBeenCalled();
+    expect(TIERS.reduce((n,t)=>n+restored.tiers[t].length,0)).toBe(129);expect(request).not.toHaveBeenCalled();
     // An explicit old full backup may intentionally have no tiers and no recovery marker.
     const intentionallyEmpty={...restored,tiers:{tier1:[],tier2:[],tier3:[],other:[]},selectedUids:[],preferenceRecoveryVersion:undefined};
     const input=el('#import') as HTMLInputElement;

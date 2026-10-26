@@ -27,9 +27,9 @@ export function speciesFilterKey(value:unknown):string|null {
   return key!==UNKNOWN_SPECIES || placeholder(value) ? key:null;
 }
 export function normalizeSpeciesSelection(value:unknown):'all'|string[] {
-  if(Array.isArray(value)) return [...new Set(value.filter(v=>typeof v==='string' && v.trim()).slice(0,200).map(speciesFilterKey).filter((key):key is string=>key!==null))];
+  if(Array.isArray(value)) return [...new Set(value.filter(v=>typeof v==='string' && v.trim()).slice(0,200).map(speciesFilterKey).filter((key):key is string=>key!==null).flatMap(key=>key.split('+')))];
   if(typeof value!=='string' || value==='all') return 'all';
-  const key=speciesFilterKey(value);return key===null ? 'all':[key];
+  const key=speciesFilterKey(value);return key===null ? 'all':key.split('+');
 }
 export function speciesLabel(value:unknown):string {
   const key=speciesKey(value);
@@ -55,7 +55,19 @@ export function speciesColor(value:string):string {
   let hash=0;for(const char of key) hash=(hash*31+char.charCodeAt(0))>>>0;
   return `hsl(${hash%360} 35% 90%)`;
 }
-export function speciesBadge(event:Observation):HTMLSpanElement {
-  const key=eventSpecies(event),node=document.createElement('span');
+export function displayedSpecies(event:Pick<Observation,'trip'|'species'|'speciesKey'>,selected:unknown='all'):string {
+  const key=eventSpecies(event),selection=normalizeSpeciesSelection(selected);
+  return selection==='all'?key:key.split('+').filter(token=>selection.includes(token)).join('+');
+}
+/** Preserve the source wording without exposing unselected species as result labels. */
+export function tripDescription(event:Observation,selected:unknown='all'):HTMLElement {
+  const filtered=displayedSpecies(event,selected)!==eventSpecies(event);
+  const node=document.createElement(filtered?'details':'p');
+  if(filtered) {const summary=document.createElement('summary');summary.textContent='복합 출조 · 원본 출조명 보기';node.append(summary,document.createTextNode(event.trip || '출조명 미표시'));node.className='original-trip';}
+  else node.textContent=event.trip || '출조명 미표시';
+  return node;
+}
+export function speciesBadge(event:Observation,selected:unknown='all'):HTMLSpanElement {
+  const key=displayedSpecies(event,selected),node=document.createElement('span');
   node.className='species-badge';node.textContent=`어종 · ${speciesLabel(key)}`;node.style.backgroundColor=speciesColor(key);return node;
 }

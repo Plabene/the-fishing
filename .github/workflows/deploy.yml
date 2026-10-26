@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       refresh_fleet:
-        description: Refresh the complete public boat directory before deploying
+        description: Refresh verified public boat directories before deploying
         type: boolean
         default: false
   schedule:
@@ -85,7 +85,7 @@ jobs:
       - name: Save verified catalog to GitHub
         if: github.event_name == 'schedule' || inputs.refresh_fleet == true
         run: |
-          git add src/data/defaultFleet.json src/data/sunsang24Fleet.json
+          git add src/data/defaultFleet.json src/data/sunsang24Fleet.json src/data/catalogSync.json
           if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

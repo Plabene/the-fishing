@@ -13,7 +13,7 @@ export function defaultFleet(): AppState {
   state.boats.push(...sunsang.boats.filter(b=>!existing.has(b.uid)).map(b=>{const region=readRegion({sea:b.sea,province:b.province,local:b.local});return {uid:b.uid,name:b.name,port:b.port,url:b.url,...(region?{region}:{})};}));
   return applySunsangTiers({...state,fleetSeedVersion:FLEET_VERSION,fleetBaseline:structuredClone(state.boats)});
 }
-export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,baseline:Boat[]):AppState {
+export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,baseline:Boat[],registerNew=true):AppState {
   const state=structuredClone(current),previous=new Map(baseline.map(b=>[b.uid,b])),incoming=new Map(boats.map(b=>[b.uid,b]));
   const existing=new Set(state.boats.map(b=>b.uid));
   for(const boat of state.boats) {
@@ -25,7 +25,8 @@ export function mergeFleetCatalog(current:AppState,boats:Boat[],version:string,b
     }
   }
   // Newly discovered boats start unselected. Missing catalog entries never erase personal boats.
-  for(const boat of boats) if(!existing.has(boat.uid) && !previous.has(boat.uid)) state.boats.push(structuredClone(boat));
+  const assigned=new Set(TIERS.flatMap(t=>state.tiers[t]));
+  for(const boat of boats) if(!existing.has(boat.uid) && !previous.has(boat.uid)) {state.boats.push(structuredClone(boat));if(registerNew && !assigned.has(boat.uid)) state.tiers.other.push(boat.uid);existing.add(boat.uid);}
   state.fleetBaseline=structuredClone(boats);state.fleetSeedVersion=version;return state;
 }
 export function initializeFleet(saved: unknown): {state:AppState; seeded:boolean; changed:boolean} {
@@ -35,14 +36,16 @@ export function initializeFleet(saved: unknown): {state:AppState; seeded:boolean
     return {state:defaultFleet(), seeded:true, changed:true};
   const catalogChanged=state.fleetSeedVersion!==FLEET_VERSION || !state.fleetBaseline;
   const tiersChanged=state.sunsangTierVersion!==SUNSANG_TIER_VERSION;
+  const originalIds=new Set(state.boats.map(b=>b.uid)),inheritPc=tiersChanged && !state.preferenceRecoveryVersion;
   if(catalogChanged) {
     const defaults=defaultFleet();
     const baseline=state.fleetBaseline || (state.fleetSeedVersion===legacy.version ? legacy.boats:defaults.boats);
-    state=mergeFleetCatalog(state,defaults.boats,FLEET_VERSION,baseline);
+    state=mergeFleetCatalog(state,defaults.boats,FLEET_VERSION,baseline,!inheritPc);
     if(state.selectedRegion) state.selectedRegion=migrateRegionFilter(state.boats,state.selectedRegion);
   }
   // Once personal settings are protected, a later bundled PC preset must not fill intentional gaps.
   if(tiersChanged) state=state.preferenceRecoveryVersion?{...state,sunsangTierVersion:SUNSANG_TIER_VERSION}:applySunsangTiers(state);
+  if(inheritPc) {const assigned=new Set(TIERS.flatMap(t=>state.tiers[t]));state.tiers.other.push(...state.boats.filter(b=>!originalIds.has(b.uid) && !assigned.has(b.uid)).map(b=>b.uid));}
   return {state, seeded:false, changed:catalogChanged || tiersChanged};
 }
 /** Explicit restore replaces the PC fleet's order while retaining custom boats and observations. */

@@ -1,3 +1,4 @@
+import {renderCatalogCoverage} from './catalogCoverage';
 import {appLayout} from './appLayout';
 import {alphabeticFleet,uniqueFleet,platformCounts,supportsLive,platformQueryStats} from './fleetList';
 import {watchAppUpdates} from './appUpdate';
@@ -11,7 +12,7 @@ import {applySunsangTiers,SUNSANG_TIER_COUNT} from './sunsang24Tiers';
 import { loadState, saveState,backupPreferences,previousPreferences,StorageConflictError } from './availabilityStore';
 import {applyPublishedPreferences,PUBLISHED_PREFERENCES_VERSION,PUBLISHED_PREFERENCES_COUNTS} from './publishedPreferences';
 import {bookingAlias} from './bookingAliases';
-import { orderedBoats, moveBoat, removeBoat, tierFor } from './tierStore';
+import { orderedBoats, moveBoat, removeBoat, tierFor, selectBoats } from './tierStore';
 import { renderCalendar } from './calendarView';
 import { el, renderDay, sourceLink } from './dayView';
 import { fixtureState } from './providers/fixtures';
@@ -85,6 +86,7 @@ function renderFleet() {
   const tiers=new Map(TIERS.flatMap(t=>state.tiers[t].map(id=>[id,t] as const)));
   const total=uniqueFleet(state.boats),counts=platformCounts(boats),external=counts.all-counts.thefishing-counts.sunsang24;
   $('#fleet-count').textContent = `전체 ${total.length}개 등록 항목 · 표시 ${boats.length}개 (더피싱 ${counts.thefishing} · 선상24 ${counts.sunsang24}${external?' · 외부 '+external:''}) · 일정 연동 ${boats.filter(supportsLive).length}개 · 선택 ${total.filter(b=>selected.has(b.uid)).length}개 · 티어 등록 ${total.filter(b=>tiers.has(b.uid)).length}개 · ${regionSummary(state.selectedRegion)}`;
+  renderCatalogCoverage($('#catalog-coverage'),state.boats,state.selectedRegion);
   $('#fleet-brief').textContent=`${state.selectedUids.length}척 선택`;
   $('#selected-only').setAttribute('aria-pressed',String(selectedOnly));
   target.dataset.sort=fleetSort;
@@ -97,7 +99,7 @@ function renderFleet() {
     row.dataset.uid=boat.uid;
     row.classList.toggle('is-selected',selected.has(boat.uid));
     check.type = 'checkbox'; check.checked = selected.has(boat.uid); check.setAttribute('aria-label', `${boat.name} 달력에 포함`);
-    check.addEventListener('change', () => { const c = structuredClone(state); c.selectedUids = check.checked ? [...new Set([...c.selectedUids, boat.uid])] : c.selectedUids.filter(id => id !== boat.uid); void commit(c, '달력에 표시할 선박을 저장했습니다.'); });
+    check.addEventListener('change', () => { const c = structuredClone(state); selectBoats(c,[boat.uid],check.checked); void commit(c, '달력에 표시할 선박을 저장했습니다.'); });
     label.append(check, el('strong', boat.name),platformBadge(boat));info.append(label);
     const metadata=el('p','','boat-meta'),region=el('span',`${regionLabel(boat)} · ${boat.port || '출항지 미확인'}`);region.title=locationDescription(boat) || region.textContent || '';
     const capability=el('span',supportsLive(boat)?'일정 연동':'공식 페이지 확인',supportsLive(boat)?'live-capable':'link-only');metadata.append(region,capability);info.append(metadata);
@@ -144,11 +146,11 @@ function render() {
   const shown = active(), result = queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly}), records=result.events;
   const counts=platformCounts(state.boats.filter(b=>matchesRegion(b,state.selectedRegion))),allCounts=platformCounts(state.boats);
   for(const button of $('#platform-filter').querySelectorAll<HTMLButtonElement>('button')) {const platform=readPlatform(button.dataset.platform);button.textContent=`${PLATFORM_LABELS[platform]} ${counts[platform]}`;button.title=`선택 지역 ${counts[platform]}개 · 전국 보유 목록 ${allCounts[platform]}개`;button.setAttribute('aria-pressed',String(platform===(state.selectedPlatform || 'all')));}
-  renderRegionFilter($('#region-filter'),state.boats,state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion,selectedSpecies:'all',excludedSpeciesKeys:[]},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
+  renderRegionFilter($('#region-filter'),state.boats,state.selectedRegion,selectedRegion=>{resultLimit=50;void commit({...state,selectedRegion},`${regionSummary(selectedRegion)} 지역을 적용했습니다. 조회 버튼을 누르면 해당 지역 선박만 새로 조회합니다.`);});
   const targets=orderedBoats(state).filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (tier==='all' || tierFor(state,b.uid)===tier)),targetCounts=platformCounts(targets);
   $('#query-target').textContent=`${targets.length}척 조회 대상 · ${regionSummary(state.selectedRegion)} · ${LABELS[tier]}`;
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
-  $('#fleet-catalog-status').textContent=`더피싱 보유 목록 ${allCounts.thefishing}개${catalog ? ` · 최근 원본 확인 ${catalog.listed}개 (${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})})`:''}. 선상24 보유 목록 ${allCounts.sunsang24}개 · PC 누적 목록과 검증된 공개 선사 목록. 두 목록은 매주 월요일 갱신을 시도하며 실패한 출처의 기존 항목은 보존합니다. 중앙 API 접근 제한·원본 페이지 중복으로 전국 완전 수집을 보장하지 않습니다. 같은 플랫폼·ID는 한 번 집계하며 플랫폼 간 동일 선박 후보는 예약정보를 합치지 않습니다. 새 항목은 선택 해제 상태이며 개인 티어·선택은 유지됩니다.`;
+  $('#fleet-catalog-status').textContent=`더피싱 보유 목록 ${allCounts.thefishing}개${catalog ? ` · 최근 원본 확인 ${catalog.listed}개 (${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})})`:''}. 선상24 보유 목록 ${allCounts.sunsang24}개 · PC 누적 목록과 검증된 공개 선사 목록. 두 목록은 매주 월요일 갱신을 시도하며 실패한 출처의 기존 항목은 보존합니다. 중앙 API 접근 제한·원본 페이지 중복으로 전국 완전 수집을 보장하지 않습니다. 같은 플랫폼·ID는 한 번 집계하며 플랫폼 간 동일 선박 후보는 예약정보를 합치지 않습니다. 새 목록 항목은 기타 티어·선택 해제 상태이며 기존 개인 티어·선택은 유지됩니다.`;
   renderTideSummary($('#tide-status'),calculateTideMonth(shown.month,shown.tideDays || []));
   if (!selectedDay.startsWith(shown.month)) selectedDay = records[0]?.date || `${shown.month}-01`;
   $<HTMLInputElement>('#month').value = shown.month; $<HTMLInputElement>('#people').value=String(shown.requiredPeople); $('#month-label').textContent = `${shown.month.slice(0, 4)}년 ${Number(shown.month.slice(5))}월`;
@@ -290,7 +292,7 @@ async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(va
 $<HTMLInputElement>('#month').addEventListener('change', e => { void setMonth((e.currentTarget as HTMLInputElement).value); });
 for (const [id, offset] of [['prev', -1], ['next', 1]] as const) $('#' + id).addEventListener('click', () => { const [y, m] = state.month.split('-').map(Number); void setMonth(new Date(Date.UTC(y, m - 1 + offset)).toISOString().slice(0, 7)); });
 $<HTMLInputElement>('#search').addEventListener('input', e => { search = (e.currentTarget as HTMLInputElement).value.trim(); render(); });
-$('#platform-filter').addEventListener('click',event=>{const button=(event.target as HTMLElement).closest<HTMLButtonElement>('button[data-platform]');if(!button || busy) return;const selectedPlatform=readPlatform(button.dataset.platform);resultLimit=50;void commit({...state,selectedPlatform,selectedSpecies:'all',excludedSpeciesKeys:[]},`${PLATFORM_LABELS[selectedPlatform]} 선박과 조회 결과를 표시합니다. 추가 수집은 하지 않습니다.`);});
+$('#platform-filter').addEventListener('click',event=>{const button=(event.target as HTMLElement).closest<HTMLButtonElement>('button[data-platform]');if(!button || busy) return;const selectedPlatform=readPlatform(button.dataset.platform);resultLimit=50;void commit({...state,selectedPlatform},`${PLATFORM_LABELS[selectedPlatform]} 선박과 조회 결과를 표시합니다. 추가 수집은 하지 않습니다.`);});
 $<HTMLSelectElement>('#fleet-sort').addEventListener('change',event=>{fleetSort=(event.currentTarget as HTMLSelectElement).value;renderFleet();});
 $('#selected-only').addEventListener('click',()=>{selectedOnly=!selectedOnly;renderFleet();});
 $<HTMLInputElement>('#fleet-search').addEventListener('input', e => { fleetSearch = (e.currentTarget as HTMLInputElement).value.trim(); renderFleet(); });
@@ -306,7 +308,7 @@ form.addEventListener('submit', async event => {
   if (index < 0 || tierFor(c, id) !== field('tier').value) moveBoat(c, id, field('tier').value as Tier);
   if (await commit(c, '선박 정보를 저장했습니다.')) closeForm();
 });
-for (const [id, include] of [['select-all', true], ['select-none', false]] as const) $('#' + id).addEventListener('click', () => { const c = structuredClone(state); const ids=new Set(fleetVisible().map(b=>b.uid));c.selectedUids = include ? [...new Set([...c.selectedUids,...ids])]:c.selectedUids.filter(uid=>!ids.has(uid)); void commit(c, '달력 선박 선택을 저장했습니다.'); });
+for (const [id, include] of [['select-all', true], ['select-none', false]] as const) $('#' + id).addEventListener('click', () => { const c = structuredClone(state); const ids=new Set(fleetVisible().map(b=>b.uid));selectBoats(c,ids,include); void commit(c, '달력 선박 선택을 저장했습니다.'); });
 $('#undo').addEventListener('click', async () => { if (undoState) await commit(undoState, '이전 상태로 되돌렸습니다.'); });
 $('#restore-fleet').addEventListener('click', async () => { const previous=structuredClone(state); if (await commit(applyDefaultFleet(state), '기본 선박 목록과 초기 선택·티어를 복원했습니다. 기존 출조 기록은 유지합니다.')) { undoState=previous; $('#undo').hidden=false; } });
 $('#tide-refresh').addEventListener('click',async()=>{
@@ -334,7 +336,7 @@ try {
   state=candidate;
   selectedDay=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul'}).format(new Date());liveMonth=state.month;
   if(changed) say(prepared.seeded?'제공한 티어·선택 목록을 처음 적용했습니다.':'기존 개인 티어·선택을 보존하고 설정 보호를 적용했습니다.');
-  if(recovered.restored) say(`비어 있던 티어 ${recovered.restored}개를 제공한 마지막 백업에서 복원했습니다. 복원 전 설정은 자동 보호 이력에 보관했습니다.`);
+  if(recovered.restored) say(`티어 ${recovered.restored}개를 제공한 마지막 백업 기준으로 적용했습니다. 복원 전 설정은 자동 보호 이력에 보관했습니다.`);
 } catch {say('기기 설정을 읽거나 저장하지 못했습니다. 백업 파일을 확인해 주세요.');}
 finally {setBusy(false);render();if(!storageReady) {setBusy(true);say('기기 설정을 읽지 못해 변경과 저장을 중지했습니다. 저장소를 지우지 말고 새로고침해 주세요.');}}
 if(storageReady) refreshRecovery=installPreferenceRecovery($('.fleet-management'),()=>state,commit,say);

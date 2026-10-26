@@ -1,5 +1,5 @@
 {
-  "version": "0d67db0588f28cea",
+  "version": "946687cefb70e09a",
   "boatUids": [
     "106",
     "107",
@@ -1057,7 +1057,13 @@
     "sunsang24:ship:2612",
     "sunsang24:ship:2615",
     "sunsang24:ship:2621",
-    "sunsang24:ship:2624"
+    "sunsang24:ship:2624",
+    "sunsang24:ship:2021",
+    "sunsang24:ship:997",
+    "sunsang24:ship:948",
+    "sunsang24:ship:944",
+    "sunsang24:ship:563",
+    "sunsang24:ship:405"
   ],
   "tiers": {
     "tier1": [
@@ -1075,7 +1081,9 @@
       "sunsang24:ship:1530",
       "sunsang24:ship:1976",
       "sunsang24:ship:115",
-      "sunsang24:ship:2065"
+      "sunsang24:ship:2065",
+      "sunsang24:ship:2021",
+      "sunsang24:ship:1371"
     ],
     "tier2": [
       "861",
@@ -1095,7 +1103,14 @@
       "sunsang24:ship:1418",
       "sunsang24:ship:884",
       "5321",
-      "3288"
+      "3288",
+      "sunsang24:ship:997",
+      "sunsang24:ship:948",
+      "sunsang24:ship:944",
+      "sunsang24:ship:563",
+      "sunsang24:ship:1393",
+      "sunsang24:ship:870",
+      "sunsang24:ship:1004"
     ],
     "tier3": [
       "6132",
@@ -1125,7 +1140,10 @@
       "sunsang24:ship:1971",
       "2356",
       "1378",
-      "2955"
+      "2955",
+      "sunsang24:ship:405",
+      "sunsang24:ship:769",
+      "sunsang24:ship:1251"
     ],
     "other": [
       "3387",
@@ -1179,7 +1197,11 @@
       "sunsang24:ship:512",
       "sunsang24:ship:344",
       "sunsang24:ship:1773",
-      "sunsang24:ship:1468"
+      "sunsang24:ship:1468",
+      "sunsang24:ship:1149",
+      "sunsang24:ship:1119",
+      "sunsang24:ship:1137",
+      "sunsang24:ship:352"
     ]
   },
   "selectedUids": [
@@ -1281,7 +1303,6 @@
     "sunsang24:ship:320",
     "sunsang24:ship:512",
     "sunsang24:ship:344",
-    "sunsang24:ship:1773",
     "sunsang24:ship:993",
     "sunsang24:ship:2299",
     "sunsang24:ship:1982",
@@ -1300,6 +1321,22 @@
     "sunsang24:ship:521",
     "5738",
     "2987",
-    "3515"
+    "3515",
+    "sunsang24:ship:563",
+    "sunsang24:ship:944",
+    "sunsang24:ship:2021",
+    "sunsang24:ship:948",
+    "sunsang24:ship:997",
+    "sunsang24:ship:405",
+    "sunsang24:ship:352",
+    "sunsang24:ship:1004",
+    "sunsang24:ship:1137",
+    "sunsang24:ship:1393",
+    "sunsang24:ship:1119",
+    "sunsang24:ship:1371",
+    "sunsang24:ship:870",
+    "sunsang24:ship:1251",
+    "sunsang24:ship:769",
+    "sunsang24:ship:1149"
   ]
 }

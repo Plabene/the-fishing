@@ -10,6 +10,15 @@ export function normalizeTiers(raw: unknown, selected: unknown[] = []): Record<T
   return result;
 }
 export function tierFor(state: AppState, id: string): Tier { return TIERS.find(t => state.tiers[t].includes(id)) || 'other'; }
+/** A selection registers only previously unassigned boats; deselection never deletes a tier. */
+export function selectBoats(state:AppState,ids:Iterable<string>,include:boolean):void {
+  const known=new Set(state.boats.map(b=>b.uid)),selected=new Set(state.selectedUids),assigned=new Set(TIERS.flatMap(t=>state.tiers[t]));
+  for(const id of ids) if(known.has(id)) {
+    if(include) {selected.add(id);if(!assigned.has(id)) {state.tiers.other.push(id);assigned.add(id);}}
+    else selected.delete(id);
+  }
+  state.selectedUids=[...selected];
+}
 export function moveBoat(state: AppState, id: string, tier: Tier, offset?: number): void {
   const old = state.tiers[tier].indexOf(id);
   for (const t of TIERS) state.tiers[t] = state.tiers[t].filter(v => v !== id);
