@@ -78,4 +78,10 @@ node scripts/update-sunsang-fleet.mjs --live --api
 
 운영 Worker 반영 버전: `3be2f475-e0e2-45a3-9195-04c3c79e863b`. 목록 요청의 일시적 네트워크·5xx 실패는 한 번 재시도하며 접근 제한·형식 오류는 재시도하지 않는다. 11:18 KST 운영 점검에서 더피싱 군산 목록 8개, 선상24 군산낚시프라자 목록 20개, 두 플랫폼의 새 잔여석 응답과 CORS/no-store 헤더를 확인했다. 뉴마린 선사의 공지·식사 항목 제외도 운영 API 응답으로 확인했다.
 
-Pages 반영과 최종 검증 결과는 배포 기록에 추가한다.
+## 배포 완료 기록
+
+- 코드 커밋: `05d1ff786cc6fe43558a20495c392351a7535cc5`.
+- [GitHub Actions 40258876237](https://github.com/Plabene/the-fishing/actions/runs/40258876237): 성공. **46개 파일·280개 테스트 통과**, API dry-run·TypeScript/Vite·번들 검사·Pages 배포 성공.
+- [운영 사이트](https://plabene.github.io/the-fishing/): HTTP 200. 배포 HTML·JS·CSS가 테스트한 로컬 산출물과 바이트 단위로 일치했다. manifest는 줄바꿈을 제외한 값이 같고 서비스 워커도 동일 로직·동일 자산 목록을 사용한다. 운영 캐시 ID는 `thefishing-offline-8a22ea5418202ba1`이다.
+- 브라우저 연결은 `Local browser use is disabled in Work settings`로 거부돼 이번에도 실제 브라우저 클릭·모바일 화면 검증은 수행하지 못했다. 이 제한을 앱 DOM 테스트나 HTTP 검증으로 수행했다고 바꾸어 표현하지 않는다.
+- 업데이트 후 플랫폼 `전체`, 시도 `전북특별자치도`, 세부 지역 `군산`, 출항지 `전체`에서 기본 보유 목록 62개를 확인할 수 있다. 사용자가 직접 삭제한 선박이나 검색어·선택 항목만 보기 조건이 있으면 표시 수는 달라질 수 있다. 기존 티어를 유지하려면 초기화/기본값 복원을 실행할 필요가 없다.
