@@ -5,8 +5,9 @@ import {sunsangLink,type PlatformFilter} from './platforms';
 import {bookingAlias} from './bookingAliases';
 export const TIERS = ['tier1', 'tier2', 'tier3', 'other'] as const;
 export type Tier = typeof TIERS[number];
-export type Filter = Tier | 'all';
-export const LABELS: Record<Filter, string> = { all: '전체', tier1: '1티어', tier2: '2티어', tier3: '3티어', other: '기타' };
+export type Filter = Tier | 'all' | Tier[];
+export type SpeciesSelection = string | string[] | {mode:'options';keys:string[]};
+export const LABELS: Record<Tier | 'all', string> = { all: '전체', tier1: '1티어', tier2: '2티어', tier3: '3티어', other: '기타' };
 export type GateStatus = 'UNVERIFIED' | 'ALLOWED_READABLE' | 'CORS_DENIED' | 'AUTH_OR_COOKIE_BLOCKED' | 'ACCESS_RESTRICTED' | 'PARSER_UNSUPPORTED' | 'PERMISSION_DENIED' | 'HTTP_ERROR' | 'NETWORK_OR_CORS' | 'TIMEOUT' | 'UNSUPPORTED_SOURCE' | 'CANCELLED' | 'API_UNAVAILABLE' | 'API_BUSY' | 'API_NOT_CONFIGURED';
 export type DisplayStatus = 'AVAILABLE' | 'UNKNOWN' | 'STALE' | 'BLOCKED' | 'UNVERIFIED' | 'FULL' | 'DEMO' | 'UNAVAILABLE';
 export interface Boat { uid: string; name: string; port: string; url: string; region?:BoatRegion }
@@ -23,8 +24,9 @@ export interface AppState {
   schema: 1; boats: Boat[]; tiers: Record<Tier, string[]>; events: Observation[];
   failures: Failure[]; month: string; requiredPeople: number; selectedUids: string[]; fleetSeedVersion?: string;
   monthlyArchiveVersion?: string; monthChecks?: MonthCheck[];
-  // Legacy backups may contain one string; arrays require the exact species set, [] selects none.
-  selectedSpecies?: string | string[]; excludedSpeciesKeys?: string[];
+  // Legacy arrays describe one exact set. Versioned options describe independently selected exact sets.
+  selectedSpecies?: SpeciesSelection; excludedSpeciesKeys?: string[];
+  selectedTiers?: Filter;
   tideDays?: TideDay[];
   selectedRegion?:RegionFilter;
   selectedPlatform?:PlatformFilter;

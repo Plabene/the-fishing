@@ -1,11 +1,11 @@
-import { type AppState, type Filter, type Observation } from './models';
-import { orderedBoats, tierFor } from './tierStore';
+import { type AppState, type Filter, type Observation, type SpeciesSelection } from './models';
+import { orderedBoats, tierFor, matchesTier } from './tierStore';
 import { eventStatus } from './availabilityStore';
-import { eventSpecies, matchesSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
+import { eventSpecies, matchesSpecies, speciesFilterKey, speciesLabel } from './species';
 import { matchesRegion } from './regions';
 import {matchesPlatform} from './platforms';
 
-export interface MonthQuery { month:string; requiredPeople:number; tier:Filter; search:string; matchingOnly:boolean; species?:string|string[]; excludedSpeciesKeys?:string[] }
+export interface MonthQuery { month:string; requiredPeople:number; tier:Filter; search:string; matchingOnly:boolean; species?:SpeciesSelection; excludedSpeciesKeys?:string[] }
 export function validateQuery(query:MonthQuery):void {
   if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(query.month)) throw new Error('조회할 연월을 선택하세요.');
   if (!Number.isInteger(query.requiredPeople) || query.requiredPeople<1 || query.requiredPeople>100) throw new Error('인원은 1~100명으로 입력하세요.');
@@ -14,7 +14,7 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   validateQuery(query);
   const context={...state,month:query.month,requiredPeople:query.requiredPeople};
   const selected=new Set(state.selectedUids);
-  const boats=orderedBoats(state).filter(b=>selected.has(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && (query.tier==='all' || tierFor(state,b.uid)===query.tier));
+  const boats=orderedBoats(state).filter(b=>selected.has(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && matchesTier(tierFor(state,b.uid),query.tier));
   const ids=new Set(boats.map(b=>b.uid)), order=new Map(boats.map((b,i)=>[b.uid,i]));
   const boatById=new Map(boats.map(b=>[b.uid,b]));
   const search=query.search.trim().toLocaleLowerCase();
@@ -32,7 +32,7 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   for(const e of raw) {const key=eventSpecies(e);rawSpeciesCounts.set(key,(rawSpeciesCounts.get(key) || 0)+1);}
   for(const e of raw) if(!query.matchingOnly || meetsPeople(e)) {const key=eventSpecies(e);speciesCounts.set(key,(speciesCounts.get(key) || 0)+1);}
   const excluded=new Set((query.excludedSpeciesKeys ?? state.excludedSpeciesKeys ?? []).map(speciesFilterKey).filter(key=>key!==null));
-  const species=normalizeSpeciesSelection(query.species ?? state.selectedSpecies);
+  const species=query.species ?? state.selectedSpecies ?? 'all';
   const all=raw.filter(e=>{const key=eventSpecies(e);return !excluded.has(key) && matchesSpecies(key,species);});
   const matches=all.filter(meetsPeople), events=query.matchingOnly ? matches : all;
   const days=[...new Set(events.map(e=>e.date))];

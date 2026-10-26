@@ -26,14 +26,14 @@ test('species become available only after collection; multi-select, platform, re
     }
     await settle();expect(el('#summary').textContent).toContain('3개 출조');expect(el('#species-filter').dataset.state).toBe('ready');
     expect(el('#platform-results').textContent).toContain('더피싱1/1척 확인');expect(el('#platform-results').textContent).toContain('선상241/1척 확인');
-    for(const name of ['갑오징어','문어']) {el(`[data-species-choice="${name}"]`).click();await settle();}
+    el('[data-species-choice="갑오징어+문어"]').click();await settle();
     expect(el('#summary').textContent).toContain('1개 출조');expect(request).toHaveBeenCalledTimes(2);
     el('[data-platform="thefishing"]').click();await settle();expect(el('#summary').textContent).toContain('0개 출조');expect(document.querySelector('[data-species-choice="문어"]')).toBeNull();
-    expect((await loadState() as typeof state).selectedSpecies).toEqual(['갑오징어','문어']);
+    expect((await loadState() as typeof state).selectedSpecies).toEqual({mode:'options',keys:['갑오징어+문어']});
     el('[data-platform="all"]').click();await settle();expect(el('#summary').textContent).toContain('1개 출조');
-    const region=el('#region-province') as HTMLSelectElement;region.value='인천광역시';region.dispatchEvent(new Event('change'));await settle();
+    el('#region-province input[value="인천광역시"]').click();await settle();
     expect(el('#summary').textContent).toContain('0개 출조');expect(el('#boats').textContent).toContain('가나 시험호');expect(document.querySelector('[data-species-choice="문어"]')).toBeNull();
-    expect((await loadState() as typeof state).selectedSpecies).toEqual(['갑오징어','문어']);
+    expect((await loadState() as typeof state).selectedSpecies).toEqual({mode:'options',keys:['갑오징어+문어']});
     el('#region-reset').click();await settle();el('.boat-row[data-uid="9986"] input').click();await settle();
     expect(el('#summary').textContent).toContain('1개 출조');expect(document.querySelector('[data-species-choice="주꾸미"]')).toBeNull();expect(request).toHaveBeenCalledTimes(2);
     const month=el('#month') as HTMLInputElement;month.value='2026-12';month.dispatchEvent(new Event('change'));await settle();expect(el('#species-filter').dataset.state).toBe('disabled');expect(el('#summary').textContent).toContain('0개 출조');

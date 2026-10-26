@@ -32,13 +32,13 @@ test('region OR within fields and AND across fields preserve compatible children
   const state={...emptyState(),boats,selectedRegion:f};expect(importData(JSON.parse(exportData(state))).state.selectedRegion).toEqual(f);
 });
 test('multi-region controls preserve multiple selections, reset a field, and keep valid descendants',()=>{
-  const root=document.createElement('div');let selected:RegionFilter=readRegionFilter({province:['전남','경남'],local:['고흥','사천'],port:['녹동항','삼천포항']});
+  const root=document.createElement('div');document.body.append(root);let selected:RegionFilter=readRegionFilter({province:['전남','경남'],local:['고흥','사천'],port:['녹동항','삼천포항']});
   const draw=()=>renderRegionFilter(root,boats,selected,next=>{selected=next;draw();});draw();
-  const province=root.querySelector<HTMLSelectElement>('#region-province')!;expect(province.multiple).toBe(true);
-  for(const option of province.options) option.selected=option.value==='경상남도';province.dispatchEvent(new Event('change'));
+  const province=root.querySelector('#region-province')!;expect(province.querySelectorAll('input:checked')).toHaveLength(2);
+  province.querySelector<HTMLInputElement>('input[value="전라남도"]')!.click();
   expect(regionValues(selected.local)).toEqual(['사천']);expect(regionValues(selected.port)).toEqual(['삼천포항']);
   root.querySelector<HTMLButtonElement>('[aria-label="시·도/지역 선택 초기화"]')!.click();expect(selected.province).toBe('');expect(selected.local).toBe('사천');
-  root.querySelector<HTMLButtonElement>('#region-reset')!.click();expect(Object.values(selected).every(v=>!v)).toBe(true);
+  root.querySelector<HTMLButtonElement>('#region-reset')!.click();expect(Object.values(selected).every(v=>!v)).toBe(true);root.remove();
 });
 test('selection assigns other once, preserves an existing tier, and unselect/reselect cannot erase assignments',()=>{
   const state={...emptyState(),boats};state.tiers.tier1=['1'];selectBoats(state,['1','2','2','absent'],true);

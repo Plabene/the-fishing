@@ -1,4 +1,4 @@
-import { text, type Observation } from './models';
+import { text, type Observation, type SpeciesSelection } from './models';
 
 // Keep the PC palette/keys, but classify the original trip instead of old derived labels.
 export const UNKNOWN_SPECIES='unknown';
@@ -44,6 +44,20 @@ export function normalizeSpeciesSelection(value:unknown):'all'|string[] {
   if(typeof value!=='string' || value==='all') return 'all';
   const key=speciesFilterKey(value);return key===null ? 'all':key.split('+');
 }
+/** Keep old [주꾸미,갑오징어] backups as one combination, never reinterpret them as two singles. */
+export function speciesOptions(value:unknown):'all'|string[] {
+  if(value && typeof value==='object' && !Array.isArray(value) && 'mode' in value && value.mode==='options') {
+    const keys='keys' in value && Array.isArray(value.keys)?value.keys:[];
+    return [...new Set(keys.slice(0,200).filter(v=>typeof v==='string' && v.trim()).map(speciesFilterKey).filter((key):key is string=>key!==null))];
+  }
+  const legacy=normalizeSpeciesSelection(value);
+  return legacy==='all'?'all':legacy.length?[speciesKey(legacy.join('+'))]:[];
+}
+export function readSpeciesSelection(value:unknown):SpeciesSelection {
+  return value && typeof value==='object' && !Array.isArray(value)
+    ? {mode:'options',keys:speciesOptions(value)==='all'?[]:speciesOptions(value) as string[]}
+    : normalizeSpeciesSelection(value);
+}
 export function speciesLabel(value:unknown):string {
   const key=speciesKey(value);
   return key===UNKNOWN_SPECIES ? '기타/미확인' : key===MIXED_SPECIES ? '쭈꾸미ㆍ갑오징어' : key.replaceAll('+','·');
@@ -52,11 +66,10 @@ export function eventSpecies(event:Pick<Observation,'trip'|'species'|'speciesKey
   // API/PC labels are derived from trip. Missing/unclear raw evidence must not borrow a stale label.
   return speciesKey(event.trip);
 }
-export function matchesSpecies(key:string,selected:string|string[]='all'):boolean {
-  const selection=normalizeSpeciesSelection(selected);
+export function matchesSpecies(key:string,selected:SpeciesSelection='all'):boolean {
+  const selection=speciesOptions(selected);
   if(selection==='all') return true;
-  const actual=speciesKey(key).split('+');
-  return actual.length===selection.length && actual.every(token=>selection.includes(token));
+  return selection.includes(speciesKey(key));
 }
 // Existing PC palette assignments for the common species; unknown remains gray.
 const colors:Record<string,string>={unknown:'#E8E8E8',갑오징어:'#ECDEDD','갑오징어+문어':'#E2F1F1',광어:'#FFE0E6',백조기:'#ECDEDC',우럭:'#D9E6E2',주꾸미:'#E5D7D3',[MIXED_SPECIES]:'#F0E3FF','광어+우럭':'#E2F4DC',문어:'#DCEEFF',참돔:'#E6D8DB',열기:'#DADBEB',농어:'#E8DCE9'};

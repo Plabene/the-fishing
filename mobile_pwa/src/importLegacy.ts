@@ -1,6 +1,6 @@
 import { type AppState, type Observation, type Failure, emptyState, text, uid, reservationLink, dateOnly, timestamp, TIERS } from './models';
-import { normalizeTiers } from './tierStore';
-import { eventSpecies, speciesFilterKey, speciesLabel, normalizeSpeciesSelection } from './species';
+import { normalizeTiers, readTierFilter } from './tierStore';
+import { eventSpecies, speciesFilterKey, speciesLabel, readSpeciesSelection } from './species';
 import { mergeTideDays } from './tides';
 import { readRegion,readRegionFilter } from './regions';
 import {readPlatform} from './platforms';
@@ -39,7 +39,8 @@ export function importData(input: unknown, current = emptyState()): { state: App
   if (/^20\d\d-(?:0[1-9]|1[0-2])$/.test(String(month))) state.month = String(month);
   const people = Number(backup ? root.requiredPeople : prefs.required_people);
   if (Number.isInteger(people) && people >= 1 && people <= 100) state.requiredPeople = people;
-  if(backup && (typeof root.selectedSpecies==='string' || Array.isArray(root.selectedSpecies))) state.selectedSpecies=normalizeSpeciesSelection(root.selectedSpecies);
+  if(backup && root.selectedSpecies!==undefined) state.selectedSpecies=readSpeciesSelection(root.selectedSpecies);
+  if(backup) {delete state.selectedTiers;if(root.selectedTiers!==undefined) state.selectedTiers=readTierFilter(root.selectedTiers);}
   const excluded=backup ? root.excludedSpeciesKeys:prefs.excluded_species_keys;
   if(Array.isArray(excluded)) state.excludedSpeciesKeys=[...new Set(excluded.filter(v=>typeof v==='string').slice(0,200).map(speciesFilterKey).filter((key):key is string=>key!==null))];
   if(backup && Array.isArray(root.tideDays)) state.tideDays=mergeTideDays(root.tideDays);

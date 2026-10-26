@@ -1,4 +1,4 @@
-export type QueryOutcome='조회 완료'|'조회 취소'|'조회 중단'|'조회 실패';
+export type QueryOutcome='조회 완료'|'조회 일부 완료'|'조회 취소'|'조회 중단'|'조회 실패';
 
 /** Elapsed wall time advances even while the first response is pending. No guessed ETA. */
 export class QueryProgress {

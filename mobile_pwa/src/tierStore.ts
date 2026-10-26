@@ -1,4 +1,10 @@
-import { TIERS, type AppState, type Tier, uid } from './models';
+import { TIERS, LABELS, type AppState, type Tier, type Filter, uid } from './models';
+export function readTierFilter(value:unknown):Filter {
+  if(Array.isArray(value)) return TIERS.filter(t=>value.includes(t));
+  return TIERS.includes(value as Tier)?value as Tier:'all';
+}
+export function matchesTier(tier:Tier,filter:Filter):boolean {return filter==='all' || (Array.isArray(filter)?filter.includes(tier):tier===filter);}
+export function tierFilterLabel(filter:Filter):string {return Array.isArray(filter)?filter.length?filter.map(t=>LABELS[t]).join(' · '):'티어 선택 없음':LABELS[filter];}
 export function normalizeTiers(raw: unknown, selected: unknown[] = []): Record<Tier, string[]> {
   const data = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
   const result: Record<Tier, string[]> = { tier1: [], tier2: [], tier3: [], other: [] };

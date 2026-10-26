@@ -1,7 +1,7 @@
 import { LABELS, TIERS, reservationLink, type AppState, type DisplayStatus, type Filter } from './models';
 import { eventStatus } from './availabilityStore';
 import { visibleEvents } from './calendarView';
-import { orderedBoats, tierFor } from './tierStore';
+import { orderedBoats, tierFor, matchesTier } from './tierStore';
 import { speciesBadge, tripDescription } from './species';
 import type { queryMonth } from './monthlyQuery';
 import { calculateTideMonth } from './tides';
@@ -51,7 +51,7 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
     target.append(group);
   }
   const ids = new Set(state.boats.filter(b=>state.selectedUids.includes(b.uid) && matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion)).map(b=>b.uid));
-  for (const failure of state.failures.filter(f => f.month === state.month && ids.has(f.uid) && (tier === 'all' || tierFor(state, f.uid) === tier))) {
+  for (const failure of state.failures.filter(f => f.month === state.month && ids.has(f.uid) && matchesTier(tierFor(state, f.uid),tier))) {
     target.append(el('p', `${state.boats.find(b => b.uid === failure.uid)?.name || failure.uid} · ${failure.status === 'BLOCKED' ? '접근 제한' : '확인 불가'} · 최근 수집 실패 기록이 있습니다.`, 'notice'));
   }
   const tideDetails=el('details','','day-tide-details');tideDetails.append(el('summary','이 날짜의 물때 상세'));

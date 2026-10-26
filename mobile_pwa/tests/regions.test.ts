@@ -17,13 +17,14 @@ test('exact hierarchical filtering distinguishes unknown regions without inferri
   expect(regionLabel(boats[0])).toBe('서해권 · 충청남도 · 보령');expect(regionLabel(boats[2])).toBe('지역 미확인');expect(readRegion({sea:''})).toBeUndefined();
 });
 test('region controls show all boats, restrict descendants and reset dependent selections',()=>{
-  const target=document.createElement('div');let selected:RegionFilter={...emptyRegion(),sea:'서해권',province:'충청남도',local:'보령',port:'오천항'};
+  const target=document.createElement('div');document.body.append(target);let selected:RegionFilter={...emptyRegion(),sea:'서해권',province:'충청남도',local:'보령',port:'오천항'};
   const render=()=>renderRegionFilter(target,boats,selected,next=>{selected=next;render();});render();
-  const sea=target.querySelector<HTMLSelectElement>('#region-sea')!;
+  const sea=target.querySelector('#region-sea')!;
   expect(sea.textContent).toContain('남해권 (1척)');expect(target.querySelector('#region-port')!.textContent).not.toContain('삼천포');
-  sea.value='남해권';sea.dispatchEvent(new Event('change'));expect(selected).toEqual({...emptyRegion(),sea:'남해권'});
+  sea.querySelector<HTMLInputElement>('input[value="남해권"]')!.click();
+  target.querySelector<HTMLInputElement>('#region-sea input[value="서해권"]')!.click();expect(selected).toEqual({...emptyRegion(),sea:'남해권'});
   expect(target.querySelector('#region-local')!.textContent).toContain('사천');expect(target.querySelector('#region-local')!.textContent).not.toContain('보령');
-  target.querySelector<HTMLButtonElement>('#region-reset')!.click();expect(selected).toEqual(emptyRegion());
+  target.querySelector<HTMLButtonElement>('#region-reset')!.click();expect(selected).toEqual(emptyRegion());target.remove();
 });
 test('month results, species counts, missing boats and failures use the same region and survive month/backup changes',()=>{
   const state=emptyState();state.boats=boats;state.selectedUids=['1','2','3'];state.month='2026-10';state.selectedRegion={...emptyRegion(),sea:'서해권'};

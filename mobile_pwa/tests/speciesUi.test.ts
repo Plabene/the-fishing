@@ -17,15 +17,15 @@ test('species controls filter calendar/list/day, persist choices, switch months 
   expect(el('#summary').textContent).toContain('4개 출조');expect(el('#species-select').textContent).not.toContain('다운샷');
   await choose('unknown');expect(el('#summary').textContent).toContain('1개 출조');el('#view-list').click();
   expect(el('#month-results').textContent).toContain('다운샷');expect(el('#month-results').textContent).toContain('어종 · 기타/미확인');el('#view-calendar').click();
-  await choose('갑오징어','문어');expect(el('#summary').textContent).toContain('0개 출조');expect(el('#species-selection-summary').textContent).toContain('같은 어종 조합 0건');
+  await choose('갑오징어','문어');expect(el('#summary').textContent).toContain('2개 출조');expect(el('#species-selection-summary').textContent).toContain('정확히 일치 2건');
   expect(choice('갑오징어').checked).toBe(true);expect(choice('문어').checked).toBe(true);
-  const multiple=initializeFleet(await loadState()).state;expect(multiple.selectedSpecies).toEqual(['갑오징어','문어']);
+  const multiple=initializeFleet(await loadState()).state;expect(multiple.selectedSpecies).toEqual({mode:'options',keys:['갑오징어','문어']});
   choice('문어').focus();choice('문어').click();await settle();expect(el('#summary').textContent).toContain('1개 출조');expect(document.activeElement).toBe(choice('문어'));
   await choose('갑오징어');expect(el('#summary').textContent).toContain('1개 출조');
   expect(el('#calendar').textContent).toContain('갑오징어');el('#view-list').click();expect(el('#month-results').textContent).toContain('어종 · 갑오징어');expect(el('#month-results').textContent).not.toContain('어종 · 문어');
   el('.month-date-heading').click();expect(el('#day-view').textContent).toContain('어종 · 갑오징어');
   expect(el('#day-view').textContent).not.toContain('쭈꾸미');
-  await choose('갑오징어','주꾸미');expect(el('#summary').textContent).toContain('1개 출조');expect(el('#day-view').textContent).toContain('쭈꾸미&갑이');el('#view-list').click();expect(el('#month-results').textContent).toContain('쭈꾸미ㆍ갑오징어');
+  await choose('주꾸미+갑오징어');expect(el('#summary').textContent).toContain('1개 출조');expect(el('#day-view').textContent).toContain('쭈꾸미&갑이');el('#view-list').click();expect(el('#month-results').textContent).toContain('쭈꾸미ㆍ갑오징어');
   await choose('갑오징어','문어');
   const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();expect(el('#summary').textContent).toContain('1개 출조');expect(choice('갑오징어')).toBeNull();expect(el('#species-all').getAttribute('aria-pressed')).toBe('true');expect(choice('문어').checked).toBe(false);
   await choose('문어');expect(el('#summary').textContent).toContain('1개 출조');

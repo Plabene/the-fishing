@@ -28,8 +28,8 @@ test('selection labels, badges and inclusion chips retain the established specie
     }
   }
   expect(getComputedStyle(root.querySelector('[data-species="주꾸미+갑오징어"]')!).backgroundColor).toBe('rgb(240, 227, 255)');
-  draw('all');root.querySelector<HTMLInputElement>('[data-species-choice="문어"]')!.click();expect(onChange).toHaveBeenLastCalledWith(['문어'],[]);
-  draw(['문어']);root.querySelector<HTMLInputElement>('[data-species-choice="문어"]')!.click();expect(onChange).toHaveBeenLastCalledWith([],[]);
+  draw('all');root.querySelector<HTMLInputElement>('[data-species-choice="문어"]')!.click();expect(onChange).toHaveBeenLastCalledWith({mode:'options',keys:['문어']},[]);
+  draw(['문어']);root.querySelector<HTMLInputElement>('[data-species-choice="문어"]')!.click();expect(onChange).toHaveBeenLastCalledWith({mode:'options',keys:[]},[]);
   root.querySelector<HTMLButtonElement>('#species-all')!.click();expect(onChange).toHaveBeenLastCalledWith('all',[]);
   renderSpeciesFilter(root,counts,'all',[],onChange,'먼저 조회하세요.');expect([...root.querySelectorAll<HTMLInputElement|HTMLButtonElement>('input,button')].every(node=>node.disabled)).toBe(true);
 });

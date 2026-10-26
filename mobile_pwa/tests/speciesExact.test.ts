@@ -87,7 +87,7 @@ test('checkbox counts show single trips; combination count follows current avail
   renderSpeciesFilter(target,counts,['갑오징어'],[],()=>{},'',matches);
   expect(target.querySelector('[data-species-choice="갑오징어"]')?.parentElement?.textContent).toBe('갑오징어단독 1건');
   expect(target.querySelector('[data-species-choice="주꾸미"]')?.parentElement?.textContent).toBe('주꾸미단독 0건');
-  expect(target.querySelector('#species-selection-summary')?.textContent).toContain('같은 어종 조합 1건');
+  expect(target.querySelector('#species-selection-summary')?.textContent).toContain('정확히 일치 1건');
   renderSpeciesFilter(target,counts,['주꾸미','갑오징어'],['주꾸미+갑오징어'],()=>{},'',matches);
-  expect(target.querySelector('#species-selection-summary')?.textContent).toContain('같은 어종 조합 0건');
+  expect(target.querySelector('#species-selection-summary')?.textContent).toContain('정확히 일치 0건');
 });
