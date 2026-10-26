@@ -1,7 +1,7 @@
 import {appLayout} from './appLayout';
 import {alphabeticFleet,uniqueFleet,platformCounts,supportsLive,platformQueryStats} from './fleetList';
 import {watchAppUpdates} from './appUpdate';
-import {initializePreferenceRecovery} from './preferenceRecovery';
+import {initializePreferenceRecovery,RECOVERY_VERSION} from './preferenceRecovery';
 import {installPreferenceRecovery} from './preferenceRecoveryView';
 import { emptyState, localMonth, LABELS, TIERS, reservationLink, text, type AppState, type Filter, type Tier, type Boat } from './models';
 import { importData, exportData } from './importLegacy';
@@ -195,6 +195,7 @@ $<HTMLInputElement>('#import').addEventListener('change', async event => {
     for (const file of files) { if (file.size > 20_000_000) throw new Error('20MB 이하 JSON을 선택하세요.'); const data = JSON.parse(await file.text()); signal.throwIfAborted(); if(isTierBackup(data)) c=restoreTierBackup(data,c).state; else {const r = importData(data, c); c = r.state; warnings.push(...r.warnings);} }
     // An explicit personal restore takes precedence over the already offered published preset.
     c.publishedPreferencesVersion=PUBLISHED_PREFERENCES_VERSION;
+    c.preferenceRecoveryVersion=RECOVERY_VERSION; // Respect an explicitly imported empty personal tier list on later reloads.
     signal.throwIfAborted(); await saveState(c, signal); state = c; demo = false; selectedDay = state.events.find(e => e.date.startsWith(state.month))?.date || `${state.month}-01`; undoState = null; $('#undo').hidden = true;
     say(`가져오기 완료 · ${files.length}개 파일. ${warnings.slice(0, 4).join(' ')}`);
   } catch (error) { say(signal.aborted ? '가져오기를 취소했습니다. 기존 자료를 유지합니다.' : `가져오지 못했습니다. ${error instanceof Error ? error.message : 'JSON 형식을 확인하세요.'}`); }
