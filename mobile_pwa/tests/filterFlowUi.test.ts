@@ -45,7 +45,7 @@ test('mixed options and multi-tier requests survive refresh; panels close only a
     expect(panelIds.some(id=>panel(id).open)).toBe(false);expect(el('#day-view').textContent).toContain('꽃돼지호');
     expect((await loadState() as AppState).selectedSpecies).toEqual(preferences);expect((await loadState() as AppState).selectedTiers).toEqual(['tier1','tier2']);
     open();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(6));respond(4,true);await settle();
-    expect(el('#app').dataset.queryState).toBe('partial');expect(panelIds.every(id=>panel(id).open)).toBe(true);expect(el('#query-phase').textContent).toBe('조회 일부 완료');
+    expect(el('#app').dataset.queryState).toBe('partial');expect(panelIds.every(id=>panel(id).open)).toBe(true);expect(el('#query-phase').textContent).toBe('조회 일부 완료');expect(el('#query-result-state').textContent).toBe('일부 완료');expect(el('#query-result-counts').textContent).toContain('확인 1척 · 실패/미지원 1척 · 미조회 0척');el('#recovery-official').click();expect(document.activeElement).toBe(el('#source-boat'));expect(el('#source-access').closest('details')!.open).toBe(true);
     // A successful query with no filter matches also collapses panels, preserving the empty selection.
     el('#species-none').click();await settle();submit();await vi.waitFor(()=>expect(network).toHaveBeenCalledTimes(8));respond(6);await settle();
     expect(el('#app').dataset.queryState).toBe('empty');expect(panelIds.some(id=>panel(id).open)).toBe(false);expect((await loadState() as AppState).selectedSpecies).toEqual([]);

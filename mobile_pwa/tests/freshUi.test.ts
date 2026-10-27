@@ -29,7 +29,7 @@ test('new queries clear old seats, display 4 to 0 changes, and do not show old a
   expect(el('#day-view').textContent).toContain('조회 당시 잔여 0석');expect(el('#day-view').textContent).not.toContain('잔여 4석');
   submit();await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(3));
   resolve(Response.json({status:'HTTP_ERROR',httpStatus:500,events:[],message:'원본 응답 실패',stop:false}));await settle();
-  expect(el('#summary').textContent).toContain('0개 출조');expect(el('#source-badge').textContent).toBe('최신 조회 필요');expect(el('#live-progress').textContent).toContain('실패/미지원 1척');
+  expect(el('#summary').textContent).toContain('0개 출조');expect(el('#source-badge').textContent).toBe('최신 조회 필요');expect(el('#live-progress').textContent).toContain('실패/미지원 1척');expect(el('#query-result-state').textContent).toBe('실패');expect(el('#query-result-counts').textContent).toContain('확인 0척 · 실패/미지원 1척 · 미조회 0척');el('#recovery-query').click();expect(document.activeElement).toBe(el('#query-submit'));expect(request).toHaveBeenCalledTimes(3);
   expect((await loadState() as typeof state).events.find(e=>e.uid===boat.uid)?.remaining).toBe(0);
   const month=el('#month') as HTMLInputElement;month.value='2026-11';month.dispatchEvent(new Event('change'));await settle();expect(el('#query-monitor').hidden).toBe(true);
   submit();await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(4));expect(String(request.mock.calls[3][0])).toContain('month=2026-11&fresh=1');

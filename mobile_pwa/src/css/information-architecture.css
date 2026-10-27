@@ -1,0 +1,29 @@
+/* Shallow sections within the existing page, with no extra navigation layer. */
+#query-scope, #booking-results, #management-section { min-width:0; }
+#query-scope-heading { display:flex; align-items:baseline; flex-wrap:wrap; gap:5px 10px; }
+.calendar-shell #query-scope-heading { font-size:13px; letter-spacing:0; color:#526b61; }
+#query-scope-heading #month-label { font-size:18px; color:var(--ink); }
+.tier-scope-heading { display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; max-width:620px; font-size:12px; }
+.tier-scope-heading>span { font-weight:650; }
+#tier-scope-help { margin-left:auto; min-width:0; }
+#tier-scope-help>summary { cursor:pointer; min-height:32px; padding:5px 0; color:#526b61; }
+#tier-scope-help[open] { flex-basis:100%; margin-left:0; }
+#tier-scope-help p { margin:0 0 5px; font-size:12px; color:#526b61; max-width:620px; }
+#tabs { margin-top:0; }
+.scope-label { font-size:11px; color:#526b61; margin:3px 0; }
+#platform-filter { margin-top:0; }
+#query-target { font-weight:650; }
+.booking-heading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px 8px; border-top:1px solid var(--line); padding-top:8px; margin-top:8px; }
+.booking-heading h2, #management-heading, #fleet-heading { font-size:14px; line-height:1.4; margin:0; }
+#booking-results>#summary { margin:3px 0 6px; color:#526b61; font-size:12px; }
+#fleet-heading { display:inline; }
+#management-heading { margin:12px 0 4px; color:#526b61; }
+#management-section { scroll-margin-top:12px; }
+#tier-recovery, #source-access, #fleet-section { scroll-margin-top:12px; }
+@media(max-width:360px) {
+  .query-controls { grid-template-columns:minmax(0,1fr) 46px; }
+  .query-controls>#query-submit { grid-column:1/-1; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html:focus-within, .filter-panel-body, .fleet-list, .day-view { scroll-behavior:auto; }
+}

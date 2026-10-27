@@ -17,7 +17,8 @@ export function monthDays(month: string): (string | null)[] {
   while (values.length % 7) values.push(null);
   return values;
 }
-export function renderCalendar(target: HTMLElement, state: AppState, tier: Filter, search: string, selectedDay: string, onSelect: (day: string) => void, matchingOnly=false, result?:ReturnType<typeof queryMonth>): void {
+export function renderCalendar(target: HTMLElement, state: AppState, tier: Filter, search: string, selectedDay: string, onSelect: (day: string, keyboard?:boolean) => void, matchingOnly=false, result?:ReturnType<typeof queryMonth>): void {
+  const focused=document.activeElement instanceof HTMLElement && target.contains(document.activeElement) ? document.activeElement.dataset.date:undefined;
   target.replaceChildren();
   const tide=calculateTideMonth(state.month,state.tideDays || []);
   const query=result ?? queryMonth(state,{month:state.month,requiredPeople:state.requiredPeople,tier,search,matchingOnly});
@@ -30,14 +31,15 @@ export function renderCalendar(target: HTMLElement, state: AppState, tier: Filte
   for (const day of monthDays(state.month)) {
     if (!day) { const gap = document.createElement('span'); gap.className = 'calendar-gap'; target.append(gap); continue; }
     const records = byDay.get(day) || [];
-    const button = document.createElement('button'); button.className = 'calendar-day'; button.type = 'button';
+    const button = document.createElement('button'); button.className = 'calendar-day'; button.type = 'button';button.dataset.date=day;
     button.setAttribute('aria-label', `${day} · 일정 ${records.length}건`); button.setAttribute('aria-pressed', String(day === selectedDay));
     const num = document.createElement('span'); num.textContent = String(Number(day.slice(8))); button.append(num);
     addTideToCell(button,day,tide);
     const status=calendarStatus(state,query,day);button.dataset.availability=status.kind;
     const count = document.createElement('small'); count.textContent = status.label;count.className='calendar-availability'; button.append(count);
     button.setAttribute('aria-label',`${button.getAttribute('aria-label')} · ${status.label}${query.missingBoats.length?' · 미확인 선박 있음':''}`);
-    for (const id of [...new Set(records.map(e=>e.uid))].slice(0,2)) {
+    const visibleIds=[...new Set(records.map(e=>e.uid))],previewIds=visibleIds.slice(0,2),remaining=visibleIds.length-previewIds.length;
+    for (const id of previewIds) {
       const trips=records.filter(e=>e.uid===id),keys=[...new Set(trips.map(e=>displayedSpecies(e)))];
       const label=document.createElement('span'); label.className='calendar-boat';label.style.backgroundColor=speciesColor(keys[0]);
       const boatName=boats.get(id)?.name || id;
@@ -45,7 +47,10 @@ export function renderCalendar(target: HTMLElement, state: AppState, tier: Filte
       const species=document.createElement('span');species.className='calendar-boat-species';species.textContent=keys.map(speciesLabel).join(' / ');
       label.append(name,species);label.title=[boatName,...keys.map(speciesLabel)].join('\n');button.append(label);
     }
+    if(remaining) {const more=document.createElement('span');more.className='calendar-overflow';more.textContent=`+${remaining}척 더 보기`;button.append(more);}
+    button.setAttribute('aria-label',`${button.getAttribute('aria-label')} · 표시 대상 선박 ${visibleIds.length}척${remaining?` · 미리보기 외 ${remaining}척 · 날짜 선택으로 전체 보기`:''}`);
     if (records.length) button.classList.add('has-records');
-    button.addEventListener('click', () => onSelect(day)); target.append(button);
+    button.addEventListener('click', event => onSelect(day,event.detail===0)); target.append(button);
+    if(focused===day) button.focus({preventScroll:true});
   }
 }

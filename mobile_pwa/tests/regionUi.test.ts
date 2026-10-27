@@ -16,7 +16,7 @@ test('regional API requests, calendar, filtered boat selection and month changes
   const change=async (s:string,value:string)=>{(el(s) as HTMLSelectElement).value=value;el(s).dispatchEvent(new Event('change'));await settle();};
   el('#region-sea input[value="서해권"]').click();await settle();expect(el('#boats').textContent).toContain('서해 시험호');expect(el('#boats').textContent).not.toContain('남해 시험호');
   el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await settle();expect(request).toHaveBeenCalledTimes(1);expect(String(request.mock.calls[0][0])).toContain('uid=9987');expect(String(request.mock.calls[0][0])).toContain('fresh=1');
-  expect(el('#summary').textContent).toContain('1척 대상');el('.calendar-day[aria-label^="2026-10-22"]').click();expect(el('#day-view').textContent).toContain('서해 시험호');
+  expect(el('#query-result-scope').textContent).toContain('현재 대상 1척');el('.calendar-day[aria-label^="2026-10-22"]').click();expect(el('#day-view').textContent).toContain('서해 시험호');
   await change('.boat-row[data-uid="9987"] select','other');expect((await loadState() as typeof state).tiers.other).toEqual(['9987']);
   expect((await loadState() as typeof state).selectedUids).toEqual(state.selectedUids);
   await change('#month','2026-11');expect((el('#region-sea input[value="서해권"]') as HTMLInputElement).checked).toBe(true);expect(el('#summary').textContent).toContain('0개 출조');

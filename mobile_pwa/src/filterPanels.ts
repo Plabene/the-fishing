@@ -3,9 +3,15 @@ const panels=['region-toggle','species-toggle'];
 export function finishFilterPanels(root:HTMLElement,outcome:QueryOutcome):void {
   root.dataset.queryState=outcome;
   if(outcome==='success' || outcome==='empty') {
-    for(const id of panels) {const panel=root.querySelector<HTMLDetailsElement>('#'+id);if(panel) panel.open=false;}
+    // Native details closing may blur its descendant. Capture the owner before closing.
     const focused=document.activeElement;
-    if(focused instanceof HTMLElement && focused.closest(panels.map(id=>'#'+id).join(','))) root.querySelector<HTMLButtonElement>('#query-submit')?.focus({preventScroll:true});
+    const returnFocus=focused instanceof HTMLElement && !!focused.closest(panels.map(id=>'#'+id).join(','));
+    for(const id of panels) {const panel=root.querySelector<HTMLDetailsElement>('#'+id);if(panel) panel.open=false;}
+    if(returnFocus) {
+      const submit=root.querySelector<HTMLButtonElement>('#query-submit');
+      const destination=submit && !submit.disabled && !submit.hidden?submit:root.querySelector<HTMLElement>('#region-toggle>summary');
+      destination?.focus({preventScroll:true});
+    }
   } else if(outcome==='error' || outcome==='partial') {
     const region=root.querySelector<HTMLDetailsElement>('#region-toggle');if(region) region.open=true;
   }

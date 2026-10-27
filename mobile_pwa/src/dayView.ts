@@ -19,11 +19,16 @@ export function sourceLink(url: string, id: string): HTMLAnchorElement | null {
   const link = el('a', '공식 페이지 ↗', 'source-link'); link.href = safe; link.target = '_blank'; link.rel = 'noopener noreferrer'; return link;
 }
 export function renderDay(target: HTMLElement, state: AppState, day: string, tier: Filter, search: string, matchingOnly=false,result?:ReturnType<typeof queryMonth>): void {
+  const headingFocused=document.activeElement===target.querySelector('#day-heading');
   target.replaceChildren();
   const events = (result?.events ?? visibleEvents(state, tier, search,matchingOnly)).filter(e => e.date === day);
-  target.append(el('h2', `${Number(day.slice(5, 7))}월 ${Number(day.slice(8))}일 · ${events.length}개 출조 일정`));
+  const heading=el('h2', `${Number(day.slice(5, 7))}월 ${Number(day.slice(8))}일 · ${new Set(events.map(e=>e.uid)).size}척 · ${events.length}개 출조 일정`);heading.id='day-heading';heading.tabIndex=-1;target.append(heading);if(headingFocused) heading.focus({preventScroll:true});
   if(result) {const status=calendarStatus(state,result,day);const summary=el('p',`${status.label}${result.missingBoats.length?` · ${result.missingBoats.length}척 미확인`:''}`,'day-status');summary.dataset.availability=status.kind;target.append(summary);}
-  if (!events.length) target.append(el('p', '선택한 조건에 맞는 조회 결과가 없습니다. 미조회·자료 없음은 예약 마감을 뜻하지 않습니다.', 'empty'));
+  if (!events.length) {
+    const kind=result?calendarStatus(state,result,day).kind:'empty';
+    const copy:Record<string,string>={unqueried:'조회 전입니다. 조회하기를 눌러 이 월의 잔여석을 확인하세요.',failed:'조회에 실패한 선박이 있습니다. 다시 조회하거나 공식 페이지를 확인하세요.',filtered:'선택 조건에 맞는 일정이 없습니다. 어종·인원 조건을 확인하세요.',unknown:'잔여석 정보가 미확인입니다. 공식 페이지에서 확인하세요.',stale:'이전 자료입니다. 현재 잔여석은 새로 조회하세요.',unavailable:'확인된 일정 중 인원 조건을 충족하는 일정이 없습니다.'};
+    target.append(el('p',`${copy[kind] || '선택한 조건에 맞는 조회 결과가 없습니다.'} 미조회·자료 없음은 예약 마감을 뜻하지 않습니다.`, 'empty'));
+  }
   const order = orderedBoats(state).map(b => b.uid);
   for (const t of TIERS) {
     const rows = events.filter(e => tierFor(state, e.uid) === t).sort((a, b) => order.indexOf(a.uid) - order.indexOf(b.uid));

@@ -6,7 +6,7 @@
 .calendar-filter-row>.filter-panel>summary::after { content:'⌄'; margin-left:auto; flex-shrink:0; }
 .calendar-filter-row>.filter-panel[open]>summary::after { content:'⌃'; }
 .calendar-filter-row>.filter-panel[open]>summary { background:var(--selected); border-color:var(--accent); }
-#reservation-filter-summary { font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; max-width:65%; }
+#reservation-filter-summary { font-size:12px; white-space:normal; overflow-wrap:anywhere; min-width:0; }
 .filter-panel-body { min-width:0; padding:8px; border:1px solid var(--line); border-radius:0 0 7px 7px; max-height:52vh; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; scrollbar-width:thin; }
 .filter-panel-heading, .filter-panel-actions { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; }
 .filter-panel-heading { position:sticky; top:-8px; z-index:1; background:#fff; padding:3px 0; font-size:13px; }
@@ -50,7 +50,6 @@ main .tier-visibility button, main .tier-visibility .button { min-height:36px; p
   .filter-panel-body { padding:6px; max-height:50vh; }
   .filter-panel-heading { top:-6px; }
   .calendar-filter-row>.filter-panel>summary { padding:6px; font-size:12px; }
-  #reservation-filter-summary { max-width:48px; }
   #species-filter .species-options { grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; }
   .species-option { padding:5px; gap:4px; min-height:40px; }
   .region-controls .region-choice { min-height:40px; }

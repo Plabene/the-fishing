@@ -1,3 +1,4 @@
+import {renderQueryFeedback,requestCounts,installQueryRecovery,revealSelectedDay,type QuerySession} from './queryFeedback';
 import {renderCatalogCoverage} from './catalogCoverage';
 import {appLayout} from './appLayout';
 import {alphabeticFleet,uniqueFleet,platformCounts,supportsLive,platformQueryStats} from './fleetList';
@@ -49,6 +50,7 @@ const root = document.querySelector<HTMLDivElement>('#app')!;
 // Only static markup is inserted here. All imported content uses textContent/value.
 root.innerHTML = appLayout(SUNSANG_TIER_COUNT);
 installFilterPanels(root);
+installQueryRecovery(root);
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 let state = emptyState(), tier: Filter = 'all', fleetSearch = '', demo = false;
 let selectedDay = `${state.month}-01`, busy = false, storageReady=false, editing: string | null = null;
@@ -56,6 +58,7 @@ let sourceBoat = '', matchingOnly=true, listView=false, resultLimit=50;
 let importController: AbortController | null = null, undoState: AppState | null = null;
 let liveController:AbortController|null=null; const directProvider=new TheFishingDirect();
 let liveRows:LiveRow[]=[], liveMonth=state.month;
+let querySession:QuerySession|null=null;
 let queryBoats:Boat[]=[],fleetSort='name';
 const fleetRows=new Map<string,{signature:string;row:HTMLElement;select:HTMLSelectElement}>();
 let livePreview:AppState|null=null;
@@ -83,7 +86,7 @@ async function commit(candidate: AppState, message: string): Promise<boolean> {
   catch(error) { say(error instanceof StorageConflictError?error.message:'기기에 저장하지 못했습니다. 저장 공간을 확인하거나 백업을 내려받으세요. 변경은 적용되지 않았습니다.'); return false; }
   finally { setBusy(false); render(); }
 }
-function chooseDay(day: string) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result);$('#day-view').scrollIntoView?.({block:'nearest',behavior:'smooth'}); }
+function chooseDay(day: string,keyboard=false) { selectedDay = day; const shown=active(),result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly});renderCalendar($('#calendar'), shown, tier, search, day, chooseDay,matchingOnly,result); renderDay($('#day-view'), shown, day, tier, search,matchingOnly,result);revealSelectedDay(root,keyboard); }
 function fleetVisible() {return (fleetSort==='name'?alphabeticFleet(state.boats):uniqueFleet(orderedBoats(state))).filter(b=>matchesPlatform(b,state.selectedPlatform) && matchesRegion(b,state.selectedRegion) && `${b.name} ${b.uid} ${b.port} ${regionLabel(b)} ${locationDescription(b)}`.toLowerCase().includes(fleetSearch.toLowerCase()));}
 function renderFleet() {
   const target = $('#boats'),fragment=document.createDocumentFragment();
@@ -136,12 +139,11 @@ function renderPlatformResults() {
 function renderResults(shown:AppState,result=queryMonth(shown,{month:shown.month,requiredPeople:shown.requiredPeople,tier,search,matchingOnly})) {
   const fresh=(shown.monthChecks || []).filter(c=>c.month===shown.month && (c.source==='direct' || c.source==='api') && Date.now()-Date.parse(c.observedAt)<600000 && result.boats.some(b=>b.uid===c.uid)).length;
   $('#source-badge').textContent=demo ? '예시 자료' : savedMode() ? '이전 자료 · 예약 판단용 아님' : fresh ? `이번 조회 ${fresh}척` : '최신 조회 필요';
-  $('#summary').textContent = `${tierFilterLabel(tier)} · ${shown.requiredPeople}명 · ${result.boats.length}척 대상 · ${result.days.length}일 / ${result.events.length}개 출조 일정`;
-  const times=result.events.flatMap(e=>e.observedAt ? [e.observedAt]:[]).sort((a,b)=>Date.parse(b)-Date.parse(a));
-  $('#last-observed').textContent=times[0] ? `이 달의 최근 관측 · ${new Date(times[0]).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}`:'관측 시각 · 확인된 자료 없음';
+  $('#summary').textContent = `${result.days.length}일 / ${result.events.length}개 출조 일정 · 현재 어종·인원 조건 적용`;
+  renderQueryFeedback(root,shown,result,tier,querySession,queryBoats,liveRows,demo?'demo':savedMode()?'saved':'live');
   $('#calendar-layout').hidden=listView; $('#month-results').hidden=!listView;
   $('#view-calendar').setAttribute('aria-pressed',String(!listView)); $('#view-list').setAttribute('aria-pressed',String(listView));
-  if(listView) renderMonthlyList($('#month-results'),shown,result,resultLimit,()=>{resultLimit+=50;render();},day=>{listView=false;selectedDay=day;render();});
+  if(listView) renderMonthlyList($('#month-results'),shown,result,resultLimit,()=>{resultLimit+=50;render();},(day,keyboard)=>{listView=false;selectedDay=day;render();revealSelectedDay(root,!!keyboard);});
   else {renderCalendar($('#calendar'),shown,tier,search,selectedDay,chooseDay,matchingOnly,result);renderDay($('#day-view'),shown,selectedDay,tier,search,matchingOnly,result);}
 }
 function render() {
@@ -160,7 +162,7 @@ function render() {
   const targets=tierQueryBoats(state,tier),targetCounts=platformCounts(targets);
   $('#query-target').textContent=`등록 티어 중 ${targets.length}척 조회 대상`;
   const visibility=tierVisibility(tierQueryState(state),tier);
-  $('#tier-saved-counts').textContent=`이 기기 저장 티어 ${visibility.total}척 · ${TIERS.map(t=>`${LABELS[t]} ${visibility.counts[t]}`).join(' / ')}`;
+  $('#tier-saved-counts').textContent=`내 선박 · 저장 티어 ${visibility.total}척 · ${TIERS.map(t=>`${LABELS[t]} ${visibility.counts[t]}`).join(' / ')}`;
   const hiddenReasons=[visibility.unselected?`선박 선택 해제 ${visibility.unselected}척`:'',visibility.excludedTier?`티어 필터 제외 ${visibility.excludedTier}척`:'',visibility.excludedLocation?`지역·플랫폼 제외 ${visibility.excludedLocation}척`:'',visibility.missingBoat?`선박 정보 없음 ${visibility.missingBoat}척`:''].filter(Boolean);
   $('#tier-hidden-reasons').textContent=(visibility.total?`저장 티어 중 조회 대상 ${visibility.included}척${hiddenReasons.length?' · '+hiddenReasons.join(' · '):''}. 조회 결과와 저장된 티어 목록은 별개입니다.`:'이 기기에 저장된 티어가 없습니다. 티어·백업 확인에서 제공한 백업과 비교할 수 있습니다.')+(visibility.unassignedSelected?` 별도로 선택된 미분류 ${visibility.unassignedSelected}척은 기타 조건으로 조회합니다.`:'');
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
@@ -202,7 +204,7 @@ function render() {
   for (const t of ['all', ...TIERS, 'none'] as const) {
     const checked=t==='all'?allTiers:t==='none'?Array.isArray(tier)&&!tier.length:!allTiers && matchesTier(t,tier);
     const b=el('button',`${checked?'✓ ':''}${t==='none'?'해제':LABELS[t]}`);b.type='button';b.dataset.tier=t;b.setAttribute('aria-pressed',String(checked));b.setAttribute('aria-label',t==='all'?'모든 티어 조회':t==='none'?'조회할 티어 선택 해제':`${LABELS[t]} ${allTiers?'조회 시작':'조회 선택'} · 기기 저장 ${visibility.counts[t]}척`);
-    b.addEventListener('click',()=>{void commit({...state,selectedTiers:toggleTierFilter(tier,t)},'조회할 티어를 변경했습니다. 선박에 지정한 티어는 유지합니다.');});$('#tabs').append(b);
+    b.addEventListener('click',async()=>{const focused=document.activeElement===b;await commit({...state,selectedTiers:toggleTierFilter(tier,t)},'조회할 티어를 변경했습니다. 선박에 지정한 티어는 유지합니다.');if(focused && document.activeElement===document.body) $('#tabs').querySelector<HTMLButtonElement>(`[data-tier="${t}"]`)?.focus({preventScroll:true});});$('#tabs').append(b);
   }
   $('#source-access').hidden = demo;
   renderSourceAccess($('#source-access'), tierQueryState(state), sourceBoat, value => { sourceBoat=value; render(); });
@@ -229,18 +231,18 @@ $<HTMLInputElement>('#import').addEventListener('change', async event => {
 $('#query-form').addEventListener('submit',async event=>{
   event.preventDefault(); if (busy) return;
   const month=$<HTMLInputElement>('#month').value, requiredPeople=Number($<HTMLInputElement>('#people').value);
-  try { queryMonth(state,{month,requiredPeople,tier,search,matchingOnly}); } catch (error) { finishFilterPanels(root,'error');say(error instanceof Error ? error.message : '조회 조건을 확인하세요.'); return; }
+  try { queryMonth(state,{month,requiredPeople,tier,search,matchingOnly}); } catch (error) { querySession={month:state.month,outcome:'error',issue:'invalid',message:error instanceof Error ? error.message : '조회 조건을 확인하세요.'};render();finishFilterPanels(root,'error');say(querySession.message!); return; }
   const candidate={...state,month,requiredPeople}; resultLimit=50;if(!selectedDay.startsWith(month)) selectedDay=`${month}-01`;
   if(demo || $<HTMLSelectElement>('#query-mode').value==='saved') {if(await commit(candidate,'저장된 월별 자료를 조건 검색했습니다.')) finishFilterPanels(root,queryMonth(active(),{month,requiredPeople,tier,search,matchingOnly}).events.length?'success':'empty');else finishFilterPanels(root,'error');return;}
   const boats=tierQueryBoats(candidate,tier);
-  if(!boats.length) {finishFilterPanels(root,'error');say('선택한 지역·티어에 조회할 선박이 없습니다. 티어 선박 관리에서 티어를 등록하거나 지역·티어 조건을 변경하세요.');return;}
-  liveRows=[];liveMonth=month;queryBoats=boats;progress.reset();render();
-  if(!navigator.onLine) {finishFilterPanels(root,'error');say('오프라인입니다. 현재 잔여석을 확인할 수 없습니다. 연결 후 다시 조회하세요.');return;}
+  if(!boats.length) {querySession={month,outcome:'error',issue:'scope'};render();finishFilterPanels(root,'error');say('선택한 지역·티어에 조회할 선박이 없습니다. 티어 선박 관리에서 티어를 등록하거나 지역·티어 조건을 변경하세요.');return;}
+  liveRows=[];liveMonth=month;queryBoats=boats;querySession=null;progress.reset();render();
+  if(!navigator.onLine) {querySession={month,outcome:'error',issue:'offline',message:'오프라인입니다. 현재 잔여석을 확인할 수 없습니다. 연결 후 다시 조회하세요.'};render();finishFilterPanels(root,'error');say(querySession.message!);return;}
   const useApi=$<HTMLSelectElement>('#query-mode').value==='api';
-  if(useApi && !configuredApi) {finishFilterPanels(root,'error');say('조회 API를 먼저 연결하세요. API 주소를 입력하고 연결 확인 및 저장을 누르세요.');$<HTMLDetailsElement>('#api-settings').open=true;$<HTMLInputElement>('#api-url').focus();return;}
+  if(useApi && !configuredApi) {querySession={month,outcome:'error',issue:'api',message:'조회 API를 먼저 연결하세요. API 주소를 입력하고 연결 확인 및 저장을 누르세요.'};render();finishFilterPanels(root,'error');say(querySession.message!);$<HTMLDetailsElement>('#api-settings').open=true;$<HTMLInputElement>('#api-url').focus();return;}
   const provider=new IntegratedProvider(useApi ? apiProvider:directProvider,new Sunsang24PublicApi(configuredApi));
   const started=performance.now();
-  liveController=new AbortController();livePreview=candidate;finishFilterPanels(root,'loading');render();setBusy(true); $('#stop-query').hidden=false;progress.start(boats.length);
+  querySession={month,outcome:'loading'};liveController=new AbortController();livePreview=candidate;finishFilterPanels(root,'loading');render();setBusy(true); $('#stop-query').hidden=false;progress.start(boats.length);
   $('#live-diagnostics').hidden=true;$('#diagnostic-text').hidden=true;
   $('#live-progress').textContent=`${boats.length}척 조회 시작 · 완료된 선박부터 달력에 표시합니다.`;
   const applied=new Set<string>();let previewTimer:ReturnType<typeof setTimeout>|undefined,lastPaint=-Infinity,queryOutcome:QueryOutcome='error';
@@ -260,10 +262,11 @@ $('#query-form').addEventListener('submit',async event=>{
     const ok=result.rows.filter(r=>r.result.status==='ALLOWED_READABLE').length, failed=result.rows.length-ok, unattempted=result.total-result.rows.length;
     const complete=!result.cancelled && !result.stopped && !failed && !unattempted;
     queryOutcome=complete ? queryMonth(tierQueryState(updated),{month,requiredPeople,tier,search,matchingOnly}).events.length?'success':'empty':result.cancelled?'cancelled':ok?'partial':'error';
+    querySession={month,outcome:queryOutcome};
     const outcome=result.cancelled ? '조회 취소' : result.stopped ? '조회 중단' : failed || unattempted ? ok?'조회 일부 완료':'조회 실패':'조회 완료';progress.finish(outcome);
     const status=`${outcome} · 성공 ${ok}척 · 실패/미지원 ${failed}척 · 미조회 ${unattempted}척 · ${((performance.now()-started)/1000).toFixed(1)}초`;
     $('#live-progress').textContent=status; say(status+' · 이번에 확인한 잔여석만 표시합니다.');
-  } catch(error) {liveRows=[];queryOutcome='error';progress.finish('조회 실패');$('#live-progress').textContent='최신 잔여석을 반영하지 못했습니다. 다시 조회하세요.';say(`조회 결과를 반영하지 못했습니다. ${error instanceof Error ? error.message : '다시 조회하세요.'}`);}
+  } catch(error) {const counts=requestCounts(queryBoats,liveRows);liveRows=[];queryOutcome='error';querySession={month,outcome:'error',issue:'storage',counts,message:'조회 결과를 기기에 반영하지 못했습니다. 이전 잔여석은 표시하지 않습니다. 다시 조회하세요.'};progress.finish('조회 실패');$('#live-progress').textContent='최신 잔여석을 반영하지 못했습니다. 다시 조회하세요.';say(`조회 결과를 반영하지 못했습니다. ${error instanceof Error ? error.message : '다시 조회하세요.'}`);}
   finally {if(previewTimer) clearTimeout(previewTimer);livePreview=null;liveController=null;$('#stop-query').hidden=true;setBusy(false);render();finishFilterPanels(root,queryOutcome);if(liveRows.some(row=>row.result.status!=='ALLOWED_READABLE')) $<HTMLDetailsElement>('#live-diagnostics').open=true;}
 });
 $('#copy-diagnostics').addEventListener('click',async()=>{
@@ -315,7 +318,7 @@ $('#restore-sunsang-tiers').addEventListener('click',async()=>{
   if(await commit(applySunsangTiers(state,true),`선상24 PC 목록 ${SUNSANG_TIER_COUNT}척의 티어·순서·선택 상태를 다시 적용했습니다. 다른 선박 설정은 유지합니다.`)) {undoState=previous;$('#undo').hidden=false;}
 });
 $('#demo').addEventListener('click', () => { demo = !demo; selectedDay = `${state.month}-${demo ? '09' : '01'}`; render(); });
-async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)) return; if(busy) return;const c = structuredClone(state); c.month = value; resultLimit=50;if(value!==state.month) {liveRows=[];queryBoats=[];progress.reset();c.selectedSpecies='all';c.excludedSpeciesKeys=[];}await commit(c, '조회 월을 변경했습니다. 조회하기를 눌러 새 잔여석을 확인하세요.'); }
+async function setMonth(value: string) { if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)) return; if(busy) return;const c = structuredClone(state); c.month = value; resultLimit=50;if(value!==state.month) {liveRows=[];queryBoats=[];querySession=null;progress.reset();c.selectedSpecies='all';c.excludedSpeciesKeys=[];}await commit(c, '조회 월을 변경했습니다. 조회하기를 눌러 새 잔여석을 확인하세요.'); }
 $<HTMLInputElement>('#month').addEventListener('change', e => { void setMonth((e.currentTarget as HTMLInputElement).value); });
 for (const [id, offset] of [['prev', -1], ['next', 1]] as const) $('#' + id).addEventListener('click', () => { const [y, m] = state.month.split('-').map(Number); void setMonth(new Date(Date.UTC(y, m - 1 + offset)).toISOString().slice(0, 7)); });
 $('#platform-filter').addEventListener('click',event=>{const button=(event.target as HTMLElement).closest<HTMLButtonElement>('button[data-platform]');if(!button || busy) return;const selectedPlatform=readPlatform(button.dataset.platform);resultLimit=50;void commit({...state,selectedPlatform},`${PLATFORM_LABELS[selectedPlatform]} 선박과 조회 결과를 표시합니다. 추가 수집은 하지 않습니다.`);});
@@ -345,7 +348,7 @@ $('#tide-refresh').addEventListener('click',async()=>{
   } catch {say('물때를 갱신하지 못했습니다. 기존 물때·예약 조회 자료는 유지합니다.');}
   finally {setBusy(false);render();}
 });
-window.addEventListener('online', connection); window.addEventListener('offline', connection);
+window.addEventListener('online', ()=>{connection();if(!busy) render();}); window.addEventListener('offline', ()=>{connection();if(!busy) render();});
 setBusy(true);
 try {
   const saved=await loadState();storageReady=true;

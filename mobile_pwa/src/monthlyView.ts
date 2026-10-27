@@ -7,10 +7,10 @@ import { speciesBadge, tripDescription } from './species';
 import {regionLabel} from './regions';
 import {platformBadge} from './platforms';
 
-export function renderMonthlyList(target:HTMLElement,state:AppState,result:ReturnType<typeof queryMonth>,limit:number,onMore:()=>void,onDay:(date:string)=>void) {
+export function renderMonthlyList(target:HTMLElement,state:AppState,result:ReturnType<typeof queryMonth>,limit:number,onMore:()=>void,onDay:(date:string,keyboard?:boolean)=>void) {
   target.replaceChildren();
   if (!result.events.length) {
-    target.append(el('p','조건에 맞는 월별 조회 결과가 없습니다. 다른 월·인원을 선택하거나 PC 조회 결과를 가져오세요. 자료가 없다고 예약 마감인 것은 아닙니다.','empty'));
+    target.append(el('p',`${result.failures.length?'조회에 실패한 선박이 있습니다. 다시 조회하거나 공식 페이지를 확인하세요.':result.missingBoats.length?'아직 확인하지 못한 선박이 있습니다. 조회하기로 새 잔여석을 확인하세요.':'선택 조건에 맞는 월별 일정이 없습니다. 어종·인원 조건을 확인하세요.'} 자료가 없다고 예약 마감인 것은 아닙니다.`,'empty'));
     return;
   }
   let date='';
@@ -18,7 +18,7 @@ export function renderMonthlyList(target:HTMLElement,state:AppState,result:Retur
     if (date!==event.date) {
       date=event.date;
       const heading=el('button',`${date} · ${result.events.filter(e=>e.date===date).length}개 일정`,'month-date-heading');
-      const day=date; heading.addEventListener('click',()=>onDay(day)); target.append(heading);
+      const day=date; heading.addEventListener('click',event=>onDay(day,event.detail===0)); target.append(heading);
     }
     const boat=state.boats.find(b=>b.uid===event.uid), row=el('article','','monthly-result');
     const info=el('div'), status=eventStatus(event,state);

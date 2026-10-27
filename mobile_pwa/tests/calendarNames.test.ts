@@ -17,7 +17,7 @@ test('calendar cells put complete vessel names before species without platform b
     expect(label.firstElementChild?.className).toBe('calendar-boat-name');expect(label.firstElementChild?.textContent).toBe(state.boats[i].name);expect((label.firstElementChild as HTMLElement).title).toBe(state.boats[i].name);
     expect(label.querySelector('.calendar-boat-species')?.textContent).toContain('갑오징어');expect(label.title).toContain(state.boats[i].name);
   });
-  labels[0].closest('button')!.click();expect(onSelect).toHaveBeenCalledWith('2026-10-25');
+  labels[0].closest('button')!.click();expect(onSelect).toHaveBeenCalledWith('2026-10-25',true);
   state.month='2026-11';renderCalendar(root,state,'all','','2026-11-01',onSelect);expect(root.querySelectorAll('.calendar-boat')).toHaveLength(0);
 });
 test('calendar names stay on one line with ellipsis under the complete stylesheet cascade',()=>{
