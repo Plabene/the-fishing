@@ -20,10 +20,10 @@ test('tier membership includes previously unchecked boats, excludes unassigned a
   expect(tierQueryBoats(state,'all').map(b=>b.uid)).toEqual(['1','2']);
 });
 
-test('latest supplied backup yields all 235 assigned boats without rewriting 126 legacy selections',()=>{
+test('latest supplied backup yields all 143 assigned boats without rewriting 133 legacy selections',()=>{
   const state=emptyState();state.boats=recovery.boats;state.tiers=recovery.tiers;state.selectedUids=recovery.selectedUids;
   const before=JSON.stringify(state);
-  expect(tierQueryBoats(state,'all')).toHaveLength(235);
-  expect(TIERS.map(t=>tierQueryBoats(state,t).length)).toEqual([16,21,31,167]);
-  expect(state.selectedUids).toHaveLength(126);expect(JSON.stringify(state)).toBe(before);
+  expect(tierQueryBoats(state,'all')).toHaveLength(143);
+  expect(TIERS.map(t=>tierQueryBoats(state,t).length)).toEqual([17,24,34,68]);
+  expect(state.selectedUids).toHaveLength(133);expect(JSON.stringify(state)).toBe(before);
 });

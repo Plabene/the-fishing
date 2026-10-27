@@ -13,7 +13,8 @@ import {appLayout} from '../src/appLayout';
 import {defaultFleet} from '../src/defaultFleet';
 import {catalogCoverage} from '../src/catalogCoverage';
 import previous from '../src/data/previousTierRecovery.json';
-import {RECOVERY_VERSION,initializePreferenceRecovery,suppliedPreferences} from '../src/preferenceRecovery';
+import published from '../src/data/publishedPreferences.json';
+import {RECOVERY_VERSION,initializePreferenceRecovery} from '../src/preferenceRecovery';
 
 const boats:Boat[]=[
   {uid:'1',name:'동명호',port:'여수항',url:'',region:{sea:'남해권',province:'전남',local:'여수'}},
@@ -67,7 +68,7 @@ test('region panel precedes calendar and boat selection/management follows calen
 });
 test('latest backup upgrades only the unchanged old backup; later edits and intentional empty preferences survive',()=>{
   const base={...defaultFleet(),tiers:structuredClone(previous.tiers),selectedUids:[...previous.selectedUids],preferenceRecoveryVersion:previous.version};
-  const upgraded=initializePreferenceRecovery(base,true);expect(upgraded.state.tiers).toEqual(suppliedPreferences.tiers);expect(upgraded.state.selectedUids).toEqual(suppliedPreferences.selectedUids);
+  const upgraded=initializePreferenceRecovery(base,true);expect(upgraded.state.tiers).toEqual(published.tiers);expect(upgraded.state.selectedUids).toEqual(published.selectedUids);
   const personal=structuredClone(base);moveBoat(personal,previous.tiers.tier1[0],'tier3');
   expect(initializePreferenceRecovery(personal,true).state.tiers).toEqual(personal.tiers);
   for(const t of TIERS) personal.tiers[t]=[];

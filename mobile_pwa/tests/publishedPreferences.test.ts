@@ -8,11 +8,11 @@ import seed from '../src/data/publishedPreferences.json';
 test('published backup applies exact tier order and selection without changing vessel attributes or injecting reservations',()=>{
   const before=defaultFleet(),after=applyPublishedPreferences(before,true);
   expect(after.tiers).toEqual(seed.tiers);expect(after.selectedUids).toEqual(seed.selectedUids);
-  expect(Object.values(after.tiers).map(ids=>ids.length)).toEqual([16,21,31,167]);expect(after.selectedUids).toHaveLength(126);
+  expect(Object.values(after.tiers).map(ids=>ids.length)).toEqual([17,25,34,184]);expect(after.selectedUids).toHaveLength(135);
   expect(after.boats).toEqual(before.boats);expect(after.events).toEqual(before.events);
   expect(new Set(seed.boatUids).size).toBe(seed.boatUids.length);expect([...Object.values(seed.tiers).flat(),...seed.selectedUids].every(id=>seed.boatUids.includes(id))).toBe(true);
   expect(Object.keys(seed).sort()).toEqual(['boatUids','selectedUids','tiers','version']);
-  expect(seed.boatUids).toHaveLength(1179);expect(Object.values(after.tiers).flat()).not.toContain('sunsang24:ship:1371');
+  expect(seed.boatUids).toHaveLength(1179);expect(after.tiers.tier1).toContain('sunsang24:ship:1371');expect(Object.values(after.tiers).flat()).not.toContain('2351');
 });
 test('migration is one-time, persists through backup and keeps custom vessels and deleted vessel choices',()=>{
   const before=defaultFleet(),deleted=seed.tiers.tier1[0];before.boats=before.boats.filter(b=>b.uid!==deleted);

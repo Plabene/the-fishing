@@ -13,7 +13,7 @@ test('recovery preview, exact apply, automatic history and month navigation pers
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'),{timeout:10000});await settle();
-    expect(el('#recovery-source').textContent).toContain('2026-10-26 17:31 마지막 백업');
+    expect(el('#recovery-source').textContent).toContain('2026-10-27 10:22 마지막 백업');
     expect(el('#recovery-preview').textContent).toContain('다른 분류 1개');
     el('#recover-missing').click();await settle();
     expect((await loadState() as AppState).tiers.tier2).toContain(suppliedPreferences.tiers.tier1[0]);
@@ -26,7 +26,7 @@ test('recovery preview, exact apply, automatic history and month navigation pers
     expect(old).toBeDefined();source.value=old.value;source.dispatchEvent(new Event('change'));
     el('#recover-exact').click();await settle();
     const restored=await loadState() as AppState;expect(restored.tiers.tier2).toContain(suppliedPreferences.tiers.tier1[0]);
-    expect(TIERS.reduce((n,t)=>n+restored.tiers[t].length,0)).toBe(235);expect(request).not.toHaveBeenCalled();
+    expect(TIERS.reduce((n,t)=>n+restored.tiers[t].length,0)).toBe(143);expect(request).not.toHaveBeenCalled();
     // An explicit old full backup may intentionally have no tiers and no recovery marker.
     const intentionallyEmpty={...restored,tiers:{tier1:[],tier2:[],tier3:[],other:[]},selectedUids:[],preferenceRecoveryVersion:undefined};
     const input=el('#import') as HTMLInputElement;

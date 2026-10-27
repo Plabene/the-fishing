@@ -7,12 +7,12 @@ import {exportTierBackup,restoreTierBackup} from '../src/tierBackup';
 import {importData,exportData} from '../src/importLegacy';
 import previous from '../src/data/previousTierRecovery.json';
 
-test('latest full backup retains exact 235 tier assignments and 126 selections including 10 unassigned boats',()=>{
+test('latest tier backup retains exact 143 assignments and 133 selections including 7 unassigned boats',()=>{
   const result=recoverPreferences(emptyState(),suppliedPreferences,'exact');
-  expect(result.count).toBe(235);expect(result.unresolved).toBe(0);expect(result.state.boats).toHaveLength(245);
-  expect(TIERS.map(t=>result.state.tiers[t].length)).toEqual([16,21,31,167]);
+  expect(result.count).toBe(143);expect(result.unresolved).toBe(0);expect(result.state.boats).toHaveLength(150);
+  expect(TIERS.map(t=>result.state.tiers[t].length)).toEqual([17,24,34,68]);
   expect(result.state.tiers).toEqual(suppliedPreferences.tiers);expect(result.state.selectedUids).toEqual(suppliedPreferences.selectedUids);
-  expect(result.state.selectedUids.filter(id=>!TIERS.some(t=>result.state.tiers[t].includes(id)))).toHaveLength(10);
+  expect(result.state.selectedUids.filter(id=>!TIERS.some(t=>result.state.tiers[t].includes(id)))).toHaveLength(7);
   const portable=restoreTierBackup(JSON.parse(exportTierBackup(result.state)),emptyState()).state;
   expect(portable.tiers).toEqual(suppliedPreferences.tiers);expect(portable.selectedUids).toEqual(suppliedPreferences.selectedUids);
 });
@@ -32,7 +32,7 @@ test('gap recovery preserves conflicting personal tiers and selections; exact re
 });
 test('only empty matching catalogs recover automatically once; later intentional clears and custom catalogs stay empty',()=>{
   const current=defaultFleet();current.tiers={tier1:[],tier2:[],tier3:[],other:[]};current.selectedUids=[];
-  const recovered=initializePreferenceRecovery(current,true);expect(recovered.restored).toBe(235);
+  const recovered=initializePreferenceRecovery(current,true);expect(recovered.restored).toBe(143);
   recovered.state.tiers={tier1:[],tier2:[],tier3:[],other:[]};expect(initializePreferenceRecovery(recovered.state,true).restored).toBe(0);
   expect(initializePreferenceRecovery(emptyState(),true).restored).toBe(0);
   const restored=importData(JSON.parse(exportData(recovered.state))).state;expect(restored.preferenceRecoveryVersion).toBe(RECOVERY_VERSION);
@@ -49,24 +49,26 @@ test('future PC tier migrations and an intentionally empty protected catalog do 
   expect(initializeFleet(empty).seeded).toBe(false);expect(initializeFleet(empty).state.boats).toEqual([]);
 });
 
-test('full backup applies explicit cleared tiers while retaining vessels, custom scope and all observations/filters',()=>{
+test('tier backup respects explicit cleared entries and retains every out-of-file tier and all observations/filters',()=>{
   const current={...defaultFleet(),tiers:structuredClone(previous.tiers),selectedUids:[...previous.selectedUids]};
   current.boats.push({uid:'personal',name:'새 개인 선박',port:'',url:''});current.tiers.tier1.push('personal');current.selectedUids.push('personal');
+  current.tiers.tier3.push('2351'); // Present in the new file, explicitly without an assignment.
   current.selectedTiers=['tier2'];current.selectedSpecies={mode:'options',keys:['문어']};
   const before=structuredClone(current),p=recoveryPreview(current,suppliedPreferences);
-  expect(p.cleared).toBe(10);expect(p.conflicts).toBe(1);
+  expect(p.cleared).toBe(1);expect(p.conflicts).toBe(3);
   const missing=recoverPreferences(current,suppliedPreferences,'missing').state;
-  expect(missing.tiers.tier1).toContain('sunsang24:ship:1371'); // gap fill never clears a personal tier
+  expect(missing.tiers.tier3).toContain('2351'); // gap fill never clears a personal tier
   const exact=recoverPreferences(current,suppliedPreferences,'exact').state;
-  for(const tier of TIERS) expect(exact.tiers[tier].filter(id=>id!=='personal')).toEqual(suppliedPreferences.tiers[tier]);
-  expect(exact.selectedUids).toEqual([...suppliedPreferences.selectedUids,'personal']);
+  const scope=new Set(suppliedPreferences.scopeUids);
+  for(const tier of TIERS) expect(exact.tiers[tier]).toEqual([...suppliedPreferences.tiers[tier],...before.tiers[tier].filter(id=>!scope.has(id))]);
+  expect(exact.selectedUids).toEqual([...suppliedPreferences.selectedUids,...before.selectedUids.filter(id=>!scope.has(id))]);
   expect(exact.boats).toEqual(before.boats);expect(exact.events).toEqual(before.events);expect(exact.selectedTiers).toEqual(before.selectedTiers);expect(exact.selectedSpecies).toEqual(before.selectedSpecies);
-  expect(exact.tiers.tier3).toContain('sunsang24:ship:944');
-  expect(TIERS.flatMap(t=>exact.tiers[t])).not.toContain('sunsang24:ship:1371');expect(exact.boats.some(b=>b.uid==='sunsang24:ship:1371')).toBe(true);
+  expect(exact.tiers.tier2).toContain('sunsang24:ship:944');expect(exact.tiers.other).toContain('6104');
+  expect(TIERS.flatMap(t=>exact.tiers[t])).not.toContain('2351');expect(exact.boats.some(b=>b.uid==='2351')).toBe(true);
   expect(current).toEqual(before);
   const file=JSON.parse(exportTierBackup(exact,new Date(),suppliedPreferences.scopeUids));
   const portable=restoreTierBackup(file,current).state;
   expect(portable.tiers).toEqual(exact.tiers);expect(portable.selectedUids).toEqual(exact.selectedUids);
-  expect(file.boats.some((b:{uid:string})=>b.uid==='sunsang24:ship:1371')).toBe(true);
+  expect(file.boats.some((b:{uid:string})=>b.uid==='2351')).toBe(true);
   expect(file.events).toBeUndefined();expect(file.selectedRegion).toBeUndefined();
 });
