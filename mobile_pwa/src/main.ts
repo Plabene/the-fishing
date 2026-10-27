@@ -25,7 +25,7 @@ import { el, renderDay, sourceLink } from './dayView';
 import { fixtureState } from './providers/fixtures';
 import { TheFishingDirect } from './providers/thefishingDirect';
 import { TheFishingApi, loadApiOrigin, saveApiOrigin, clearApiOrigin, checkApi } from './providers/thefishingApi';
-import { collectMonth, applyLiveResults, type LiveRow } from './liveQuery';
+import { collectMonth, applyLiveResults, createLivePreview, type LiveRow } from './liveQuery';
 import { initializeFleet, applyDefaultFleet } from './defaultFleet';
 import { renderSourceAccess } from './sourceAccess';
 import { initializeMonthlyArchive } from './monthlyArchive';
@@ -262,19 +262,20 @@ $('#query-form').addEventListener('submit',async event=>{
   $('#live-diagnostics').hidden=true;$('#diagnostic-text').hidden=true;
   $('#live-progress').textContent=`${boats.length}척 조회 시작 · 완료된 선박부터 달력에 표시합니다.`;
   liveStatus.say(`${month} · ${boats.length}척 실시간 조회를 시작합니다.`);
-  const applied=new Set<string>();let previewTimer:ReturnType<typeof setTimeout>|undefined,lastPaint=-Infinity,queryOutcome:QueryOutcome='error';
-  const paint=()=>{previewTimer=undefined;if(livePreview) {renderResults(active());lastPaint=performance.now();}};
+  const applied=new Set<string>(),preview=createLivePreview(candidate,month),pendingPreview:LiveRow[]=[];
+  let previewTimer:ReturnType<typeof setTimeout>|undefined,lastPaint=-Infinity,queryOutcome:QueryOutcome='error';
+  const paint=()=>{previewTimer=undefined;if(livePreview) {livePreview=preview.append(pendingPreview.splice(0));renderResults(active());lastPaint=performance.now();}};
   try {
     const result=await collectMonth(provider,boats,month,liveController.signal,(rows,total)=>{
       liveRows=rows;progress.update(rows.length,rows.filter(row=>row.result.status==='ALLOWED_READABLE').length);const delta=rows.filter(row=>!applied.has(row.boat.uid)),last=delta.at(-1)!;
       renderPlatformResults();
       for(const row of delta) applied.add(row.boat.uid);
-      livePreview=applyLiveResults(livePreview || candidate,month,delta);
+      pendingPreview.push(...delta);
       $('#live-progress').textContent=`${rows.length}/${total}척 확인 · ${last.boat.name} · 달력에 순차 반영 중`;
       liveStatus.progress(`${total}척 중 ${rows.length}척 응답 · 성공 ${rows.filter(row=>row.result.status==='ALLOWED_READABLE').length}척`);
-      if(performance.now()-lastPaint>=250) {if(previewTimer) clearTimeout(previewTimer);paint();}
-      else if(!previewTimer) previewTimer=setTimeout(paint,250-(performance.now()-lastPaint));
-    },useApi ? 3:1);
+      // Dispatch the next request before DOM work; fast responses share one paint.
+      if(!previewTimer) previewTimer=setTimeout(paint,Math.max(0,250-(performance.now()-lastPaint)));
+    },useApi ? {perPlatform:3}:1);
     if(previewTimer) clearTimeout(previewTimer);
     const updated=applyLiveResults(candidate,month,result.rows); await saveState(updated);state=updated;undoState=null;$('#undo').hidden=true;
     const ok=result.rows.filter(r=>r.result.status==='ALLOWED_READABLE').length, failed=result.rows.length-ok, unattempted=result.total-result.rows.length;
