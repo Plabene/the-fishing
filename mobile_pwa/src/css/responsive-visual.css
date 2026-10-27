@@ -1,0 +1,109 @@
+/* Presentation-only final overrides. Provider/species palettes and data stay intact. */
+:root {
+  --ink:#173b3e; --muted:#405b52; --accent:#176c60; --selected:#eaf5ef;
+  --line:#dbe5df; --control-line:#6b8179; --focus:#805900;
+  --control-height:40px; --field-height:44px; --control-radius:7px;
+}
+main { color:var(--ink); }
+main :is(button,input,select,summary,a):focus-visible, #day-heading:focus-visible,
+.query-selection summary:focus-visible, .region-choice:focus-within, .species-option:focus-within {
+  outline:3px solid var(--focus); outline-offset:2px;
+}
+main :is(.muted,.timestamp,.empty,.legend,.weekday,.day-group h3,.result-tier), footer { color:var(--muted); }
+.weekday:first-child { color:#8b3d2e; }
+main :is(.timestamp,.day-group h3,.result-tier,.legend) { font-size:11px; }
+main button:not(.calendar-day), main .button { min-height:var(--control-height); }
+main :is(input:not([type=checkbox]):not([type=file]),select), main button:not([aria-pressed=true]):not(.calendar-day),
+main .panel-close, .query-recovery a, .event-card .source-link, .monthly-footer .source-link,
+.query-selection>#region-toggle>summary, .calendar-filter-row>.filter-panel>summary { border-color:var(--control-line); }
+main #tabs button:not([aria-pressed=true]) { border-color:var(--control-line); }
+main #tabs button { gap:3px; white-space:normal; }
+main #tabs button[data-tier=none], main #query-status p,
+main #source-access p, main .data-tools p { color:var(--muted); }
+main button.quiet-danger { color:#804d3e; }
+.query-selection { margin-top:4px; }
+.query-controls { grid-template-columns:minmax(0,1fr) 66px 104px; }
+.query-controls .people-label { font-size:12px; max-width:none; white-space:nowrap; }
+.query-controls .month-controls { grid-template-columns:44px minmax(0,1fr) 44px; }
+#prev, #next { width:44px; min-width:44px; height:44px; }
+#query-form #month, #query-form #people { font-size:16px; }
+.query-controls>#query-submit { min-height:44px; height:44px; }
+.query-feedback { padding:6px 8px; }
+.query-feedback p { margin:2px 0; }
+.tier-scope-heading { align-items:center; }
+#tier-scope-help>summary { min-height:40px; padding:7px 0; }
+.tier-selection-summary { padding:6px 8px; min-height:40px; }
+.filter-panel-body { scrollbar-width:auto; scrollbar-color:var(--control-line) #eef3ef; }
+.region-controls .region-all, .region-controls>#region-reset, main .panel-close { min-height:40px; }
+.region-field>summary, #species-panel>summary { min-height:40px; }
+.region-field { border-color:var(--control-line); }
+.region-controls .region-options { scrollbar-width:auto; scrollbar-color:var(--control-line) #eef3ef; overscroll-behavior:auto; }
+.species-option small { color:var(--muted); }
+.species-chip, #species-filter .species-chip, #species-filter .species-controls button { min-height:40px; }
+.species-badge, .species-chip, .species-option, .calendar-boat { color:#17202a; }
+.badge { color:#624e17; }
+.status-available { color:#20563f; background:#e7f4eb; }
+.status-unknown, .status-unverified { color:#43554a; background:#ecefea; }
+.status-stale, .status-full { color:#624e17; background:#ede9d7; }
+.status-blocked { color:#8b3d2e; background:#f7e5e0; }
+.status-demo { color:#435776; background:#e9edf4; }
+.status-unavailable { color:#7c2d12; background:#ffedd5; }
+.calendar-day { min-height:80px; gap:2px; border-color:var(--control-line); }
+.calendar-day>span:first-child { font-weight:700; font-size:14px; }
+.calendar-day .calendar-availability { font-size:11px!important; color:var(--muted); }
+.calendar-day.has-records .calendar-availability { color:#285c3a; }
+.calendar-day[data-availability=failed] .calendar-availability { color:#8b3d2e; }
+.calendar-day[data-availability=unavailable] .calendar-availability { color:#6c4d30; }
+.calendar-day[aria-pressed=true] .calendar-availability { color:#fff; }
+.calendar-day .calendar-tide { font-size:10px; line-height:1.3; }
+.calendar-tide-compact { display:none; }
+.calendar-boat-name { font-size:11px; line-height:1.3; }
+.calendar-boat-species { font-size:10px; }
+.calendar-overflow { font-size:10px; line-height:1.35; }
+.event-card { padding:7px 8px; gap:3px; }
+.event-card h4, .monthly-result h3 { white-space:normal; overflow:visible; overflow-wrap:anywhere; }
+.event-heading { gap:3px 8px; }
+.event-details { gap:1px; }
+.event-footer, .monthly-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:3px 6px; min-width:0; }
+.event-card .timestamp, .monthly-footer .timestamp { flex:1 1 110px; font-size:11px; color:var(--muted); margin:0; }
+.event-card .source-link, .monthly-footer .source-link { flex:none; min-height:40px; font-size:12px; padding:4px 7px; margin:0; display:inline-flex; align-items:center; border:1px solid var(--control-line); border-radius:var(--control-radius); color:#22594b; }
+.monthly-result { display:grid; grid-template-columns:minmax(0,1fr) minmax(105px,35%); gap:4px 10px; padding:8px 4px; }
+.monthly-result .result-detail { min-width:0; max-width:none; gap:3px; overflow-wrap:anywhere; }
+.monthly-result>div { min-width:0; }
+.monthly-footer { grid-column:1/-1; }
+.fleet-list { border:1px solid var(--control-line); scrollbar-width:auto; scrollbar-color:var(--control-line) #eef3ef; overscroll-behavior:auto; scrollbar-gutter:stable; }
+.fleet-list:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+#fleet-section .boat-row { grid-template-columns:minmax(0,1fr) 112px; gap:6px; padding:6px 8px; }
+#fleet-section .boat-actions { flex-wrap:nowrap; align-self:center; gap:4px; }
+#fleet-section .boat-actions select { width:68px; min-height:40px; padding:4px; }
+#fleet-section .boat-more>summary { width:40px; min-height:40px; border-color:var(--control-line); }
+#fleet-section .boat-actions:has(.boat-more[open]) { display:contents; }
+#fleet-section .boat-actions:has(.boat-more[open])>select { grid-column:2; grid-row:1; align-self:start; }
+#fleet-section .boat-more[open] { display:block; grid-column:1/-1; width:100%; }
+#fleet-section .boat-more[open]>summary { position:absolute; top:6px; right:8px; }
+#fleet-section .boat-more[open]>.boat-extra { position:static; box-shadow:none; }
+.boat-extra { scrollbar-width:auto; scrollbar-color:var(--control-line) #eef3ef; }
+.boat-title strong { line-height:1.4; }
+@media(max-width:900px) { .day-view { max-height:none; overflow:visible; } }
+@media(max-width:620px) {
+  .query-controls { grid-template-columns:minmax(0,1fr) 66px; gap:4px 6px; }
+  .query-controls>#query-submit { grid-column:1/-1; }
+  .query-controls .month-controls { gap:2px; }
+  .calendar-day .calendar-tide>span:first-child, .calendar-day .calendar-tide>span:nth-child(2) { display:none; }
+  .calendar-day .calendar-tide .calendar-tide-compact { display:block; white-space:nowrap; }
+  .calendar-boat-species { display:none; } /* Full species stays in the title and one-click details. */
+  .calendar-day { min-height:76px; }
+  #fleet-section .fleet-tools .fleet-search-label { grid-column:auto; }
+  .species-option, .species-option:has(input:checked) { min-height:40px; }
+}
+@media(max-width:430px) {
+  #tabs { grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
+  .query-controls { grid-template-columns:66px minmax(0,1fr); }
+  .query-controls .month-controls { grid-column:1/-1; }
+  .query-controls>#query-submit { grid-column:2; }
+  .monthly-result { grid-template-columns:minmax(0,1fr); }
+  .monthly-result .result-detail { flex-direction:row; flex-wrap:wrap; align-items:baseline; justify-content:flex-start; gap:3px 8px; }
+  .monthly-footer { grid-column:auto; }
+  .query-controls .people-label { font-size:12px; }
+}
+@media(pointer:coarse) { :root { --control-height:44px; } .query-recovery a, .event-card .source-link, .monthly-footer .source-link { min-height:44px; } }

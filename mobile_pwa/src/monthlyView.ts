@@ -27,10 +27,11 @@ export function renderMonthlyList(target:HTMLElement,state:AppState,result:Retur
     const detail=el('div','','result-detail');
     detail.append(el('strong',event.remaining===null ? '잔여석 미확인' : `조회 당시 ${event.remaining}석`),el('span',STATUS_LABELS[status],`badge status-${status.toLowerCase()}`));
     if (event.price!==undefined && event.price!==null) detail.append(el('span',`${event.price.toLocaleString('ko-KR')}원`,'muted'));
-    detail.append(el('span',event.observedAt ? new Date(event.observedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}) : '조회 시각 미확인','timestamp'));
+    const footer=el('div','','monthly-footer');
+    footer.append(el('span',event.observedAt ? new Date(event.observedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}) : '조회 시각 미확인','timestamp'));
     if(event.reservationStatusLabel) detail.append(el('span',`원본 예약 상태 · ${event.reservationStatusLabel}`,'muted'));
-    const link=boat && sourceLink(event.reservationUrl || boat.url,boat.uid); if (link) detail.append(link);
-    row.append(info,detail); target.append(row);
+    const link=boat && sourceLink(event.reservationUrl || boat.url,boat.uid); if (link) footer.append(link);
+    row.append(info,detail,footer); target.append(row);
   }
   if (result.events.length>limit) {
     const more=el('button',`50개 더 보기 · ${limit} / ${result.events.length}개 표시`,'more-results');

@@ -4,7 +4,7 @@ const flow=(day?:CalculatedTide)=>day?.flowPercent==null ? '물흐름 —':`물�
 const range=(day?:CalculatedTide)=>day ? `고저차 ${Math.round(day.rangeCm)}cm`:'고저차 —';
 export function addTideToCell(cell:HTMLButtonElement,date:string,month:TideMonth) {
   const day=month.days[date];cell.dataset.tideGrade=day?.grade || 'insufficient';
-  const values=node('span','','calendar-tide');values.append(node('span',flow(day)),node('span',range(day)));cell.append(values);
+  const values=node('span','','calendar-tide'),compact=node('span',day?.flowPercent==null?'물 —':`물 ${day.flowPercent}%`,'calendar-tide-compact');compact.setAttribute('aria-hidden','true');values.append(node('span',flow(day)),node('span',range(day)),compact);cell.append(values);
   cell.setAttribute('aria-label',`${cell.getAttribute('aria-label')} · 보령 ${flow(day)} · ${range(day)}`);
 }
 export function renderTideSummary(target:HTMLElement,month:TideMonth) {
