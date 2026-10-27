@@ -1,10 +1,10 @@
 import { el } from './dayView';
 import { speciesColor, speciesKey, speciesLabel, speciesOptions, matchesSpecies } from './species';
 import type {SpeciesSelection} from './models';
+import {retainDisclosureUi} from './uiFocus';
 
 export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>,selected:SpeciesSelection,excluded:string[],onChange:(selected:SpeciesSelection,excluded:string[])=>void,disabledReason='',matchingCounts=counts) {
-  const focused=target.contains(document.activeElement) ? document.activeElement as HTMLElement:null;
-  const focusedChoice=focused?.dataset.speciesChoice,focusedId=focused?.id;
+  const restoreUi=retainDisclosureUi(target,()=>target.closest('details')?.querySelector('summary') || null);
   target.replaceChildren();
   const selection=speciesOptions(selected),blocked=new Set(excluded),keys=[...counts.keys()].sort((a,b)=>speciesLabel(a).localeCompare(speciesLabel(b),'ko'));
   const controls=el('div','','species-controls'),heading=el('strong','어종 선택 · 정확히 일치');
@@ -12,7 +12,7 @@ export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>
   const clear=el('button','선택 해제');clear.type='button';clear.id='species-none';clear.addEventListener('click',()=>onChange([],[]));
   controls.append(heading,reset,clear);target.append(controls);
   const matched=[...matchingCounts].reduce((total,[key,count])=>total+(!blocked.has(key) && matchesSpecies(key,selected)?count:0),0);
-  const status=el('p',disabledReason || (selection==='all' ? '전체 어종 표시 · 단독·복합 항목을 각각 선택하세요. 여러 항목은 각 조합과 정확히 일치하는 출조를 함께 표시합니다.':selection.length ? `선택: ${selection.map(speciesLabel).join(', ')} · 정확히 일치 ${matched}건`:'선택한 어종이 없습니다. 아래에서 원하는 어종을 선택하세요.'),'species-selection-summary');status.id='species-selection-summary';status.setAttribute('role','status');target.append(status);
+  const status=el('p',disabledReason || (selection==='all' ? '전체 어종 표시 · 단독·복합 항목을 각각 선택하세요. 여러 항목은 각 조합과 정확히 일치하는 출조를 함께 표시합니다.':selection.length ? `선택: ${selection.map(speciesLabel).join(', ')} · 정확히 일치 ${matched}건`:'선택한 어종이 없습니다. 아래에서 원하는 어종을 선택하세요.'),'species-selection-summary');status.id='species-selection-summary';target.append(status);
   const group=el('fieldset','','species-options');group.id='species-select';group.append(el('legend','조회할 어종 선택','sr-only'));
   const options=[...new Set([...keys,...keys.flatMap(key=>key.split('+')),...(selection==='all'?[]:selection)])].sort((a,b)=>Number(a.includes('+'))-Number(b.includes('+')) || speciesLabel(a).localeCompare(speciesLabel(b),'ko'));
   for(const key of options) {
@@ -32,7 +32,7 @@ export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>
     const group=el('div','','species-chips');
     for(const key of keys.filter(key=>blocked.has(key)===isExcluded)) {
       const chip=el('button',`${speciesLabel(key)} · ${counts.get(key) || 0}건`,'species-chip');chip.type='button';chip.dataset.species=key;chip.style.backgroundColor=speciesColor(key);
-      chip.setAttribute('aria-label',`${speciesLabel(key)} ${isExcluded ? '포함':'제외'}로 이동`);
+      chip.setAttribute('aria-label',`${speciesLabel(key)} ${isExcluded ? '포함으로':'제외로'} 이동`);
       chip.addEventListener('click',()=>{const next=new Set(blocked);if(isExcluded) next.delete(key);else next.add(speciesKey(key));onChange(selected,[...next]);});group.append(chip);
     }
     if(!group.childElementCount) group.append(el('p',isExcluded ? '제외한 어종이 없습니다.':'해당 월의 포함 어종이 없습니다.','muted'));
@@ -43,6 +43,5 @@ export function renderSpeciesFilter(target:HTMLElement,counts:Map<string,number>
   target.dataset.state=disabledReason?'disabled':'ready';
   for(const control of target.querySelectorAll<HTMLInputElement|HTMLButtonElement>('input,button')) {control.disabled=!!disabledReason;control.dataset.locked=String(!!disabledReason);control.setAttribute('aria-describedby','species-selection-summary');}
   // A save re-renders the panel; retain keyboard position for the next checkbox.
-  const nextFocus=[...target.querySelectorAll<HTMLElement>('input,button')].find(node=>focusedChoice ? node.dataset.speciesChoice===focusedChoice : !!focusedId && node.id===focusedId);
-  nextFocus?.focus({preventScroll:true});
+  restoreUi();
 }

@@ -9,20 +9,23 @@ import { renderDayTide } from './tideView';
 import {matchesRegion,regionLabel} from './regions';
 import {matchesPlatform,platformBadge} from './platforms';
 import {calendarStatus} from './calendarStatus';
+import {retainDisclosureUi} from './uiFocus';
 
 export const STATUS_LABELS: Record<DisplayStatus, string> = { AVAILABLE: '확인된 잔여석', UNKNOWN: '확인 불가', STALE: '이전 자료', BLOCKED: '접근 제한', UNVERIFIED: '미검증', FULL: '확인된 인원 미달', DEMO: '예시 자료',UNAVAILABLE:'예약 가능 상태 아님' };
 export function el<K extends keyof HTMLElementTagNameMap>(tag: K, text = '', className = ''): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag); node.textContent = text; node.className = className; return node;
 }
-export function sourceLink(url: string, id: string): HTMLAnchorElement | null {
+export function sourceLink(url: string, id: string, context=''): HTMLAnchorElement | null {
   const safe = reservationLink(url, id); if (!safe) return null;
-  const link = el('a', '공식 페이지 ↗', 'source-link'); link.href = safe; link.target = '_blank'; link.rel = 'noopener noreferrer'; return link;
+  const link = el('a', '공식 페이지 ↗', 'source-link'); link.href = safe; link.target = '_blank'; link.rel = 'noopener noreferrer';
+  if(context) link.setAttribute('aria-label',`공식 페이지 · ${context} · 새 탭`);
+  return link;
 }
 export function renderDay(target: HTMLElement, state: AppState, day: string, tier: Filter, search: string, matchingOnly=false,result?:ReturnType<typeof queryMonth>): void {
-  const headingFocused=document.activeElement===target.querySelector('#day-heading');
+  const restoreUi=retainDisclosureUi(target,()=>target.querySelector('#day-heading'));
   target.replaceChildren();
   const events = (result?.events ?? visibleEvents(state, tier, search,matchingOnly)).filter(e => e.date === day);
-  const heading=el('h2', `${Number(day.slice(5, 7))}월 ${Number(day.slice(8))}일 · ${new Set(events.map(e=>e.uid)).size}척 · ${events.length}개 출조 일정`);heading.id='day-heading';heading.tabIndex=-1;target.append(heading);if(headingFocused) heading.focus({preventScroll:true});
+  const heading=el('h2', `${Number(day.slice(5, 7))}월 ${Number(day.slice(8))}일 · ${new Set(events.map(e=>e.uid)).size}척 · ${events.length}개 출조 일정`);heading.id='day-heading';heading.tabIndex=-1;target.append(heading);
   if(result) {const status=calendarStatus(state,result,day);const summary=el('p',`${status.label}${result.missingBoats.length?` · ${result.missingBoats.length}척 미확인`:''}`,'day-status');summary.dataset.availability=status.kind;target.append(summary);}
   if (!events.length) {
     const kind=result?calendarStatus(state,result,day).kind:'empty';
@@ -49,7 +52,7 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
       if(event.reservationStatusLabel) booking.append(el('p',`원본 예약 상태 · ${event.reservationStatusLabel}`,'muted'));
       const footer=el('div','','event-footer');
       footer.append(el('p',`관측 ${event.observedAt ? new Date(event.observedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}) : '시각 미확인'}`,'timestamp'));
-      const link=boat && sourceLink(event.reservationUrl || boat.url,boat.uid);if(link) footer.append(link);
+      const link=boat && sourceLink(event.reservationUrl || boat.url,boat.uid,`${boat.name} · ${day} · ${event.departure || '시간 미표시'} · ${event.trip}`);if(link) {link.dataset.focusKey=`day-source:${event.uid}:${event.id}`;footer.append(link);}
       card.append(heading,tags,details);if(booking.childElementCount) card.append(booking);card.append(footer);
       group.append(card);
     }
@@ -59,6 +62,7 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
   for (const failure of state.failures.filter(f => f.month === state.month && ids.has(f.uid) && matchesTier(tierFor(state, f.uid),tier))) {
     target.append(el('p', `${state.boats.find(b => b.uid === failure.uid)?.name || failure.uid} · ${failure.status === 'BLOCKED' ? '접근 제한' : '확인 불가'} · 최근 수집 실패 기록이 있습니다.`, 'notice'));
   }
-  const tideDetails=el('details','','day-tide-details');tideDetails.append(el('summary','이 날짜의 물때 상세'));
+  const tideDetails=el('details','','day-tide-details');tideDetails.dataset.focusKey=`day-tide:${day}`;tideDetails.append(el('summary','이 날짜의 물때 상세'));
   renderDayTide(tideDetails,day,calculateTideMonth(state.month,state.tideDays || []));target.append(tideDetails);
+  restoreUi();
 }

@@ -4,8 +4,10 @@ import { LABELS, TIERS, type AppState } from './models';
 import { matchesRegion } from './regions';
 import {matchesPlatform,boatPlatform,PLATFORM_LABELS} from './platforms';
 import {bookingAlias} from './bookingAliases';
+import {retainFocus} from './uiFocus';
 
 export function renderSourceAccess(target: HTMLElement, state: AppState, selectedUid: string, selectBoat:(uid:string)=>void): void {
+  const restoreFocus=retainFocus(target,()=>target.closest('details')?.querySelector('summary') || null);
   target.replaceChildren();
   const boats = orderedBoats(state).filter(boat=>state.selectedUids.includes(boat.uid) && matchesPlatform(boat,state.selectedPlatform) && matchesRegion(boat,state.selectedRegion));
   const chosen = boats.find(boat=>boat.uid===selectedUid) || boats[0];
@@ -20,10 +22,12 @@ export function renderSourceAccess(target: HTMLElement, state: AppState, selecte
     }
     if (group.children.length) select.append(group);
   }
-  select.value=chosen?.uid || ''; select.disabled=!chosen;
+  select.value=chosen?.uid || ''; select.disabled=!chosen;select.dataset.locked=String(!chosen);
+  select.setAttribute('aria-describedby','source-access-reason');
   select.addEventListener('change',()=>selectBoat(select.value)); label.append(select); controls.append(label);
-  const link = chosen && sourceLink(bookingAlias(chosen.uid)?.url || chosen.url,chosen.uid);
+  const link = chosen && sourceLink(bookingAlias(chosen.uid)?.url || chosen.url,chosen.uid,chosen.name);
   if (link) { link.textContent='공식 예약 페이지 열기 ↗'; link.className='button primary'; controls.append(link); }
-  else controls.append(el('p',chosen ? '저장된 공식 링크가 없습니다.' : '등록된 티어와 지역을 확인하세요.','muted'));
+  const reason=el('p',chosen ? link?'공식 페이지는 새 탭에서 열립니다.':'저장된 공식 링크가 없습니다.':'등록된 티어와 지역을 확인하세요.','muted');reason.id='source-access-reason';controls.append(reason);
   target.append(heading,controls);
+  restoreFocus();
 }

@@ -17,6 +17,12 @@ export function finishFilterPanels(root:HTMLElement,outcome:QueryOutcome):void {
   }
 }
 export function installFilterPanels(root:HTMLElement):void {
+  root.addEventListener('keydown',event=>{
+    if(event.key!=='Escape' || event.defaultPrevented) return;
+    const panel=(event.target as HTMLElement).closest<HTMLDetailsElement>('details[open]');
+    if(!panel || !root.contains(panel)) return;
+    event.preventDefault();event.stopPropagation();panel.open=false;panel.querySelector<HTMLElement>(':scope>summary')?.focus({preventScroll:true});
+  });
   root.addEventListener('click',event=>{
     const button=(event.target as HTMLElement).closest<HTMLButtonElement>('[data-close-panel]');
     if(!button) return;

@@ -4,6 +4,7 @@ import { displayedSpecies, speciesColor, speciesLabel } from './species';
 import { calculateTideMonth } from './tides';
 import { addTideToCell } from './tideView';
 import {calendarStatus} from './calendarStatus';
+import {retainFocus} from './uiFocus';
 
 export function visibleEvents(state: AppState, tier: Filter, search = '', matchingOnly=false) {
   return queryMonth(state,{month:state.month,requiredPeople:state.requiredPeople,tier,search,matchingOnly}).events;
@@ -18,7 +19,7 @@ export function monthDays(month: string): (string | null)[] {
   return values;
 }
 export function renderCalendar(target: HTMLElement, state: AppState, tier: Filter, search: string, selectedDay: string, onSelect: (day: string, keyboard?:boolean) => void, matchingOnly=false, result?:ReturnType<typeof queryMonth>): void {
-  const focused=document.activeElement instanceof HTMLElement && target.contains(document.activeElement) ? document.activeElement.dataset.date:undefined;
+  const restoreFocus=retainFocus(target);
   target.replaceChildren();
   const tide=calculateTideMonth(state.month,state.tideDays || []);
   const query=result ?? queryMonth(state,{month:state.month,requiredPeople:state.requiredPeople,tier,search,matchingOnly});
@@ -51,6 +52,6 @@ export function renderCalendar(target: HTMLElement, state: AppState, tier: Filte
     button.setAttribute('aria-label',`${button.getAttribute('aria-label')} · 표시 대상 선박 ${visibleIds.length}척${remaining?` · 미리보기 외 ${remaining}척 · 날짜 선택으로 전체 보기`:''}`);
     if (records.length) button.classList.add('has-records');
     button.addEventListener('click', event => onSelect(day,event.detail===0)); target.append(button);
-    if(focused===day) button.focus({preventScroll:true});
   }
+  restoreFocus();
 }

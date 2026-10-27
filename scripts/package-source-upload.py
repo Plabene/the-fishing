@@ -11,7 +11,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 ROOT_FILES = {'.gitignore', '.node-version', 'README.md', 'mobile.cmd'}
 APP_FILES = {'index.html', 'package.json', 'pnpm-lock.yaml', 'tsconfig.json',
-             'vite.config.ts', 'wrangler.jsonc', 'README.md', 'README_MOBILE_A_KO.md'}
+             'vite.config.ts', 'playwright.accessibility.config.ts', 'wrangler.jsonc', 'README.md', 'README_MOBILE_A_KO.md'}
 APP_DIRS = {'src', 'public', 'tests', 'scripts', 'availability_api'}
 EXCLUDED = {'.git', '.venv', 'node_modules', '__pycache__', '.wrangler', '.worker-build',
             '.local', 'release', 'dist', '.cache', '.pnpm-store', 'test-results', 'playwright-report'}

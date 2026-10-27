@@ -1,11 +1,12 @@
 import type {Boat} from './models';
+import {retainDisclosureUi} from './uiFocus';
 import {el} from './dayView';
 import {uniqueFleet} from './fleetList';
 import {emptyRegion,matchesRegion,readRegionFilter,regionValue,regionValues,regionSelection,pruneRegionChildren,REGION_FIELDS,REGION_LABELS,UNKNOWN_REGION,type RegionFilter} from './regions';
 export function renderRegionFilter(target:HTMLElement,boats:Boat[],selected:RegionFilter|undefined,onChange:(filter:RegionFilter)=>void) {
+  const restoreUi=retainDisclosureUi(target,()=>target.closest('details')?.querySelector('summary') || null);
   const opened=new Set([...target.querySelectorAll<HTMLDetailsElement>('details[open]')].map(node=>node.dataset.regionField));
   const scroll=new Map([...target.querySelectorAll<HTMLElement>('.region-options')].map(node=>[node.id,node.scrollTop]));
-  const focused=target.contains(document.activeElement)?document.activeElement as HTMLInputElement:null,focusField=focused?.dataset.regionChoice,focusValue=focused?.value,focusId=focused?.id;
   target.replaceChildren();boats=uniqueFleet(boats);const filter=readRegionFilter(selected),controls=el('div','','region-controls');
   for(const [index,key] of REGION_FIELDS.entries()) {
     const parent=Object.fromEntries(REGION_FIELDS.slice(0,index).map(k=>[k,filter[k]])),counts=new Map<string,number>();
@@ -27,5 +28,5 @@ export function renderRegionFilter(target:HTMLElement,boats:Boat[],selected:Regi
   const help=el('details','','region-help');help.dataset.regionField='help';help.open=opened.has('help');help.append(el('summary','지역 선택 안내'),el('p','같은 항목은 하나라도 일치, 다른 항목은 모두 일치하는 선박을 표시합니다. 항구 선택 시 출항지 미확인 선박은 제외됩니다. 전국 완전 목록은 아직 확인되지 않았습니다.','muted'));
   target.append(controls,help);
   for(const node of target.querySelectorAll<HTMLElement>('.region-options')) node.scrollTop=scroll.get(node.id) || 0;
-  [...target.querySelectorAll<HTMLInputElement|HTMLButtonElement>('input,button')].find(node=>focusField?node.dataset.regionChoice===focusField && node.value===focusValue:!!focusId && node.id===focusId)?.focus({preventScroll:true});
+  restoreUi();
 }

@@ -45,7 +45,6 @@ main .tier-tabs button { min-width:0; padding:5px 2px; }
 }
 #species-toggle { flex:1; min-width:125px; }
 #species-toggle[open] { flex-basis:100%; order:3; }
-#species-toggle-label[aria-disabled=true] { color:#73807c; background:#f3f5f4; }
 #species-filter { margin:4px 0 0; padding:8px; border-radius:8px; }
 .species-controls { gap:4px; }
 .species-controls strong { font-size:12px; min-width:0; }

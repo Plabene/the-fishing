@@ -59,6 +59,7 @@ export function scrollToControl(target:HTMLElement) {
 export function installQueryRecovery(root:HTMLElement) {
   const routes:Record<string,string>={'recovery-fleet':'#fleet-search','recovery-region':'#region-toggle>summary','recovery-tiers':'#tabs button','recovery-species':'#species-toggle>summary','recovery-query':'#query-submit','recovery-api':'#api-url','recovery-official':'#source-boat'};
   root.addEventListener('click',event=>{
+    if((event.target as HTMLElement).closest('#skip-results')) {event.preventDefault();scrollToControl(root.querySelector<HTMLElement>('#booking-heading')!);return;}
     const link=(event.target as HTMLElement).closest<HTMLAnchorElement>('#query-recovery a');
     const selector=link && routes[link.id];if(!selector) return;
     const target=root.querySelector<HTMLElement>(selector);if(!target) return;
@@ -72,8 +73,8 @@ export function installQueryRecovery(root:HTMLElement) {
 export function revealSelectedDay(root:HTMLElement,keyboard:boolean) {
   const panel=root.querySelector<HTMLElement>('#day-view')!,heading=panel.querySelector<HTMLElement>('h2')!;
   const narrow=!!window.matchMedia?.('(max-width: 900px)')?.matches;
-  const announcement=root.querySelector<HTMLElement>('#day-announcement')!;
-  if(narrow && keyboard) {setText(announcement,'');heading.focus({preventScroll:true});}
-  else setText(announcement,heading.textContent || '');
+  const announcement=document.querySelector<HTMLElement>('#app-announcement');
+  if(narrow && keyboard) {if(announcement) setText(announcement,'');heading.focus({preventScroll:true});}
+  else if(announcement) setText(announcement,heading.textContent || '');
   if(narrow) panel.scrollIntoView?.({block:'nearest',behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?'auto':'smooth'});
 }

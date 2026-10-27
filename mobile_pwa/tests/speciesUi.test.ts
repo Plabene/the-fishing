@@ -13,7 +13,8 @@ test('species controls filter calendar/list/day, persist choices, switch months 
   const el=(q:string)=>document.querySelector<HTMLElement>(q)!;
   const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
   const choice=(value:string)=>el(`[data-species-choice="${value}"]`) as HTMLInputElement;
-  const choose=async(...values:string[])=>{el('#species-none').click();await settle();for(const value of values) {choice(value).click();await settle();}};
+  // Keyboard assertions must operate inside an actually open disclosure.
+  const choose=async(...values:string[])=>{(el('#species-toggle') as HTMLDetailsElement).open=true;el('#species-none').click();await settle();for(const value of values) {choice(value).click();await settle();}};
   expect(el('#summary').textContent).toContain('4개 출조');expect(el('#species-select').textContent).not.toContain('다운샷');
   await choose('unknown');expect(el('#summary').textContent).toContain('1개 출조');el('#view-list').click();
   expect(el('#month-results').textContent).toContain('다운샷');expect(el('#month-results').textContent).toContain('어종 · 기타/미확인');el('#view-calendar').click();

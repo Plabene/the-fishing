@@ -42,7 +42,7 @@ test.each([{narrow:true,reduce:true,keyboard:true},{narrow:true,reduce:false,key
   revealSelectedDay(root,keyboard);
   if(narrow) expect(scroll).toHaveBeenCalledWith({block:'nearest',behavior:reduce?'auto':'smooth'});else expect(scroll).not.toHaveBeenCalled();
   expect(document.activeElement).toBe(narrow&&keyboard?get('day-heading'):stable);
-  expect(get('day-announcement').textContent).toBe(narrow&&keyboard?'':get('day-heading').textContent);
+  expect(get('app-announcement').textContent).toBe(narrow&&keyboard?'':get('day-heading').textContent);
   expect(get('day-view').hasAttribute('aria-live')).toBe(false);
 });
 

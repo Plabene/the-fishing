@@ -9,6 +9,7 @@
     "build": "tsc --noEmit && vite build && node scripts/finalize-build.mjs && node scripts/audit-bundle.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
+    "test:browser": "playwright test --config playwright.accessibility.config.ts",
     "api:check": "wrangler deploy --dry-run --outdir .worker-build",
     "api:dev": "wrangler dev --local --ip 127.0.0.1 --port 8787 --show-interactive-dev-session false",
     "api:deploy": "wrangler deploy"
