@@ -5,6 +5,7 @@ import {Sunsang24PublicApi} from '../src/providers/sunsang24PublicApi';
 import {defaultFleet} from '../src/defaultFleet';
 import {publicRouteForBoat} from '../src/sunsang24PublicRoutes';
 import {auditCalendar} from '../src/calendarAudit';
+import {sunsangListing} from '../src/platforms';
 import {discoverPublicHosts,publicCandidateHost} from '../scripts/lib/public-discovery.mjs';
 
 // Actual 2026-10-28 DOM, stripped to public schedule identity/status/species fields.
@@ -34,6 +35,14 @@ test('audit detects dropped rows and stale results instead of counting HTTP succ
  expect(auditCalendar(boat('769'),month,source,{...client,cached:true})).toMatchObject({classification:'CALENDAR_MISMATCH',calendarEvents:0});
  expect(auditCalendar(boat('769'),month,source,{...client,status:'UNVERIFIED',events:[]})).toMatchObject({classification:'SOURCE_FAILED'});
  expect(auditCalendar(boat('769'),month,{...source,events:[]},{...client,events:[]})).toMatchObject({classification:'NO_PUBLISHED_SCHEDULE',calendarEvents:0});
+});
+test('legacy personal boat UIDs compare using verified platform identity without changing stored tiers',()=>{
+ const alias=defaultFleet().boats.find(b=>b.uid==='external:c4ebfacb32593d90a212')!;
+ const id=sunsangListing(alias.uid)!.shipId,source=parsePublicMonth(html,host,month,new Date().toISOString());
+ source.events=source.events.filter(e=>e.uid===boat('769').uid).map(e=>({...e,uid:`sunsang24:ship:${id}`}));
+ const client={...source,events:source.events.map(e=>({...e,uid:alias.uid}))};
+ expect(auditCalendar(alias,month,source,client)).toMatchObject({classification:'NORMAL_CALENDAR',sourceEvents:30,calendarEvents:30});
+ expect(alias.uid).toBe('external:c4ebfacb32593d90a212');
 });
 test('discovery deduplicates only public fleet homepage candidates and never authorizes them',()=>{
  const links=['https://newboat.sunsang24.com/','https://newboat.sunsang24.com/ship/schedule_fleet/202611','https://api.sunsang24.com/','https://www.sunsang24.com/ship/list','https://evil.example/','https://user:password@other.sunsang24.com/','http://plain.sunsang24.com/','javascript:alert(1)','https://private.sunsang24.com/customer/account','https://sibling.sunsang24.com/ship/info'];

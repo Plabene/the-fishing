@@ -31,8 +31,10 @@ try {
   for(const boat of sorted) {
    const route=publicRouteForBoat(boat.uid),row={uid:boat.uid,shipId:sunsangListing(boat.uid)?.shipId,name:boat.name,region:commonRegion(boat),url:boat.url,month,host:route?.host||'',sourceUrl:route?`https://${route.host}/ship/schedule_fleet/${month.replace('-','')}`:null,classification:route?'NOT_TESTED':'UNLINKED'};
    if(live && route) {
-    const start=Date.now(),client=await provider.readMonth(boat,month,AbortSignal.timeout(35000));
-    const source=raw.get(route.host)||client;
+    const start=Date.now();let client;
+    try {client=await provider.readMonth(boat,month,AbortSignal.timeout(35000));}
+    catch {client={status:'TIMEOUT',events:[],message:'Audit request deadline exceeded',source:'api',stop:false};}
+    const candidate=raw.get(route.host),source=candidate && Array.isArray(candidate.events) && typeof candidate.status==='string'?candidate:client;
     Object.assign(row,auditCalendar(boat,month,source,client),{status:client.status,message:client.message,httpStatus:source.httpStatus||client.httpStatus||null,observedAt:client.observedAt||null,fresh:client.fresh===true,cached:client.cached===true,elapsedMs:Date.now()-start});
     console.log(JSON.stringify({uid:row.uid,month,classification:row.classification,events:row.calendarEvents}));
    }
