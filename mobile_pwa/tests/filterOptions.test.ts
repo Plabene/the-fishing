@@ -63,7 +63,7 @@ test('manual close, reopen and completion keep form values; errors and cancellat
   for(const id of ids) {panel(id).open=true;root.querySelector<HTMLButtonElement>(`[data-close-panel="${id}"]`)!.click();expect(panel(id).open).toBe(false);expect(input.value).toBe('3');panel(id).querySelector<HTMLElement>('summary')!.click();expect(panel(id).open).toBe(true);}
   for(const outcome of ['loading','cancelled','partial','error'] as const) {finishFilterPanels(root,outcome);expect(ids.every(id=>panel(id).open)).toBe(true);}
   for(const outcome of ['success','empty'] as const) {ids.forEach(id=>panel(id).open=true);finishFilterPanels(root,outcome);expect(ids.some(id=>panel(id).open)).toBe(false);expect(input.value).toBe('3');}
-  finishFilterPanels(root,'error');expect(panel('region-toggle').open).toBe(true);
+  finishFilterPanels(root,'error','scope');expect(panel('region-toggle').open).toBe(true);
   const before=(a:string,b:string)=>!!(root.querySelector(a)!.compareDocumentPosition(root.querySelector(b)!)&Node.DOCUMENT_POSITION_FOLLOWING);
   expect(before('#calendar-layout','#fleet-section')).toBe(true);expect(root.querySelector('#selected-boats')).toBeNull();
   expect(before('#region-toggle','#calendar-layout')).toBe(true);expect(before('#species-toggle','#calendar-layout')).toBe(true);

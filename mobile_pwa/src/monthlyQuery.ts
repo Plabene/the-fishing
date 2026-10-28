@@ -18,8 +18,8 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   const ids=new Set(boats.map(b=>b.uid)), order=new Map(boats.map((b,i)=>[b.uid,i]));
   const boatById=new Map(boats.map(b=>[b.uid,b]));
   const search=query.search.trim().toLocaleLowerCase();
-  const raw=state.events.filter(e=> {
-    if (!ids.has(e.uid) || !e.date.startsWith(query.month+'-')) return false;
+  const sourceRaw=state.events.filter(e=>ids.has(e.uid) && e.date.startsWith(query.month+'-'));
+  const raw=sourceRaw.filter(e=> {
     const b=boatById.get(e.uid);
     return !search || `${b?.name} ${b?.port} ${e.trip} ${speciesLabel(eventSpecies(e))}`.toLocaleLowerCase().includes(search);
   }).sort((a,b)=>a.date.localeCompare(b.date) || order.get(a.uid)!-order.get(b.uid)! || a.departure.localeCompare(b.departure) || a.trip.localeCompare(b.trip));
@@ -37,9 +37,9 @@ export function queryMonth(state:AppState, query:MonthQuery, now=Date.now()) {
   const matches=all.filter(meetsPeople), events=query.matchingOnly ? matches : all;
   const days=[...new Set(events.map(e=>e.date))];
   const checked=new Set((state.monthChecks || []).filter(c=>c.month===query.month && c.requiredPeople<=query.requiredPeople && ids.has(c.uid)).map(c=>c.uid));
-  for (const e of raw) checked.add(e.uid);
+  for (const e of sourceRaw) checked.add(e.uid);
   const failures=state.failures.filter(f=>f.month===query.month && ids.has(f.uid));
-  const dates=raw.flatMap(e=>e.observedAt ? [e.observedAt] : []);
+  const dates=sourceRaw.flatMap(e=>e.observedAt ? [e.observedAt] : []);
   dates.push(...(state.monthChecks || []).filter(c=>c.month===query.month && ids.has(c.uid)).map(c=>c.observedAt));
   dates.sort((a,b)=>Date.parse(b)-Date.parse(a));
   return {events,all,matches,days,boats,speciesCounts,rawSpeciesCounts,checkedCount:checked.size,missingBoats:boats.filter(b=>!checked.has(b.uid)),failures,latest:dates[0] || null,

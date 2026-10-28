@@ -71,6 +71,22 @@ jobs:
         # Avoid resource contention between full-catalog DOM suites.
         run: pnpm test --maxWorkers=2
 
+      - name: Install browser for local fixture checks
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Test responsive keyboard journeys with mocked providers
+        timeout-minutes: 5
+        run: pnpm test:browser
+
+      - name: Save browser verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: browser-verification
+          path: mobile_pwa/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: Check API build
         run: pnpm run api:check
 

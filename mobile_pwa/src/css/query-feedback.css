@@ -1,5 +1,14 @@
 .query-feedback { border:1px solid var(--line); background:#f5f8f6; border-radius:8px; margin:6px 0; padding:7px 9px; min-width:0; font-size:12px; overflow-wrap:anywhere; }
 .query-feedback p { margin:3px 0; }
+.query-feedback[data-outcome=changed] #query-result-state { color:#85401e; }
+#query-result-state { margin-right:8px; }
+.result-search { margin:5px 0 8px; font-size:12px; }
+.result-search>summary { cursor:pointer; padding:5px 0; min-height:36px; }
+.result-search-controls { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px; margin:4px 0; }
+.result-search-controls input { width:100%; min-width:0; border:1px solid #76968c; border-radius:6px; padding:6px 8px; font-size:13px; }
+.result-search-controls button { min-height:40px; padding:5px 8px; font-size:12px; }
+.manage-tier-link { display:inline-flex; align-items:center; min-height:44px; margin-top:6px; padding:5px 8px; color:#225c50; font-size:13px; text-underline-offset:3px; }
+.manage-tier-link[hidden] { display:none; }
 .query-feedback [role=status] { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 8px; }
 #query-result-state { color:#205e50; }
 #query-result-counts, #query-result-note { font-size:11px; }

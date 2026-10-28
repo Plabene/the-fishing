@@ -16,7 +16,7 @@ test('region/tier summary, target requests and calendar agree without individual
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));
     expect(el('#query-target').textContent).toContain('2척');const ids=[...document.querySelectorAll('[id]')].map(node=>node.id);expect(new Set(ids).size).toBe(ids.length);
-    for(const removed of ['#search-section','#search','#selected-boats','#select-all','#select-none','#selected-only','.boat-row input[type=checkbox]']) expect(el(removed)).toBeNull();
+    for(const removed of ['#search-section','#selected-boats','#select-all','#select-none','#selected-only','.boat-row input[type=checkbox]']) expect(el(removed)).toBeNull();
     expect(el('#region-toggle').compareDocumentPosition(el('#tabs')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(el('#tabs').compareDocumentPosition(el('#query-form')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     el('#region-province input[value="전북특별자치도"]').click();await settle();

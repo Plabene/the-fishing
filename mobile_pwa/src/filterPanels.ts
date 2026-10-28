@@ -1,6 +1,7 @@
 export type QueryOutcome='loading'|'success'|'empty'|'partial'|'error'|'cancelled';
+export type QueryIssue='scope'|'offline'|'api'|'invalid'|'storage';
 const panels=['region-toggle','species-toggle'];
-export function finishFilterPanels(root:HTMLElement,outcome:QueryOutcome):void {
+export function finishFilterPanels(root:HTMLElement,outcome:QueryOutcome,issue?:QueryIssue):void {
   root.dataset.queryState=outcome;
   if(outcome==='success' || outcome==='empty') {
     // Native details closing may blur its descendant. Capture the owner before closing.
@@ -12,7 +13,7 @@ export function finishFilterPanels(root:HTMLElement,outcome:QueryOutcome):void {
       const destination=submit && !submit.disabled && !submit.hidden?submit:root.querySelector<HTMLElement>('#region-toggle>summary');
       destination?.focus({preventScroll:true});
     }
-  } else if(outcome==='error' || outcome==='partial') {
+  } else if((outcome==='error' || outcome==='partial') && issue==='scope') {
     const region=root.querySelector<HTMLDetailsElement>('#region-toggle');if(region) region.open=true;
   }
 }

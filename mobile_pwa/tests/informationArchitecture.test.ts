@@ -20,7 +20,7 @@ test('one route has labelled scope, results and management; counts and source st
   expect(before('#summary','#calendar-layout')).toBe(true);expect(before('#source-badge','#calendar-layout')).toBe(true);
   expect(before('#booking-results','#fleet-section')).toBe(true);expect(before('#fleet-section','#management-section')).toBe(true);
   expect(root.querySelectorAll('#query-form button[type=submit],button[form=query-form][type=submit]')).toHaveLength(1);
-  for(const selector of ['#search','#search-section','#search-reset','#selected-boats','#select-all','#select-none']) expect(root.querySelector(selector)).toBeNull();
+  for(const selector of ['#search-section','#search-reset','#selected-boats','#select-all','#select-none']) expect(root.querySelector(selector)).toBeNull();
   expect(get('#tier-scope-help').textContent).toContain('이번 조회 범위만 바꿉니다');
 });
 
@@ -52,6 +52,6 @@ test('manual close returns focus to summary; unavailable submit falls back to a 
   expect(document.activeElement).toBe(region.querySelector('summary'));expect(region.open).toBe(false);
   region.open=true;root.querySelector<HTMLButtonElement>('[data-close-panel=region-toggle]')!.focus();root.querySelector<HTMLButtonElement>('#query-submit')!.disabled=true;
   finishFilterPanels(root,'success');expect(document.activeElement).toBe(region.querySelector('summary'));
-  species.open=true;finishFilterPanels(root,'error');expect(region.open).toBe(true);expect(species.open).toBe(true);
+  species.open=true;finishFilterPanels(root,'error','scope');expect(region.open).toBe(true);expect(species.open).toBe(true);
   finishFilterPanels(root,'cancelled');expect(region.open).toBe(true);expect(species.open).toBe(true);
 });

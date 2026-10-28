@@ -23,9 +23,28 @@ test('responsive keyboard journey preserves exact filters, data, focus and nativ
   const date=await page.locator('#month').inputValue()+'-06';await page.locator(`[data-date="${date}"]`).press('Enter');await expect(page.locator('#day-heading')).toContainText('1척 · 2개');if(testInfo.project.use.viewport!.width<=900) await expect(page.locator('#day-heading')).toBeFocused();
   await expect(page.locator('.event-card')).toHaveCount(2);for(const card of await page.locator('.event-card').all()) {await expect(card).toContainText('쭈꾸미');await expect(card).toContainText('갑오징어');await expect(card).toContainText('120,000원');await expect(card.locator('a')).toHaveAttribute('rel','noopener noreferrer');await expect(card.locator('a')).toHaveAttribute('aria-label',/아주긴선박명.*새 탭/);}
   expect(await overflow()).toBe(true);await page.screenshot({path:testInfo.outputPath('after-day.png'),fullPage:true});
-  await page.locator('#fleet-section>summary').press('Enter');await page.locator('.boat-more>summary').first().press('Enter');expect(await overflow()).toBe(true);await page.keyboard.press('Escape');await expect(page.locator('.boat-more>summary').first()).toBeFocused();
+  await page.locator('#manage-tier-boats').press('Enter');await expect(page.locator('#fleet-search')).toBeFocused();await page.locator('.boat-more>summary').first().press('Enter');expect(await overflow()).toBe(true);await page.keyboard.press('Escape');await expect(page.locator('.boat-more>summary').first()).toBeFocused();
   await page.locator('[data-tier=none]').click();await page.locator('#query-submit').click();await expect(page.locator('#query-result-state')).toHaveText('조회 대상 없음');await page.locator('#recovery-fleet').press('Enter');await expect(page.locator('#fleet-search')).toBeFocused();
   await testInfo.attach('measurement',{body:JSON.stringify({width:testInfo.project.use.viewport!.width,horizontalOverflow:!await overflow(),humanTaskTime:'not measured',fiveSecondStudy:'not conducted',screenReaderAudio:'not measured'}),contentType:'application/json'});
+});
+
+test('scope changes invalidate completion, while result search and species remain local',async({page},testInfo)=>{
+  await page.locator('#query-submit').click();await expect(page.locator('#query-result-state')).toHaveText('완료');
+  await expect(page.locator('#fixture-requests')).toHaveText('요청 4');
+  await page.locator('#result-search>summary').press('Enter');await page.locator('#search').fill('반응형 시험 2호');
+  await expect(page.locator('#summary')).toContainText('2개 출조');await expect(page.locator('#search')).toBeFocused();
+  await expect(page.locator('#query-result-state')).toHaveText('완료');await expect(page.locator('#query-result-counts')).toContainText('확인 4척');
+  await page.locator('#search').fill('존재하지 않는 시험선박');await expect(page.locator('#query-result-note')).toContainText('검색어를 지우면');
+  await page.locator('#search-clear').press('Enter');await expect(page.locator('#search')).toBeFocused();await expect(page.locator('#summary')).toContainText('8개 출조');
+  await expect(page.locator('#fixture-requests')).toHaveText('요청 4');
+  if(testInfo.project.use.hasTouch) await page.locator('[data-tier=tier1]').tap();else await page.locator('[data-tier=tier1]').press('Space');
+  await expect(page.locator('#query-result-state')).toHaveText('조건 변경 · 새 조회 필요');await expect(page.locator('#query-result-counts')).toContainText('이전 조건의 조회: 완료');
+  await expect(page.locator('#recovery-query')).toBeVisible();await expect(page.locator('#fixture-requests')).toHaveText('요청 4');
+  await page.locator('#recovery-query').press('Enter');await expect(page.locator('#query-submit')).toBeFocused();await page.keyboard.press('Enter');await expect(page.locator('#query-result-state')).toHaveText('완료');await expect(page.locator('#fixture-requests')).toHaveText('요청 5');
+  await page.locator('#people').fill('2');await page.locator('#query-submit').click();await expect(page.locator('#fixture-requests')).toHaveText('요청 6');await expect(page.locator('#query-result-state')).toHaveText('완료');
+  await page.locator('#next').press('Enter');await expect(page.locator('#query-result-state')).toHaveText('조건 변경 · 새 조회 필요');await expect(page.locator('#summary')).toContainText('0개 출조');await expect(page.locator('#fixture-requests')).toHaveText('요청 6');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:testInfo.outputPath('scope-changed.png'),fullPage:true});
 });
 
 test('success, empty, partial, failure, cancellation and offline do not erase user tiers',async({page,context},testInfo)=>{
@@ -34,4 +53,24 @@ test('success, empty, partial, failure, cancellation and offline do not erase us
   await page.locator('#fixture-scenario').selectOption('slow');await page.locator('#query-submit').click();await expect(page.locator('#stop-query')).toBeVisible();await page.locator('#stop-query').press('Enter');await expect(page.locator('#query-result-state')).toHaveText('취소');await expect(page.locator('#query-submit')).toBeFocused();
   await context.setOffline(true);await page.locator('#query-submit').click();await expect(page.locator('#query-result-note')).toContainText('오프라인');await context.setOffline(false);
   await page.locator('#fleet-section>summary').click();await expect(page.locator('#tier-saved-counts')).toContainText('1티어 1 / 2티어 1 / 3티어 1 / 기타 1');await page.screenshot({path:testInfo.outputPath('recovery.png'),fullPage:true});
+});
+
+test('visible scope, species and day detail text keep readable contrast and size',async({page},testInfo)=>{
+  await page.locator('#query-submit').click();await expect(page.locator('#query-result-state')).toHaveText('완료');
+  await page.locator('#species-toggle-label').click();
+  const date=await page.locator('#month').inputValue()+'-06';await page.locator(`[data-date="${date}"]`).click();
+  const samples=await page.evaluate(()=>{
+    const rgb=(s:string)=>s.match(/[\d.]+/g)!.map(Number);
+    const lum=(v:number[])=>v.slice(0,3).map(c=>c/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4).reduce((sum,c,i)=>sum+c*[.2126,.7152,.0722][i],0);
+    const visible=(n:Element)=>{for(let p:Element|null=n;p;p=p.parentElement) if((p as HTMLElement).hidden || getComputedStyle(p).display==='none' || getComputedStyle(p).visibility==='hidden' || p instanceof HTMLDetailsElement && !p.open && !p.querySelector('summary')?.contains(n)) return false;return n.getClientRects().length>0;};
+    return [...document.querySelectorAll('#query-scope *,#query-feedback *,#species-filter *,#calendar *,#day-view *,#result-search>summary')].filter(n=>visible(n) && [...n.childNodes].some(c=>c.nodeType===3 && c.textContent?.trim()) && !n.closest(':disabled')).map(n=>{
+      let bg=[255,255,255];for(let p:Element|null=n;p;p=p.parentElement) {const c=rgb(getComputedStyle(p).backgroundColor);if(c.length===3 || c[3]>=.99) {bg=c;break;}}
+      const style=getComputedStyle(n),a=lum(rgb(style.color)),b=lum(bg);
+      return {selector:n.id || n.className,text:n.textContent?.slice(0,40),font:Number.parseFloat(style.fontSize),contrast:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};
+    });
+  });
+  expect(samples.length).toBeGreaterThan(100);
+  expect(samples.filter(s=>s.contrast<4.5),JSON.stringify(samples.filter(s=>s.contrast<4.5))).toEqual([]);
+  expect(samples.filter(s=>s.font<10)).toEqual([]);
+  await testInfo.attach('computed-text-contrast',{body:JSON.stringify(samples),contentType:'application/json'});
 });

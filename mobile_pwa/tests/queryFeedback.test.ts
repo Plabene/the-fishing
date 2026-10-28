@@ -5,7 +5,7 @@ import {appLayout} from '../src/appLayout';
 import {renderCalendar} from '../src/calendarView';
 import {renderDay} from '../src/dayView';
 import {queryMonth} from '../src/monthlyQuery';
-import {renderQueryFeedback,requestCounts,revealSelectedDay,type QuerySession} from '../src/queryFeedback';
+import {renderQueryFeedback,requestCounts,queryScopeFingerprint,revealSelectedDay,type QuerySession} from '../src/queryFeedback';
 import type {LiveRow} from '../src/liveQuery';
 
 afterEach(()=>{vi.unstubAllGlobals();document.body.replaceChildren();});
@@ -51,16 +51,16 @@ test('request counts do not count duplicate rows or unrelated IDs and differ fro
   const failed:LiveRow={boat:state.boats[1],result:{status:'HTTP_ERROR',events:[],message:'fixture',stop:false}};
   const rows=[success,success,failed,{...failed,boat:{...failed.boat,uid:'unrelated'}}];
   expect(requestCounts(state.boats,rows)).toEqual({total:3,success:1,failed:1,unqueried:1});
-  state.selectedUids=['1'];const session:QuerySession={month:state.month,outcome:'partial'};
+  state.selectedUids=['1'];const session:QuerySession={scope:queryScopeFingerprint(state),month:state.month,outcome:'partial'};
   renderQueryFeedback(root,state,result(),'all',session,state.boats,rows,'live');
   expect(get('query-result-scope').textContent).toContain('현재 대상 1척');expect(get('query-result-counts').textContent).toContain('마지막 요청 대상 3척 · 확인 1척 · 실패/미지원 1척 · 미조회 1척');
   expect(get('query-result-state').textContent).toBe('일부 완료');expect(get('recovery-official').hidden).toBe(false);
   renderQueryFeedback(root,state,result(),'all',session,state.boats,rows,'saved');expect(get('query-result-state').textContent).toBe('이전 자료 열람');expect(get('query-result-note').textContent).toContain('현재 잔여석이 아닙니다');expect(get('last-observed').textContent).toContain('이전 자료');
-  renderQueryFeedback(root,state,result(),'all',{month:'2026-10',outcome:'success'},state.boats,rows,'live');expect(get('query-result-state').textContent).toBe('조회 전');
+  renderQueryFeedback(root,state,result(),'all',{scope:queryScopeFingerprint({...state,month:'2026-10'}),month:'2026-10',outcome:'success'},state.boats,rows,'live');expect(get('query-result-state').textContent).toBe('조건 변경 · 새 조회 필요');
 });
 
 test('offline, expired observation, successful empty and failure do not imply fully booked',()=>{
-  const {root,state,result,get}=fixture(),session:QuerySession={month:state.month,outcome:'success'};
+  const {root,state,result,get}=fixture(),session:QuerySession={scope:queryScopeFingerprint(state),month:state.month,outcome:'success'};
   vi.spyOn(navigator,'onLine','get').mockReturnValue(false);
   renderQueryFeedback(root,state,result(),'all',session,state.boats,[],'live');expect(get('last-observed').textContent).toContain('오프라인');vi.restoreAllMocks();
   state.events.forEach(e=>e.observedAt='2026-01-01T00:00:00Z');renderQueryFeedback(root,state,result(),'all',session,state.boats,[],'live');expect(get('last-observed').textContent).toContain('시간 경과');
@@ -70,6 +70,6 @@ test('offline, expired observation, successful empty and failure do not imply fu
 
  test('storage errors retain actual response counts while live seats remain unavailable',()=>{
   const {root,state,result,get}=fixture();state.events=[];
-  renderQueryFeedback(root,state,result(),'all',{month:state.month,outcome:'error',issue:'storage',message:'기기에 반영하지 못했습니다.',counts:{total:3,success:2,failed:1,unqueried:0}},state.boats,[],'live');
+  renderQueryFeedback(root,state,result(),'all',{scope:queryScopeFingerprint(state),month:state.month,outcome:'error',issue:'storage',message:'기기에 반영하지 못했습니다.',counts:{total:3,success:2,failed:1,unqueried:0}},state.boats,[],'live');
   expect(get('query-result-state').textContent).toBe('실패');expect(get('query-result-counts').textContent).toContain('확인 2척 · 실패/미지원 1척 · 미조회 0척');expect(get('query-result-note').textContent).toBe('기기에 반영하지 못했습니다.');expect(get('last-observed').textContent).toContain('확인된 자료 없음');
 });
