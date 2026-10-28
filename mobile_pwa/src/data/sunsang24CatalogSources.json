@@ -785,6 +785,60 @@
       "locationToken": "여수",
       "regionEvidenceUrl": "https://newstar.sunsang24.com/ship/schedule_fleet",
       "portByShip": {}
+    },
+    {
+      "host": "ysoceanstar.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "여수",
+      "locationToken": "여수",
+      "regionEvidenceUrl": "https://ysoceanstar.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "redfox.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "여수",
+      "locationToken": "여수",
+      "regionEvidenceUrl": "https://redfox.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "juliana.sunsang24.com",
+      "sea": "서해권",
+      "province": "충청남도",
+      "local": "태안",
+      "locationToken": "태안",
+      "regionEvidenceUrl": "https://juliana.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "paragon.sunsang24.com",
+      "sea": "서해권",
+      "province": "충청남도",
+      "local": "서천",
+      "locationToken": "서천",
+      "regionEvidenceUrl": "https://paragon.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "dolpung.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "여수",
+      "locationToken": "여수",
+      "regionEvidenceUrl": "https://dolpung.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "kingkong.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "고흥",
+      "locationToken": "고흥",
+      "regionEvidenceUrl": "https://kingkong.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
     }
   ]
 }

@@ -1,8 +1,9 @@
-import {readFile,writeFile,rename} from 'node:fs/promises';
+import {readFile,writeFile,rename,mkdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {robotsAllows} from './lib/robots.mjs';
 import {parsePublicFleet,validatePublicFleet} from './lib/public-fleet.mjs';
 import {prepareCatalogRefresh} from './lib/catalog-refresh.mjs';
+import {discoverPublicHosts,publicCandidateHost} from './lib/public-discovery.mjs';
 if(!process.argv.includes('--live')) throw new Error('Use --live for registered public vessel pages.');
 const path=resolve(import.meta.dirname,'../src/data/sunsang24Fleet.json'),previous=JSON.parse(await readFile(path,'utf8'));
 const sources=JSON.parse(await readFile(resolve(import.meta.dirname,'../src/data/sunsang24CatalogSources.json'),'utf8')).sources;
@@ -24,19 +25,23 @@ async function get(url,max,type) {
     } catch(error) {if(attempt===0 && (error.transient || error.name==='TimeoutError' || error instanceof TypeError && !/redirect/i.test(error.message))) continue;throw error;}
   }
 }
-const results=[],reports=[];
+const results=[],reports=[],candidates=new Map(),knownHosts=new Set(sources.map(s=>s.host));
 for(const source of sources) {
   if(!/^[a-z0-9-]+\.sunsang24\.com$/.test(source.host) || ['api','service','www'].includes(source.host.split('.')[0])) throw new Error('공개 선사 주소만 수집할 수 있습니다.');
   const url=`https://${source.host}/ship/schedule_fleet`;
   try {
-    let boats,at;
-    if(useApi) {const value=JSON.parse(await get(`${api}/v1/sunsang24/catalog?host=${source.host}`,1000000,'application/json'));boats=validatePublicFleet(value,source);at=value.observedAt;}
-    else {const robots=await get(`https://${source.host}/robots.txt`,100000,'text/plain');if(!robotsAllows(robots,'/ship/schedule_fleet')) throw new Error('robots 접근 제한');const html=await get(url,12000000,'text/html');at=new Date().toISOString();boats=parsePublicFleet(html,source,at);}
+    let boats,at,discovered=[];
+    if(useApi) {const value=JSON.parse(await get(`${api}/v1/sunsang24/catalog?host=${source.host}`,1000000,'application/json'));boats=validatePublicFleet(value,source);at=value.observedAt;if(Array.isArray(value.candidateHosts)) discovered=value.candidateHosts.slice(0,300).filter(h=>typeof h==='string' && publicCandidateHost(`https://${h}/`)===h);}
+    else {const robots=await get(`https://${source.host}/robots.txt`,100000,'text/plain');if(!robotsAllows(robots,'/ship/schedule_fleet')) throw new Error('robots 접근 제한');const html=await get(url,12000000,'text/html');at=new Date().toISOString();boats=parsePublicFleet(html,source,at);discovered=discoverPublicHosts(html,source.host);}
+    for(const host of discovered) if(!knownHosts.has(host)) {const evidence=candidates.get(host)||new Set();evidence.add(url);candidates.set(host,evidence);}
     results.push(boats);
     reports.push({host:source.host,status:'OK',checkedAt:at,listed:boats.length,shipIds:boats.map(b=>b.shipId)});console.log(`public directory ${source.host} ${boats.length}`);
   } catch(error) {reports.push({host:source.host,status:'UNAVAILABLE',checkedAt:new Date().toISOString(),message:/^(HTTP \d{3}|robots 접근 제한|응답 형식 변경|응답 크기 초과|수집 시간 한도 초과)$/.test(error.message)?error.message:'선박 목록 또는 지역 근거 재확인 필요'});console.log(`public directory ${source.host} UNAVAILABLE; retain old entries`);}
 }
 const {next,report}=prepareCatalogRefresh(previous,results,reports,previousSync,new Date().toISOString());
+await mkdir(resolve('.audit'),{recursive:true});
+await writeFile(resolve('.audit/sunsang24-discovery.json'),JSON.stringify({checkedAt:report.lastAttemptAt,candidates:[...candidates].map(([host,urls])=>({host,evidenceUrls:[...urls],status:'REVIEW_REQUIRED'})),note:'Links are candidates only. Verify robots, calendar IDs and address before registering a source. This does not establish nationwide completeness.'},null,2)+'\n');
+if(candidates.size) console.log(`::warning::${candidates.size} new Sunsang24 homepage candidates require identity and region verification. See discovery artifact.`);
 await writeFile(syncPath+'.tmp',JSON.stringify(report,null,2)+'\n');await rename(syncPath+'.tmp',syncPath);
 if(!results.length) throw new Error('모든 공개 목록 확인 실패. 기존 목록·티어는 보존하고 실패 시각만 기록했습니다.');
 await writeFile(path+'.tmp',JSON.stringify(next,null,2)+'\n');await rename(path+'.tmp',path);

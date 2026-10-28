@@ -9,8 +9,9 @@ import {apiFailure,validQuery,type Store} from './service';
 import {scheduleStatus} from './sunsang24';
 import sources from '../src/data/sunsang24CatalogSources.json';
 import {parsePublicFleet,type PublicFleetSource,type PublicFleetBoat} from '../scripts/lib/public-fleet.mjs';
+import {discoverPublicHosts} from '../scripts/lib/public-discovery.mjs';
 export const PUBLIC_CATALOG_SOURCES=new Map<string,PublicFleetSource>(sources.sources.map(s=>[s.host,s]));
-type PublicCatalogReply={status:'OK';host:string;observedAt:string;cached:boolean;boats:PublicFleetBoat[]}|{status:'UNAVAILABLE';message:string};
+type PublicCatalogReply={status:'OK';host:string;observedAt:string;cached:boolean;boats:PublicFleetBoat[];candidateHosts?:string[]}|{status:'UNAVAILABLE';message:string};
 
 const AGENT='TheFishingAvailability';
 const UA=`${AGENT}/1.0 (+https://github.com/Plabene/the-fishing)`;
@@ -93,11 +94,11 @@ export class Sunsang24PublicService {
     const existing=this.catalogPending.get(host);if(existing) return existing;
     if(this.catalogPending.size>=2) return Promise.resolve({status:'UNAVAILABLE',message:'공개 선사 목록 확인 중'});
     const work=(async():Promise<PublicCatalogReply>=>{
-      const key=`public-catalog-v1:${host}:${JSON.stringify(source)}`,cached=await this.store.get<{expires:number;result:PublicCatalogReply}>(key);
+      const key=`public-catalog-v2:${host}:${JSON.stringify(source)}`,cached=await this.store.get<{expires:number;result:PublicCatalogReply}>(key);
       if(cached && cached.expires>Date.now() && cached.result.status==='OK') return {...cached.result,cached:true};
       try {
         const month=new Date(Date.now()+9*3600000).toISOString().slice(0,7),html=await this.readCatalogHtml(host,month),observedAt=new Date().toISOString();
-        const boats=parsePublicFleet(html,source,observedAt),result:PublicCatalogReply={status:'OK',host,observedAt,cached:false,boats};
+        const boats=parsePublicFleet(html,source,observedAt),result:PublicCatalogReply={status:'OK',host,observedAt,cached:false,boats,candidateHosts:discoverPublicHosts(html,host)};
         await this.store.put(key,{expires:Date.now()+86400000,result});return result;
       } catch(error) {return {status:'UNAVAILABLE',message:error instanceof SourceFailure?error.message:'공개 선박 목록·등록 지역을 확인하지 못했습니다. 기존 목록을 유지합니다.'};}
     })().finally(()=>this.catalogPending.delete(host));this.catalogPending.set(host,work);return work;

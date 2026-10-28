@@ -679,6 +679,56 @@
       ],
       "evidenceUrl": "https://newstar.sunsang24.com/ship/schedule_fleet/202611",
       "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "ysoceanstar.sunsang24.com",
+      "ships": [
+        "602",
+        "769",
+        "681"
+      ],
+      "evidenceUrl": "https://ysoceanstar.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "redfox.sunsang24.com",
+      "ships": [
+        "352"
+      ],
+      "evidenceUrl": "https://redfox.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "juliana.sunsang24.com",
+      "ships": [
+        "368"
+      ],
+      "evidenceUrl": "https://juliana.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "paragon.sunsang24.com",
+      "ships": [
+        "960"
+      ],
+      "evidenceUrl": "https://paragon.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "dolpung.sunsang24.com",
+      "ships": [
+        "725"
+      ],
+      "evidenceUrl": "https://dolpung.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "kingkong.sunsang24.com",
+      "ships": [
+        "1121"
+      ],
+      "evidenceUrl": "https://kingkong.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
     }
   ]
 }

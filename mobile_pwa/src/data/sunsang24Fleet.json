@@ -1,5 +1,5 @@
 {
-  "version": "4f05c29a4f957f8f",
+  "version": "ef94796021320f9a",
   "source": "PC catalog plus verified public provider directories; no seat data",
   "boats": [
     {
@@ -388,7 +388,9 @@
       "areaId": "456",
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=352",
-      "observedAt": "2026-08-11T11:01:15+09:00"
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://redfox.sunsang24.com/ship/schedule_fleet",
+      "calendarObserved": true
     },
     {
       "shipId": "360",
@@ -445,7 +447,9 @@
       "areaId": "500",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=368",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://juliana.sunsang24.com/ship/schedule_fleet",
+      "calendarObserved": true
     },
     {
       "shipId": "370",
@@ -989,6 +993,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "602",
+      "uid": "sunsang24:ship:602",
+      "name": "오션스타1호",
+      "port": "",
+      "departureArea": "",
+      "province": "전라남도",
+      "local": "여수",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=602",
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://ysoceanstar.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "615",
       "uid": "sunsang24:ship:615",
       "name": "해안선호",
@@ -1361,6 +1382,23 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "681",
+      "uid": "sunsang24:ship:681",
+      "name": "오션스타3호",
+      "port": "",
+      "departureArea": "",
+      "province": "전라남도",
+      "local": "여수",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=681",
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://ysoceanstar.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": true
+    },
+    {
       "shipId": "685",
       "uid": "sunsang24:ship:685",
       "name": "왕선장호",
@@ -1494,6 +1532,40 @@
       "observedAt": "2026-09-03T12:01:07+09:00"
     },
     {
+      "shipId": "722",
+      "uid": "sunsang24:ship:722",
+      "name": "레드폭스2호",
+      "port": "",
+      "departureArea": "",
+      "province": "전라남도",
+      "local": "여수",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=722",
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://redfox.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": false
+    },
+    {
+      "shipId": "723",
+      "uid": "sunsang24:ship:723",
+      "name": "레드폭스3호",
+      "port": "",
+      "departureArea": "",
+      "province": "전라남도",
+      "local": "여수",
+      "provinceId": "",
+      "areaId": "",
+      "sea": "남해권",
+      "url": "https://www.sunsang24.com/ship/list?ship_no=723",
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://redfox.sunsang24.com/ship/schedule_fleet",
+      "regionBasis": "public-provider-address",
+      "calendarObserved": false
+    },
+    {
       "shipId": "725",
       "uid": "sunsang24:ship:725",
       "name": "돌풍호",
@@ -1505,7 +1577,9 @@
       "areaId": "456",
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=725",
-      "observedAt": "2026-08-11T11:01:15+09:00"
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://dolpung.sunsang24.com/ship/schedule_fleet",
+      "calendarObserved": true
     },
     {
       "shipId": "727",
@@ -1626,7 +1700,9 @@
       "areaId": "456",
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=769",
-      "observedAt": "2026-08-11T11:01:15+09:00"
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://ysoceanstar.sunsang24.com/ship/schedule_fleet",
+      "calendarObserved": true
     },
     {
       "shipId": "784",
@@ -2229,7 +2305,9 @@
       "areaId": "496",
       "sea": "서해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=960",
-      "observedAt": "2026-09-03T12:01:07+09:00"
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://paragon.sunsang24.com/ship/schedule_fleet",
+      "calendarObserved": true
     },
     {
       "shipId": "970",
@@ -2613,7 +2691,9 @@
       "areaId": "457",
       "sea": "남해권",
       "url": "https://www.sunsang24.com/ship/list?ship_no=1121",
-      "observedAt": "2026-09-14T19:51:21+09:00"
+      "observedAt": "2026-10-28T06:01:58.375Z",
+      "sourceUrl": "https://kingkong.sunsang24.com/ship/schedule_fleet",
+      "calendarObserved": true
     },
     {
       "shipId": "1131",
@@ -7373,11 +7453,11 @@
     }
   ],
   "catalog": {
-    "checkedAt": "2026-10-28T02:24:28.233Z",
+    "checkedAt": "2026-10-28T06:01:58.375Z",
     "coverage": "registered-public-providers-only",
     "complete": false,
-    "listed": 165,
-    "retained": 332,
+    "listed": 175,
+    "retained": 326,
     "conflicts": [],
     "sources": [
       {
@@ -8216,6 +8296,64 @@
         "shipIds": [
           "2509",
           "826"
+        ]
+      },
+      {
+        "host": "ysoceanstar.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-28T06:01:58.375Z",
+        "listed": 3,
+        "shipIds": [
+          "602",
+          "769",
+          "681"
+        ]
+      },
+      {
+        "host": "redfox.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-28T06:01:58.375Z",
+        "listed": 3,
+        "shipIds": [
+          "352",
+          "722",
+          "723"
+        ]
+      },
+      {
+        "host": "juliana.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-28T06:01:58.375Z",
+        "listed": 1,
+        "shipIds": [
+          "368"
+        ]
+      },
+      {
+        "host": "paragon.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-28T06:01:58.375Z",
+        "listed": 1,
+        "shipIds": [
+          "960"
+        ]
+      },
+      {
+        "host": "dolpung.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-28T06:01:58.375Z",
+        "listed": 1,
+        "shipIds": [
+          "725"
+        ]
+      },
+      {
+        "host": "kingkong.sunsang24.com",
+        "status": "OK",
+        "checkedAt": "2026-10-28T06:01:58.375Z",
+        "listed": 1,
+        "shipIds": [
+          "1121"
         ]
       }
     ]
