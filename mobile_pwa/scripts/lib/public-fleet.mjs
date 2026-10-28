@@ -40,7 +40,7 @@ export function mergePublicFleet(previous,results) {
       if(old.name!==boat.name && !sameSource) {conflicts.push({shipId:boat.shipId,field:'name'});continue;}
       // Keep PC region evidence, legacy UID aliases and personal navigation identity intact.
       const verifiedPort=group.find(b=>b.port)?.port;
-      const next={...old,name:boat.name,observedAt:boat.observedAt,sourceUrl:sameSource?old.sourceUrl:boat.sourceUrl,...((!old.province || sameSource && old.regionBasis==='public-provider-address') && boat.province ? {province:boat.province,local:boat.local,sea:boat.sea,regionBasis:boat.regionBasis}:{}),...(verifiedPort && (!old.port || sameSource) ? {port:verifiedPort}:{})};
+      const next={...old,name:boat.name,observedAt:boat.observedAt,sourceUrl:sameSource?old.sourceUrl:boat.sourceUrl,calendarObserved:!!(sameSource && old.calendarObserved) || group.filter(b=>b.sourceUrl===(sameSource?old.sourceUrl:boat.sourceUrl)).some(b=>b.calendarObserved),...((!old.province || sameSource && old.regionBasis==='public-provider-address') && boat.province ? {province:boat.province,local:boat.local,sea:boat.sea,regionBasis:boat.regionBasis}:{}),...(verifiedPort && (!old.port || sameSource) ? {port:verifiedPort}:{})};
       if(['name','port','province','local','sea'].some(field=>old[field]!==next[field])) changed++;
       rows.set(boat.shipId,next);
     } else rows.set(boat.shipId,boat);

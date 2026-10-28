@@ -13,6 +13,26 @@ class MemoryStore implements Store {
 }
 const success=():ProviderResult=>({status:'ALLOWED_READABLE',fresh:true,cached:false,events:[],observedAt:new Date().toISOString(),message:'ok'});
 const detail=`<script>var data='date6='+date6+'&st_uid=981&pa_uid=6130';$.ajax({url:'../reservation/list.view.view.1.ajax.new.php'});</script>`;
+
+test('one transient vessel failure does not stop others; three consecutive failures open a short circuit',async()=>{
+  const fail:ProviderResult={status:'TIMEOUT',message:'timeout',events:[],stop:true};
+  const readMonth=vi.fn().mockResolvedValueOnce(fail).mockResolvedValueOnce(success()).mockResolvedValue(fail),store=new MemoryStore(),service=new MonthlyService(store,{readMonth});
+  expect((await service.query('1','2026-11')).stop).toBe(false);
+  expect((await service.query('2','2026-11')).status).toBe('ALLOWED_READABLE');
+  expect((await service.query('3','2026-11')).stop).toBe(false);
+  expect((await service.query('4','2026-11')).stop).toBe(false);
+  expect((await service.query('5','2026-11')).stop).toBe(true);
+  expect((await service.query('6','2026-11')).cached).toBe(true);expect(readMonth).toHaveBeenCalledTimes(5);
+});
+
+test('server-only direct provider isolates a failed detail request and still reads the next vessel',async()=>{
+  const fetcher=vi.fn<typeof fetch>().mockRejectedValueOnce(new TypeError('connection')).mockResolvedValueOnce(new Response(detail)).mockResolvedValueOnce(new Response(calendar));
+  const provider=new TheFishingDirect(fetcher,0,1000,parseHTML('<html></html>').document as unknown as Document,undefined,3600000,true);
+  const first=await provider.readMonth({uid:'1',name:'',port:'',url:'https://thefishing.kr/reservation/list.php?uid=1'},'2026-09',new AbortController().signal);
+  expect(first).toMatchObject({status:'NETWORK_OR_CORS',stop:false});
+  const next=await provider.readMonth({uid:'6130',name:'',port:'',url:'https://thefishing.kr/reservation/list.php?uid=6130'},'2026-09',new AbortController().signal);
+  expect(next.status).toBe('ALLOWED_READABLE');expect(fetcher).toHaveBeenCalledTimes(3);
+});
 test('server DOM parses the same real-format calendar and does not expose raw HTML',async()=>{
   const fetcher=vi.fn<typeof fetch>().mockResolvedValueOnce(new Response(detail)).mockResolvedValueOnce(new Response(calendar));
   const provider=new TheFishingDirect(fetcher,0,1000,parseHTML('<html></html>').document as unknown as Document);

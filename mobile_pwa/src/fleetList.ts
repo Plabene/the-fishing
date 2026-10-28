@@ -25,15 +25,15 @@ export function platformQueryStats(boats:Boat[],rows:LiveRow[]) {
   const byId=new Map(rows.map(row=>[boatIdentity(row.boat),row.result]));
   return (['thefishing','sunsang24','external'] as const).map(platform=>{
     const candidates=uniqueFleet(boats).filter(b=>boatPlatform(b)===platform);
-    let success=0,unlinked=0,restricted=0,failed=0,pending=0,events=0;
+    let success=0,empty=0,unlinked=0,restricted=0,failed=0,pending=0,events=0;
     for(const boat of candidates) {
       const result=byId.get(boatIdentity(boat));
       if(!result) pending++;
-      else if(result.status==='ALLOWED_READABLE') {success++;events+=result.events.length;}
+      else if(result.status==='ALLOWED_READABLE') {success++;events+=result.events.length;if(!result.events.length) empty++;}
       else if(result.status==='UNSUPPORTED_SOURCE') unlinked++;
       else if(['PERMISSION_DENIED','ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED'].includes(result.status)) restricted++;
       else failed++;
     }
-    return {platform,total:candidates.length,success,unlinked,restricted,failed,pending,events};
+    return {platform,total:candidates.length,success,empty,unlinked,restricted,failed,pending,events};
   }).filter(row=>row.total>0);
 }

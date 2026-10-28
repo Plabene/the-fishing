@@ -144,7 +144,7 @@ function renderPlatformResults() {
   for(const item of platformQueryStats(queryBoats,liveRows)) {
     const card=el('div','','platform-result');card.dataset.platform=item.platform;
     card.append(el('strong',PLATFORM_LABELS[item.platform]),el('span',`${item.success}/${item.total}척 확인 · 일정 ${item.events}건`));
-    const states=[item.unlinked?`공개 주소 미연동 ${item.unlinked}`:'',item.restricted?`접근 제한 ${item.restricted}`:'',item.failed?`조회 실패 ${item.failed}`:'',item.pending?`${liveController?'대기':'미조회'} ${item.pending}`:''].filter(Boolean);
+    const states=[item.empty?`확인된 일정 없음 ${item.empty}`:'',item.unlinked?`공개 주소 미연동 ${item.unlinked}`:'',item.restricted?`접근 제한 ${item.restricted}`:'',item.failed?`조회 실패 ${item.failed}`:'',item.pending?`${liveController?'대기':'미조회'} ${item.pending}`:''].filter(Boolean);
     card.append(el('small',states.join(' · ') || '조회 완료'));target.append(card);
   }
 }

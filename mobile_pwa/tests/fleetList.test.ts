@@ -36,6 +36,6 @@ test('per-platform summary distinguishes successful empty calendars, missing rou
     {boat:boats[2],result:{status:'PERMISSION_DENIED',events:[],message:'제한'}},
     {boat:boats[3],result:{status:'UNSUPPORTED_SOURCE',events:[],message:'미연동'}}];
   expect(platformQueryStats(boats,rows)).toEqual([
-    {platform:'thefishing',total:2,success:1,unlinked:0,restricted:0,failed:1,pending:0,events:0},
-    {platform:'sunsang24',total:3,success:0,unlinked:1,restricted:1,failed:0,pending:1,events:0}]);
+    {platform:'thefishing',total:2,success:1,empty:1,unlinked:0,restricted:0,failed:1,pending:0,events:0},
+    {platform:'sunsang24',total:3,success:0,empty:0,unlinked:1,restricted:1,failed:0,pending:1,events:0}]);
 });

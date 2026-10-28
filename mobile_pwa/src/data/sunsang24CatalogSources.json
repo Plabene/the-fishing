@@ -692,6 +692,99 @@
       "locationToken": "군산시",
       "regionEvidenceUrl": "https://taepyoung.sunsang24.com/ship/schedule_fleet",
       "portByShip": {}
+    },
+    {
+      "host": "chf.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "여수",
+      "locationToken": "여수",
+      "regionEvidenceUrl": "https://chf.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "blackdragon.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "고흥",
+      "locationToken": "고흥",
+      "regionEvidenceUrl": "https://blackdragon.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "specialdream.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "고흥",
+      "locationToken": "고흥",
+      "regionEvidenceUrl": "https://specialdream.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "yongyong.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "고흥",
+      "locationToken": "고흥",
+      "regionEvidenceUrl": "https://yongyong.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {},
+      "excludeShipIds": [
+        "2498"
+      ]
+    },
+    {
+      "host": "sungbin.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "여수",
+      "locationToken": "여수",
+      "regionEvidenceUrl": "https://sungbin.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "2pro.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "완도",
+      "locationToken": "완도",
+      "regionEvidenceUrl": "https://2pro.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "happydream.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "완도",
+      "locationToken": "완도",
+      "regionEvidenceUrl": "https://happydream.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "cyfishing.sunsang24.com",
+      "sea": "남해권",
+      "province": "경상남도",
+      "local": "통영",
+      "locationToken": "통영",
+      "regionEvidenceUrl": "https://cyfishing.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "manjinstar.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "여수",
+      "locationToken": "여수",
+      "regionEvidenceUrl": "https://manjinstar.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
+    },
+    {
+      "host": "newstar.sunsang24.com",
+      "sea": "남해권",
+      "province": "전라남도",
+      "local": "여수",
+      "locationToken": "여수",
+      "regionEvidenceUrl": "https://newstar.sunsang24.com/ship/schedule_fleet",
+      "portByShip": {}
     }
   ]
 }

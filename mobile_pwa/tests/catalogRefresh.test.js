@@ -2,6 +2,13 @@ import {expect,test} from 'vitest';
 import {prepareCatalogRefresh} from '../scripts/lib/catalog-refresh.mjs';
 const boat=(id,name=id)=>({shipId:id,uid:`sunsang24:ship:${id}`,name,port:'',province:'전라남도',local:'여수',sea:'남해권',sourceUrl:'https://example.sunsang24.com/ship/schedule_fleet',regionBasis:'public-provider-address',observedAt:'2026-10-20T00:00:00Z'});
 const previous={version:'old',boats:[boat('1'),boat('2')]},sync={lastSuccessAt:'2026-10-20T00:00:00Z',schedule:'weekly'},now='2026-10-26T00:00:00Z';
+
+test('existing fleet IDs gain a verified calendar connection and retain it across seasonally empty refreshes',()=>{
+  const first=prepareCatalogRefresh(previous,[[{...boat('1'),calendarObserved:true}]],[{status:'OK'}],sync,now).next;
+  expect(first.boats[0].calendarObserved).toBe(true);
+  const second=prepareCatalogRefresh(first,[[{...boat('1'),calendarObserved:false}]],[{status:'OK'}],sync,now).next;
+  expect(second.boats[0].calendarObserved).toBe(true);expect(second.boats[0].uid).toBe(previous.boats[0].uid);
+});
 test('total failure retains the catalog and last success; records failure timestamp and missing IDs',()=>{
   const before=JSON.stringify(previous),result=prepareCatalogRefresh(previous,[],[{host:'example',status:'UNAVAILABLE'}],sync,now);
   expect(result.next).toBeNull();expect(result.report).toMatchObject({status:'FAILED',lastAttemptAt:now,lastSuccessAt:sync.lastSuccessAt,added:0,changed:0,total:2,retained:2,failedSources:1,missingShipIds:['1','2']});expect(JSON.stringify(previous)).toBe(before);

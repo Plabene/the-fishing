@@ -582,6 +582,103 @@
       ],
       "evidenceUrl": "https://taepyoung.sunsang24.com/ship/schedule_fleet",
       "verifiedAt": "2026-10-26"
+    },
+    {
+      "host": "chf.sunsang24.com",
+      "ships": [
+        "2525",
+        "1370",
+        "1371",
+        "1845"
+      ],
+      "evidenceUrl": "https://chf.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "blackdragon.sunsang24.com",
+      "ships": [
+        "1391",
+        "1149"
+      ],
+      "evidenceUrl": "https://blackdragon.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "specialdream.sunsang24.com",
+      "ships": [
+        "870",
+        "1250",
+        "1251",
+        "1293",
+        "1433",
+        "1199"
+      ],
+      "evidenceUrl": "https://specialdream.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "yongyong.sunsang24.com",
+      "ships": [
+        "1393",
+        "1392",
+        "1950",
+        "1527"
+      ],
+      "evidenceUrl": "https://yongyong.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "sungbin.sunsang24.com",
+      "ships": [
+        "1119"
+      ],
+      "evidenceUrl": "https://sungbin.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "2pro.sunsang24.com",
+      "ships": [
+        "1954",
+        "1955"
+      ],
+      "evidenceUrl": "https://2pro.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "happydream.sunsang24.com",
+      "ships": [
+        "995",
+        "1872"
+      ],
+      "evidenceUrl": "https://happydream.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "cyfishing.sunsang24.com",
+      "ships": [
+        "1427",
+        "2450"
+      ],
+      "evidenceUrl": "https://cyfishing.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "manjinstar.sunsang24.com",
+      "ships": [
+        "1004",
+        "1005"
+      ],
+      "evidenceUrl": "https://manjinstar.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
+    },
+    {
+      "host": "newstar.sunsang24.com",
+      "ships": [
+        "2509",
+        "826"
+      ],
+      "evidenceUrl": "https://newstar.sunsang24.com/ship/schedule_fleet/202611",
+      "verifiedAt": "2026-10-28"
     }
   ]
 }

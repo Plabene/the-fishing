@@ -29,6 +29,50 @@ test('public parser preserves explicit seats, species, departure; never booked t
 test('wrong month, missing ship identity, duplicates and mismatching action IDs fail closed',()=>{
   for(const html of [page('', '2026-11'),page(card('99999')),page(card()+card()),page(card().replace('data-schedule_no="123"','data-schedule_no="456"')),page(card().replace('2026-10-25','2026-11-25'))]) expect(()=>parsePublicMonth(html,host,'2026-10',at())).toThrow();
 });
+
+test('one malformed vessel is isolated while siblings and their verified month remain readable',async()=>{
+  const result=parsePublicMonth(page(card('1976','123')+card('2171','124').replace('data-sdate="2026-10-25"','data-sdate="2026-11-25"')),host,'2026-10',at());
+  expect(result.events).toHaveLength(1);expect(result.shipIds).toEqual(['1976']);expect(result.shipFailures).toMatchObject([{shipId:'2171'}]);
+  const request=vi.fn<typeof fetch>(async()=>Response.json(result)),provider=new Sunsang24PublicApi('https://fishing.example.workers.dev',request);
+  expect((await provider.readMonth(boat('1976'),'2026-10',signal())).status).toBe('ALLOWED_READABLE');
+  expect(await provider.readMonth(boat('2171'),'2026-10',signal())).toMatchObject({status:'PARSER_UNSUPPORTED',stop:false,events:[],httpStatus:200});expect(request).toHaveBeenCalledTimes(1);
+});
+
+test('a verified whole-fleet month distinguishes an empty sibling from an unidentified vessel',async()=>{
+  const nav='<button class="btn-schedule-ship" data-ship-list-no="2171">다른호</button>';
+  const result=parsePublicMonth(page(card())+nav,host,'2026-10',at());
+  const provider=new Sunsang24PublicApi('https://fishing.example.workers.dev',async()=>Response.json(result));
+  expect(await provider.readMonth(boat('2171'),'2026-10',signal())).toMatchObject({status:'ALLOWED_READABLE',events:[],fresh:true});
+  expect(()=>parsePublicMonth(page('')+nav,host,'2026-10',at())).toThrow();
+});
+
+test('calendar retries a transient failure once within its total deadline but never retries 403 or parsing errors',async()=>{
+  for(const status of [503,403]) {
+    let reads=0;
+    const request=vi.fn<typeof fetch>(async input=>String(input).endsWith('robots.txt')?response('User-agent: *\nAllow: /'):++reads===1?new Response('',{status}):response(page()));
+    const result=await new Sunsang24PublicService(new Memory(),request).query('1976','2026-10');
+    expect(result.status).toBe(status===503?'ALLOWED_READABLE':'ACCESS_RESTRICTED');expect(reads).toBe(status===503?2:1);
+    if(status===403) expect(result.httpStatus).toBe(403);
+  }
+});
+
+test('a newly verified calendar ID on an already reviewed host works without a worker redeployment',async()=>{
+  const html=page(card('9999999'))+'<button class="btn-schedule-ship" data-ship-list-no="9999999">신규호</button>';
+  const request=vi.fn<typeof fetch>(async input=>String(input).endsWith('robots.txt')?response('User-agent: *\nAllow: /'):response(html));
+  expect(await new Sunsang24PublicService(new Memory(),request).query('9999999','2026-10',host)).toMatchObject({status:'ALLOWED_READABLE',shipIds:['9999999']});
+  const coordinatorFetch=vi.fn(async()=>Response.json({status:'test'})),env={ALLOWED_ORIGIN:'https://plabene.github.io',MONTHLY:{idFromName:(x:string)=>x,get:()=>({fetch:coordinatorFetch})}} as never;
+  for(const suffix of ['host=evil.sunsang24.com','host='+host+'&host='+host,'host=127.0.0.1']) expect((await handleRequest(new Request('https://worker/v1/sunsang24/public-month?ship=9999999&month=2026-10&fresh=1&'+suffix),env)).status).toBe(400);
+  expect(coordinatorFetch).not.toHaveBeenCalled();expect((await handleRequest(new Request('https://worker/v1/sunsang24/public-month?ship=9999999&month=2026-10&fresh=1&host='+host),env)).status).toBe(200);
+});
+
+test('older clients without the host parameter receive only their reviewed route IDs',async()=>{
+  const value={status:'ALLOWED_READABLE',shipIds:['1976','9999999'],events:[{uid:'sunsang24:ship:1976'},{uid:'sunsang24:ship:9999999'}]};
+  const env={ALLOWED_ORIGIN:'https://plabene.github.io',MONTHLY:{idFromName:(x:string)=>x,get:()=>({fetch:async()=>Response.json(value)})}} as never;
+  const old=await handleRequest(new Request('https://worker/v1/sunsang24/public-month?ship=1976&month=2026-11&fresh=1'),env);
+  expect(await old.json()).toMatchObject({shipIds:['1976'],events:[{uid:'sunsang24:ship:1976'}]});
+  const current=await handleRequest(new Request('https://worker/v1/sunsang24/public-month?ship=1976&month=2026-11&fresh=1&host='+host),env);
+  expect(await current.json()).toEqual(value);
+});
 test('copied calendars inside operator notices cannot override live seats or poison sibling vessel parsing',()=>{
   const copied=card('1976','999','2026-09-01','ING',999);
   const html=page(card('1976','123','2026-10-25','ING',4).replace('버릴 메모',`<div class="editor_memo_pc">${copied}</div>`));

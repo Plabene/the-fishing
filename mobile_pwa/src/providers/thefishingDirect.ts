@@ -23,7 +23,7 @@ export class TheFishingDirect implements AvailabilityProvider {
   private blockedUntil=0;
   private blockResult:ProviderResult|undefined;
   private metadata=new Map<string,CalendarMetadata>();
-  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document,private metadataCache?:MetadataCache,private metadataTtlMs=3600000) {}
+  constructor(private request:typeof fetch=(...args)=>fetch(...args),private gapMs=1000,private timeoutMs=15000,private dom:Document=globalThis.document,private metadataCache?:MetadataCache,private metadataTtlMs=3600000,private isolateTransient=false) {}
   private async admit(signal:AbortSignal) {
     const previous=this.admission;let release!:()=>void;this.admission=new Promise<void>(resolve=>{release=resolve;});
     await previous;
@@ -70,7 +70,7 @@ export class TheFishingDirect implements AvailabilityProvider {
     } catch(error) {
       if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
       if(error instanceof ReadError) throw error;
-      throw new ReadError(fail(controller.signal.aborted ? 'TIMEOUT':'NETWORK_OR_CORS',controller.signal.aborted ? '조회 응답 시간이 초과되었습니다.' : '브라우저에서 응답을 읽지 못했습니다. CORS·네트워크·리디렉션 중 정확한 원인은 확인되지 않았습니다.',true,{stage}));
+      throw new ReadError(fail(controller.signal.aborted ? 'TIMEOUT':'NETWORK_OR_CORS',controller.signal.aborted ? '조회 응답 시간이 초과되었습니다.' : '브라우저에서 응답을 읽지 못했습니다. CORS·네트워크·리디렉션 중 정확한 원인은 확인되지 않았습니다.',!this.isolateTransient,{stage}));
     } finally {clearTimeout(timer);signal.removeEventListener('abort',abort);}
   }
   async readMonth(boat:Boat,month:string,signal:AbortSignal):Promise<ProviderResult> {
@@ -97,7 +97,7 @@ export class TheFishingDirect implements AvailabilityProvider {
     } catch(error) {
       if(signal.aborted) throw new DOMException('취소되었습니다.','AbortError');
       const result=error instanceof ReadError ? error.result : fail('PARSER_UNSUPPORTED',error instanceof Error ? error.message : '달력 응답을 해석하지 못했습니다.');
-      if(['ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED','NETWORK_OR_CORS','TIMEOUT'].includes(result.status)) {
+      if(['ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED',...(!this.isolateTransient?['NETWORK_OR_CORS','TIMEOUT']:[])].includes(result.status)) {
         this.blockedUntil=Date.now()+(['ACCESS_RESTRICTED','AUTH_OR_COOKIE_BLOCKED'].includes(result.status) ? 600000:30000);this.blockResult={...result,stop:true};
       }
       this.metadata.delete(boat.uid);await this.metadataCache?.delete(boat.uid);

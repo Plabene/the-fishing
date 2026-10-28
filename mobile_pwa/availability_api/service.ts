@@ -7,7 +7,7 @@ export interface Store {
   put<T>(key:string,value:T):Promise<unknown>;
   delete(key:string):Promise<unknown>;
 }
-interface Limits {windowStart:number;count:number;blockedUntil:number;block?:ProviderResult}
+interface Limits {windowStart:number;count:number;blockedUntil:number;block?:ProviderResult;transientFailures?:number}
 class Serial {
   private tail:Promise<unknown>=Promise.resolve();
   run<T>(action:()=>Promise<T>):Promise<T> {const result=this.tail.then(action);this.tail=result.catch(()=>{});return result;}
@@ -15,7 +15,7 @@ class Serial {
 export function sourceProvider(metadata?:MetadataCache):AvailabilityProvider {
   const dom=parseHTML('<!doctype html><html><body></body></html>').document as unknown as Document;
   // Workers support manual/follow redirects. Never follow: the provider rejects every non-200 response.
-  return new TheFishingDirect((input,init)=>fetch(input,{...init,redirect:'manual'}),1000,10000,dom,metadata,24*3600000);
+  return new TheFishingDirect((input,init)=>fetch(input,{...init,redirect:'manual'}),1000,10000,dom,metadata,24*3600000,true);
 }
 export const apiFailure=(status:ProviderResult['status'],message:string):ProviderResult=>({status,message,events:[],stop:true,source:'api',stage:'api'});
 export function validQuery(uid:string,month:string):boolean {return /^\d{1,10}$/.test(uid) && /^20\d\d-(0[1-9]|1[0-2])$/.test(month);}
@@ -84,11 +84,15 @@ export class MonthlyService {
       if(result.status==='ALLOWED_READABLE') result.message=`${result.events.length}개 출조 상품을 조회 서버에서 확인했습니다.`;
       if(result.status==='NETWORK_OR_CORS') result.message='조회 서버가 더피싱 응답을 받지 못했습니다. 원본 서버 연결 상태를 확인해야 합니다.';
       await this.serial.run(async()=>{
-        if(['AUTH_OR_COOKIE_BLOCKED','ACCESS_RESTRICTED','NETWORK_OR_CORS','TIMEOUT'].includes(result.status)) {
-          const limits=await this.store.get<Limits>('limits') || {windowStart:this.now(),count:0,blockedUntil:0};
-          const until=this.now()+(['AUTH_OR_COOKIE_BLOCKED','ACCESS_RESTRICTED'].includes(result.status) ? 600000:30000);
+        const limits=await this.store.get<Limits>('limits') || {windowStart:this.now(),count:0,blockedUntil:0};
+        const transient=['NETWORK_OR_CORS','TIMEOUT'].includes(result.status),restricted=['AUTH_OR_COOKIE_BLOCKED','ACCESS_RESTRICTED'].includes(result.status);
+        limits.transientFailures=transient?(limits.transientFailures || 0)+1:0;
+        if(transient) result.stop=limits.transientFailures>=3;
+        if(restricted || transient && result.stop) {
+          const until=this.now()+(restricted?600000:30000);
           if(until>limits.blockedUntil) {limits.blockedUntil=until;limits.block={...result,stop:true};await this.store.put('limits',limits);}
         }
+        await this.store.put('limits',limits);
       });
       return result;
     } finally {this.release();}
