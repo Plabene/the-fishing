@@ -11,6 +11,7 @@ main :is(button,input,select,summary,a):focus-visible, #day-heading:focus-visibl
 }
 #booking-heading:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
 .skip-link { position:fixed; top:8px; left:8px; z-index:50; transform:translateY(-200%); padding:10px 14px; background:#fff; color:var(--accent); border:2px solid var(--accent); border-radius:var(--control-radius); }
+.skip-link:not(:focus) { clip-path:inset(50%); width:1px; height:1px; overflow:hidden; white-space:nowrap; }
 .skip-link:focus { transform:none; }
 #species-toggle[data-available=false]>summary { color:var(--muted); background:#f3f5f4; }
 main :is(.muted,.timestamp,.empty,.legend,.weekday,.day-group h3,.result-tier), footer { color:var(--muted); }

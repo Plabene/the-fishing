@@ -12,7 +12,9 @@ test('responsive keyboard journey preserves exact filters, data, focus and nativ
   expect(await overflow()).toBe(true);
   await page.locator('#fixture-scenario').press('Tab');
   await expect(page.locator('#skip-results')).toBeFocused();
+  await expect(page.locator('#skip-results')).toHaveCSS('clip-path','none');
   await page.keyboard.press('Enter');await expect(page.locator('#booking-heading')).toBeFocused();
+  await expect(page.locator('#skip-results')).toHaveCSS('clip-path','inset(50%)');
   await page.locator('[data-tier=tier1]').press('Space');await expect(page.locator('[data-tier=tier1]')).toBeFocused();await expect(page.locator('[data-tier=tier1]')).toHaveAttribute('aria-pressed','true');
   await page.keyboard.press('Tab');await expect(page.locator('[data-tier=tier2]')).toBeFocused();await page.keyboard.press('Enter');await expect(page.locator('[data-tier=tier2]')).toBeFocused();await expect(page.locator('[data-tier=tier2]')).toHaveAttribute('aria-pressed','true');await page.keyboard.press('Shift+Tab');await expect(page.locator('[data-tier=tier1]')).toBeFocused();
   await page.locator('#region-toggle>summary').press('Enter');
