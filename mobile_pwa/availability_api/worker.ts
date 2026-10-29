@@ -1,6 +1,7 @@
 import type { DurableObjectNamespace, DurableObjectState, ExportedHandler } from '@cloudflare/workers-types';
 import { apiFailure, MonthlyService, validQuery, type Store } from './service';
 import { TideService } from './tides';
+import {isTideStation} from '../src/tideStations';
 import {CatalogService,validCatalogPage,validCatalogArea} from './catalog';
 import {Sunsang24Service,SUNSANG_AREAS} from './sunsang24';
 import {Sunsang24PublicService,PUBLIC_CATALOG_SOURCES} from './sunsang24Public';
@@ -32,7 +33,7 @@ export class MonthlyCoordinator {
       catch {return json({status:'UNAVAILABLE',message:'목록 처리 실패. 기존 목록을 유지합니다.'},503);}
     }
     try {
-      if(u.pathname==='/v1/tides') return json(await this.tides.query(u.searchParams.get('month') || ''));
+      if(u.pathname==='/v1/tides') {const station=u.searchParams.get('station') || 'DT_0025';return isTideStation(station)?json(await this.tides.query(u.searchParams.get('month') || '',station)):json({message:'관측소 오류'},400);}
       const started=Date.now(),uid=u.searchParams.get('uid') || '',month=u.searchParams.get('month') || '',result=await this.service.query(uid,month);
       logQuery('thefishing',uid,month,started,result);return json(result);
     }
@@ -83,10 +84,11 @@ export async function handleRequest(request:Request,env:Env):Promise<Response> {
   }
   if(url.pathname==='/v1/tides') {
     const month=url.searchParams.get('month') || '';
-    if(!validQuery('1',month) || url.searchParams.getAll('month').length!==1 || [...url.searchParams.keys()].some(k=>k!=='month')) return json({message:'물때 조회 월을 확인하세요.'},400,headers);
+    const station=url.searchParams.get('station') || 'DT_0025';
+    if(!validQuery('1',month) || !isTideStation(station) || url.searchParams.getAll('month').length!==1 || url.searchParams.getAll('station').length>1 || url.searchParams.has('station') && !url.searchParams.get('station') || [...url.searchParams.keys()].some(k=>!['month','station'].includes(k))) return json({message:'물때 조회 월·관측소를 확인하세요.'},400,headers);
     try {
       const coordinator=env.MONTHLY.get(env.MONTHLY.idFromName('tides-v1'));
-      const response=await coordinator.fetch(new Request(`https://coordinator/v1/tides?month=${month}`) as never);
+      const response=await coordinator.fetch(new Request(`https://coordinator/v1/tides?month=${month}&station=${station}`) as never);
       return new Response(await response.text(),{status:response.status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
     } catch {return json({message:'물때 조회 서버에 연결하지 못했습니다.'},503,headers);}
   }

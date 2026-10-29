@@ -1,7 +1,7 @@
 import { type AppState, type Filter } from './models';
 import { queryMonth } from './monthlyQuery';
 import { displayedSpecies, speciesColor, speciesLabel } from './species';
-import { calculateTideMonth } from './tides';
+import { regionalTideMonth } from './tideRegion';
 import { addTideToCell } from './tideView';
 import {calendarStatus} from './calendarStatus';
 import {retainFocus} from './uiFocus';
@@ -21,7 +21,7 @@ export function monthDays(month: string): (string | null)[] {
 export function renderCalendar(target: HTMLElement, state: AppState, tier: Filter, search: string, selectedDay: string, onSelect: (day: string, keyboard?:boolean) => void, matchingOnly=false, result?:ReturnType<typeof queryMonth>): void {
   const restoreFocus=retainFocus(target);
   target.replaceChildren();
-  const tide=calculateTideMonth(state.month,state.tideDays || []);
+  const tide=regionalTideMonth(state,tier);
   const query=result ?? queryMonth(state,{month:state.month,requiredPeople:state.requiredPeople,tier,search,matchingOnly});
   const events = query.events;
   const byDay=new Map<string,typeof events>(),boats=new Map(state.boats.map(b=>[b.uid,b]));

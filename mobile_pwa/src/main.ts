@@ -35,7 +35,9 @@ import { diagnosticReport, renderDiagnostics } from './queryDiagnostics';
 import { renderSpeciesFilter } from './speciesFilter';
 
 import tideArchive from './data/tideArchive.json';
-import { calculateTideMonth,mergeTideDays } from './tides';
+import { mergeTideDays } from './tides';
+import {regionalTideMonth,representativeTide} from './tideRegion';
+import {TideAutoLoad} from './tideAutoLoad';
 import { renderTideSummary } from './tideView';
 import { readTideMonth } from './providers/tideApi';
 import { freshQueryView } from './freshResults';
@@ -84,6 +86,18 @@ let search=''; // Result-only text filter; never part of source request membersh
 const savedMode=()=> $<HTMLSelectElement>('#query-mode').value==='saved';
 const progress=new QueryProgress($('#query-monitor'));
 const active = () => tierQueryState(demo ? {...fixtureState(state.month),requiredPeople:state.requiredPeople,selectedSpecies:state.selectedSpecies,excludedSpeciesKeys:state.excludedSpeciesKeys,tideDays:state.tideDays,selectedRegion:state.selectedRegion} : savedMode() ? state : freshQueryView(livePreview || state,liveMonth,liveRows));
+let tideTimer:ReturnType<typeof setTimeout>|undefined;
+const tideLoader=new TideAutoLoad((station,month,signal)=>readTideMonth(configuredApi,month,signal,undefined,station),async(days,signal)=>{
+  // Use the latest personal state, never the snapshot from before an asynchronous request.
+  while(busy) {signal.throwIfAborted();await new Promise(resolve=>setTimeout(resolve,100));}
+  signal.throwIfAborted();setBusy(true);
+  try {const candidate={...state,tideDays:mergeTideDays(state.tideDays,days)};await saveState(candidate,signal);state=candidate;}
+  finally {setBusy(false);render();}
+},message=>{$('#tide-loading').textContent=message;});
+function scheduleTides(force=false) {
+  clearTimeout(tideTimer);
+  tideTimer=setTimeout(()=>{if(!storageReady || busy) return;const rep=representativeTide(state,tier);void tideLoader.sync(rep.stationCode,state.month,state.tideDays || [],!!configuredApi && navigator.onLine && !demo,force);},force?0:250);
+}
 function connection() { $('#connectivity').textContent = navigator.onLine ? '● 온라인 · 월별 조회 준비' : '○ 오프라인 · 이전 조회 결과 열람'; }
 function setBusy(value: boolean) {
   if(value && !busy) restoreBusyFocus=retainFocus(root);
@@ -182,7 +196,10 @@ function render() {
   $('#tier-hidden-reasons').textContent=(visibility.total?`저장 티어 중 조회 대상 ${visibility.included}척${hiddenReasons.length?' · '+hiddenReasons.join(' · '):''}. 조회 결과와 저장된 티어 목록은 별개입니다.`:'이 기기에 저장된 티어가 없습니다. 티어·백업 확인에서 제공한 백업과 비교할 수 있습니다.')+(visibility.unassignedSelected?` 별도로 선택된 미분류 ${visibility.unassignedSelected}척은 기타 조건으로 조회합니다.`:'');
   const catalog=(fleetSeed as {catalog?:{checkedAt:string;listed:number}}).catalog;
   $('#fleet-catalog-status').textContent=`더피싱 보유 목록 ${allCounts.thefishing}개${catalog ? ` · 최근 원본 확인 ${catalog.listed}개 (${new Date(catalog.checkedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})})`:''}. 선상24 보유 목록 ${allCounts.sunsang24}개 · PC 누적 목록과 검증된 공개 선사 목록. 두 목록은 매주 월요일 갱신을 시도하며 실패한 출처의 기존 항목은 보존합니다. 중앙 API 접근 제한·원본 페이지 중복으로 전국 완전 수집을 보장하지 않습니다. 같은 플랫폼·ID는 한 번 집계하며 플랫폼 간 동일 선박 후보는 예약정보를 합치지 않습니다. 새 목록 항목은 기타 티어·선택 해제 상태이며 기존 개인 티어·선택은 유지됩니다.`;
-  renderTideSummary($('#tide-status'),calculateTideMonth(shown.month,shown.tideDays || []));
+  const tide=regionalTideMonth(shown,tier);
+  renderTideSummary($('#tide-status'),tide);
+  $('#tide-basis').textContent=tide.representative.station?`물때: ${tide.representative.station.name} 대표 지점 · ${tide.representative.regionLabel} ${tide.representative.boatCount}척`:`물때: ${tide.representative.reason}`;
+  scheduleTides();
   if (!selectedDay.startsWith(shown.month)) selectedDay = records[0]?.date || `${shown.month}-01`;
   $<HTMLInputElement>('#month').value = shown.month; $<HTMLInputElement>('#people').value=String(shown.requiredPeople); $('#month-label').textContent = `${shown.month.slice(0, 4)}년 ${Number(shown.month.slice(5))}월`;
   // Species renderer retains disclosure and logical keyboard position itself.
@@ -371,15 +388,10 @@ form.addEventListener('submit', async event => {
 });
 $('#undo').addEventListener('click', async () => { if (undoState) await commit(undoState, '이전 상태로 되돌렸습니다.'); });
 $('#restore-fleet').addEventListener('click', async () => { const previous=structuredClone(state); if (await commit(applyDefaultFleet(state), '기본 선박 목록과 초기 선택·티어를 복원했습니다. 기존 출조 기록은 유지합니다.')) { undoState=previous; $('#undo').hidden=false; } });
-$('#tide-refresh').addEventListener('click',async()=>{
+$('#tide-refresh').addEventListener('click',()=>{
   if(busy) return;if(!configuredApi) {say('물때를 갱신하려면 조회 API를 먼저 연결하세요.');return;}
   if(!navigator.onLine) {say('오프라인입니다. 저장된 물때를 표시합니다.');return;}
-  const month=state.month;setBusy(true);say(`${month} 보령 물때를 불러오는 중입니다.`);
-  try {
-    const result=await readTideMonth(configuredApi,month,new AbortController().signal);
-    const candidate={...state,tideDays:mergeTideDays(state.tideDays,result.days)};await saveState(candidate);state=candidate;undoState=null;$('#undo').hidden=true;say(result.message);
-  } catch {say('물때를 갱신하지 못했습니다. 기존 물때·예약 조회 자료는 유지합니다.');}
-  finally {setBusy(false);render();}
+  scheduleTides(true);
 });
 window.addEventListener('online', ()=>{connection();if(!busy) render();}); window.addEventListener('offline', ()=>{connection();if(!busy) render();});
 setBusy(true);

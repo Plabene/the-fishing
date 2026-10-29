@@ -1,4 +1,5 @@
 import { dateOnly, timestamp } from './models';
+import {isTideStation,type TideStationCode} from './tideStations';
 
 export const TIDE_STATION='DT_0025';
 export const TIDE_SOURCE_URL='https://www.data.go.kr/data/15156018/openapi.do';
@@ -6,7 +7,7 @@ export const TIDE_TTL=12*60*60*1000;
 export type TideQuality='boundary_complete'|'month_transitions'|'daily_range_fallback'|'insufficient';
 export type TideGrade='gold'|'silver'|'normal'|'insufficient';
 export interface TideExtremum {timestamp:string;levelCm:number;kind:'high'|'low'}
-export interface TideDay {date:string;stationCode:typeof TIDE_STATION;extrema:TideExtremum[];fetchedAt:string}
+export interface TideDay {date:string;stationCode:TideStationCode;extrema:TideExtremum[];fetchedAt:string}
 export interface CalculatedTide extends TideDay {highestCm:number;lowestCm:number;rangeCm:number;representativeCm:number|null;flowPercent:number|null;grade:TideGrade;quality:TideQuality}
 export const qualityLabels:Record<TideQuality,string>={boundary_complete:'경계일 포함',month_transitions:'본월 데이터 근사',daily_range_fallback:'당일 고저차 근사',insufficient:'기준 데이터 부족'};
 export function tideDates(month:string):string[] {
@@ -18,7 +19,7 @@ function kst(value:string):string {return new Date(Date.parse(value)+9*3600000).
 export function validateTideDay(value:unknown):TideDay {
   if(!value || typeof value!=='object') throw new Error('물때 자료 형식 오류');
   const row=value as Record<string,unknown>,date=dateOnly(row.date),fetchedAt=timestamp(row.fetchedAt);
-  if(!date || !fetchedAt || row.stationCode!==TIDE_STATION || !Array.isArray(row.extrema) || row.extrema.length>12) throw new Error('물때 날짜·관측소·자료 시각 오류');
+  if(!date || !fetchedAt || !isTideStation(row.stationCode) || !Array.isArray(row.extrema) || row.extrema.length>12) throw new Error('물때 날짜·관측소·자료 시각 오류');
   const unique=new Map<string,TideExtremum>();
   for(const item of row.extrema) {
     if(!item || typeof item!=='object') throw new Error('고저조 항목 오류');
@@ -31,14 +32,16 @@ export function validateTideDay(value:unknown):TideDay {
   const highs=extrema.filter(e=>e.kind==='high'),lows=extrema.filter(e=>e.kind==='low');
   const range=Math.max(...highs.map(e=>e.levelCm))-Math.min(...lows.map(e=>e.levelCm));
   if(!highs.length || !lows.length || range<0 || range>3000) throw new Error('고조·저조 자료 부족');
-  return {date,stationCode:TIDE_STATION,extrema,fetchedAt};
+  return {date,stationCode:row.stationCode,extrema,fetchedAt};
 }
 export function mergeTideDays(...sources:unknown[]):TideDay[] {
   const days=new Map<string,TideDay>();
-  for(const source of sources) if(Array.isArray(source)) for(const row of source.slice(0,1000)) {
-    try {const day=validateTideDay(row),old=days.get(day.date);if(!old || Date.parse(day.fetchedAt)>=Date.parse(old.fetchedAt)) days.set(day.date,day);} catch { /* Keep other validated dates. */ }
+  for(const source of sources) if(Array.isArray(source)) for(const row of source.slice(0,20000)) {
+    try {const day=validateTideDay(row),key=`${day.stationCode}/${day.date}`,old=days.get(key);if(!old || Date.parse(day.fetchedAt)>=Date.parse(old.fetchedAt)) days.set(key,day);} catch { /* Keep other validated dates. */ }
   }
-  return [...days.values()].sort((a,b)=>b.fetchedAt.localeCompare(a.fetchedAt)).slice(0,1000).sort((a,b)=>a.date.localeCompare(b.date));
+  // Retain at least two years per station; another region cannot evict this region's data.
+  const counts=new Map<string,number>();
+  return [...days.values()].sort((a,b)=>b.fetchedAt.localeCompare(a.fetchedAt)).filter(day=>{const count=(counts.get(day.stationCode)||0)+1;counts.set(day.stationCode,count);return count<=800;}).sort((a,b)=>a.stationCode.localeCompare(b.stationCode) || a.date.localeCompare(b.date));
 }
 export function tideGrade(percent:number|null):TideGrade {return percent===null ? 'insufficient':percent<30 ? 'gold':percent<=60 ? 'silver':'normal';}
 export function tideTransitions(extrema:TideExtremum[]) {
@@ -49,8 +52,8 @@ export function tideTransitions(extrema:TideExtremum[]) {
   });
 }
 /** Port of boryeong_tide.normalize_monthly_tide_ranges (PC flow schema 4). */
-export function calculateTideMonth(month:string,input:TideDay[]) {
-  const dates=tideDates(month),byDate=new Map(input.map(d=>[d.date,d])),valid=dates.slice(1,-1).flatMap(date=>byDate.get(date) ? [byDate.get(date)!]:[]);
+export function calculateTideMonth(month:string,input:TideDay[],stationCode:TideStationCode|null=TIDE_STATION) {
+  const dates=tideDates(month),byDate=new Map(input.filter(d=>d.stationCode===stationCode).map(d=>[d.date,d])),valid=dates.slice(1,-1).flatMap(date=>byDate.get(date) ? [byDate.get(date)!]:[]);
   const missingBoundaryDates=[dates[0],dates.at(-1)!].filter(date=>!byDate.get(date)?.extrema.length);
   const monthTransitions=tideTransitions(valid.flatMap(d=>d.extrema));
   const boundaryTransitions=missingBoundaryDates.length ? []:tideTransitions(dates.flatMap(date=>byDate.get(date)?.extrema || []));
@@ -73,6 +76,6 @@ export function calculateTideMonth(month:string,input:TideDay[]) {
     day.flowPercent=Math.trunc(Math.min(100,Math.max(0,(day.representativeCm-referenceMinCm)/(referenceMaxCm-referenceMinCm)*100)));
     day.grade=tideGrade(day.flowPercent);
   }
-  return {month,stationCode:TIDE_STATION,days,expectedDays:dates.length-2,complete:valid.length===dates.length-2,missingBoundaryDates,referenceMinCm,referenceMaxCm};
+  return {month,stationCode,days,expectedDays:dates.length-2,complete:valid.length===dates.length-2,missingBoundaryDates,referenceMinCm,referenceMaxCm};
 }
 export type TideMonth=ReturnType<typeof calculateTideMonth>;

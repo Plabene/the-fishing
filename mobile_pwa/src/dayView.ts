@@ -4,7 +4,7 @@ import { visibleEvents } from './calendarView';
 import { orderedBoats, tierFor, matchesTier } from './tierStore';
 import { speciesBadge, tripDescription } from './species';
 import type { queryMonth } from './monthlyQuery';
-import { calculateTideMonth } from './tides';
+import { regionalTideMonth } from './tideRegion';
 import { renderDayTide } from './tideView';
 import {matchesRegion,regionLabel} from './regions';
 import {matchesPlatform,platformBadge} from './platforms';
@@ -63,6 +63,6 @@ export function renderDay(target: HTMLElement, state: AppState, day: string, tie
     target.append(el('p', `${state.boats.find(b => b.uid === failure.uid)?.name || failure.uid} · ${failure.status === 'BLOCKED' ? '접근 제한' : '확인 불가'} · 최근 수집 실패 기록이 있습니다.`, 'notice'));
   }
   const tideDetails=el('details','','day-tide-details');tideDetails.dataset.focusKey=`day-tide:${day}`;tideDetails.append(el('summary','이 날짜의 물때 상세'));
-  renderDayTide(tideDetails,day,calculateTideMonth(state.month,state.tideDays || []));target.append(tideDetails);
+  renderDayTide(tideDetails,day,regionalTideMonth(state,tier));target.append(tideDetails);
   restoreUi();
 }

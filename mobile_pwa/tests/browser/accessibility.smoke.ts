@@ -76,3 +76,19 @@ test('visible scope, species and day detail text keep readable contrast and size
   expect(samples.filter(s=>s.font<10)).toEqual([]);
   await testInfo.attach('computed-text-contrast',{body:JSON.stringify(samples),contentType:'application/json'});
 });
+
+test('regional tides load December and future months without changing reservation filters or personal tiers',async({page},testInfo)=>{
+  await page.goto('tests/responsive-fixture.html?south=1');await expect(page.locator('#query-submit')).toBeEnabled();
+  await page.locator('#month').fill('2026-12');await page.locator('#month').dispatchEvent('change');
+  await expect(page.locator('#tide-status')).toContainText('여수 물때 · 31/31일');
+  await expect(page.locator('#tide-basis')).toContainText('여수 대표 지점');await expect(page.locator('.calendar-tide')).toHaveCount(31);
+  await page.locator('[data-date="2026-12-15"]').click();await expect(page.locator('.day-tide')).toContainText('여수 물때');
+  await page.locator('[data-tier=tier3]').click();await expect(page.locator('#tide-status')).toContainText('보령 물때 · 31/31일');
+  await page.locator('[data-tier=all]').click();await expect(page.locator('#tide-status')).toContainText('여수 물때 · 31/31일');
+  await page.locator('#month').fill('2027-12');await page.locator('#month').dispatchEvent('change');await expect(page.locator('#tide-status')).toContainText('여수 물때 · 31/31일');
+  await expect(page.locator('#fixture-requests')).toHaveText('요청 0');
+  await page.locator('#query-submit').click();await expect(page.locator('#query-result-state')).toHaveText('완료');await expect(page.locator('#fixture-requests')).toHaveText('요청 4');
+  await page.locator('#fleet-section>summary').click();await expect(page.locator('#tier-saved-counts')).toContainText('1티어 1 / 2티어 1 / 3티어 1 / 기타 1');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:testInfo.outputPath('regional-tides.png'),fullPage:true});
+});

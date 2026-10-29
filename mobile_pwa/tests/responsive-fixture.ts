@@ -2,15 +2,28 @@
 import '../src/style.css';
 import {emptyState} from '../src/models';
 import {saveState} from '../src/availabilityStore';
+import {tideDates} from '../src/tides';
+import {TIDE_STATIONS,type TideStationCode} from '../src/tideStations';
 const state=emptyState();
 state.boats=['9971','9972','9973','9974'].map((uid,i)=>({uid,name:i===0?'아주긴선박명과출항정보를확인하는가상시험선박호':`반응형 시험 ${i+1}호`,port:i<2?'비응항':'오천항',url:`https://thefishing.kr/reservation/list.php?uid=${uid}`,region:{sea:'서해권',province:i<2?'전북특별자치도':'충청남도',local:i<2?'군산':'보령'}}));
 state.selectedUids=state.boats.map(b=>b.uid);state.tiers={tier1:['9971'],tier2:['9972'],tier3:['9973'],other:['9974']};
 state.selectedRegion={sea:'',province:['전북특별자치도','충청남도'],local:'',port:''};
+if(new URL(location.href).searchParams.has('south')) {
+  for(const boat of state.boats.slice(0,2)) boat.region={sea:'남해권',province:'전라남도',local:'여수'};
+  state.selectedRegion.province=['전라남도','충청남도'];
+}
 await saveState(state);
 localStorage.removeItem('thefishing-availability-api');
 let requests=0;
 window.fetch=async(input,init)=>{
   const url=new URL(String(input));
+  if(url.hostname.endsWith('.workers.dev') && url.pathname==='/v1/tides') {
+    const station=url.searchParams.get('station') as TideStationCode,month=url.searchParams.get('month')!;
+    if(!TIDE_STATIONS[station]) throw new Error('Invalid fixture station');
+    document.body.dataset.tideRequests=String(Number(document.body.dataset.tideRequests || 0)+1);
+    // Explicitly synthetic browser fixture; never production or captured forecasts.
+    return Response.json({schema:1,stationCode:station,month,status:'OK',days:tideDates(month).map((date,i)=>({date,stationCode:station,fetchedAt:new Date().toISOString(),extrema:[{timestamp:date+'T01:00:00+09:00',kind:'low',levelCm:10},{timestamp:date+'T07:00:00+09:00',kind:'high',levelCm:100+i*3}]}))});
+  }
   if(!url.hostname.endsWith('.workers.dev') || url.pathname!=='/v1/month') throw new Error('Fixture blocks all non-mocked network requests');
   document.querySelector('#fixture-requests')!.textContent=`요청 ${++requests}`;
   const scenario=document.querySelector<HTMLSelectElement>('#fixture-scenario')!.value;

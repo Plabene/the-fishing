@@ -4,6 +4,7 @@ import { handleRequest } from '../availability_api/worker';
 import { readTideMonth } from '../src/providers/tideApi';
 import { TIDE_TTL,tideDates } from '../src/tides';
 import type { Store } from '../availability_api/service';
+import {TIDE_STATIONS,type TideStationCode} from '../src/tideStations';
 const sample=(date:string)=>({response:{header:{resultCode:'00'},body:{totalCount:4,items:{item:[['01:00',100,2],['07:00',650,1],['13:00',130,4],['19:00',680,3]].map(([time,level,kind])=>({obsvtrNm:'보령',predcDt:`${date} ${time}`,predcTdlvVl:level,extrSe:kind}))}}}});
 class MemoryStore implements Store {data=new Map<string,unknown>();async get<T>(key:string){return structuredClone(this.data.get(key)) as T|undefined;} async put<T>(key:string,value:T){this.data.set(key,structuredClone(value));}async delete(key:string){this.data.delete(key);}}
 test('official parser checks source/date/completeness and never returns API credential text',()=>{
@@ -53,4 +54,25 @@ test('tide gateway accepts only a month and routes to a separate object; client 
   const request=vi.fn<typeof fetch>().mockResolvedValue(Response.json(data));expect((await readTideMonth('https://a.b.workers.dev',month,new AbortController().signal,request)).days).toHaveLength(33);
   expect(request.mock.calls[0][1]?.credentials).toBe('omit');
   request.mockResolvedValue(Response.json({...data,month:'2026-11'}));await expect(readTideMonth('https://a.b.workers.dev',month,new AbortController().signal,request)).rejects.toThrow();
+});
+
+test('station-separated durable cache keeps December and future years intact across region switches',async()=>{
+ const request=vi.fn<typeof fetch>(async(input)=>{const u=new URL(String(input)),d=u.searchParams.get('reqDate')!,station=u.searchParams.get('obsCode') as TideStationCode;
+  const payload=sample(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6)}`);for(const row of payload.response.body.items.item) row.obsvtrNm=TIDE_STATIONS[station].name;return Response.json(payload);
+ });
+ const store=new MemoryStore(),service=new TideService(store,'private',request,()=>Date.now(),0);
+ for(const station of ['DT_0025','DT_0016','DT_0014'] as const) {const result=await service.query('2027-12',station);expect(result.status).toBe('OK');expect(result.days).toHaveLength(33);expect(result.days.every(d=>d.stationCode===station)).toBe(true);}
+ expect(request).toHaveBeenCalledTimes(99);expect((await service.query('2027-12','DT_0025')).cached).toBe(true);expect(request).toHaveBeenCalledTimes(99);
+ expect((await service.query('2028-02','DT_0016')).days).toHaveLength(31);
+});
+test('wrong coordinates, station responses and inner-day station mismatch fail closed',async()=>{
+ const bad=sample('2026-12-15');Object.assign(bad.response.body.items.item[0],{lat:34.74722,lot:127.76555});expect(()=>parseTideResponse(bad,'2026-12-15',new Date().toISOString())).toThrow(/좌표/);
+ const date='2026-12-15',day=parseTideResponse(sample(date),date,new Date().toISOString());
+ const request=vi.fn<typeof fetch>().mockResolvedValue(Response.json({schema:1,month:'2026-12',stationCode:'DT_0016',status:'PARTIAL',days:[day]}));
+ await expect(readTideMonth('https://a.b.workers.dev','2026-12',new AbortController().signal,request,'DT_0016')).rejects.toThrow(/관측소/);
+});
+test('missing one day remains missing, keeps successful dates and can recover without refetching all days',async()=>{
+ let missing=true;const request=vi.fn<typeof fetch>(async(input)=>{const d=new URL(String(input)).searchParams.get('reqDate')!;return Response.json(missing && d==='20261215'?{response:{header:{resultCode:'00'},body:{totalCount:0,items:[]}}}:sample(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6)}`));});
+ let now=Date.now();const service=new TideService(new MemoryStore(),'private',request,()=>now,0),partial=await service.query('2026-12');expect(partial.status).toBe('PARTIAL');expect(partial.missingDates).toEqual(['2026-12-15']);expect(partial.days).toHaveLength(32);
+ missing=false;now+=60001;const recovered=await service.query('2026-12');expect(recovered.status).toBe('OK');expect(request).toHaveBeenCalledTimes(34);
 });
