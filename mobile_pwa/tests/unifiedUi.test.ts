@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState} from '../src/models';
 import {saveState,loadState} from '../src/availabilityStore';
 import {defaultFleet} from '../src/defaultFleet';
@@ -9,7 +10,7 @@ test('species become available only after collection; multi-select, platform, re
   const state=emptyState();state.month='2026-11';state.selectedPlatform='sunsang24';
   state.boats=[{uid:'9986',name:'가나 시험호',port:'인천남항',region:{sea:'서해권',province:'인천',local:''},url:'https://thefishing.kr/reservation/list.php?uid=9986'},defaultFleet().boats.find(b=>b.uid==='sunsang24:ship:1530')!];state.selectedUids=state.boats.map(b=>b.uid);state.tiers.tier1=['9986'];state.tiers.tier2=[state.boats[1].uid];await saveState(state);
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
-  const responses:((response:Response)=>void)[]=[],request=vi.fn<typeof fetch>(()=>new Promise(resolve=>responses.push(resolve)));vi.stubGlobal('fetch',request);
+  const responses:((response:Response)=>void)[]=[],request=vi.fn<typeof fetch>(()=>new Promise(resolve=>responses.push(resolve)));vi.stubGlobal('fetch',vesselFetch(request));
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));await settle();

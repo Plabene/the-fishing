@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { expect, test, vi } from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import { saveState,loadState } from '../src/availabilityStore';
 import { defaultFleet } from '../src/defaultFleet';
 import published from '../src/data/publishedPreferences.json';
@@ -8,7 +9,7 @@ import published from '../src/data/publishedPreferences.json';
 test('month query form, people filter, list/day views and empty month work end to end',async()=>{
   const fleet=defaultFleet();fleet.month='2026-10'; await saveState(fleet);
   document.body.innerHTML='<div id="app"></div>';
-  const network=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',network);
+  const network=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',vesselFetch(network));
   await import('../src/main');
   expect(network).not.toHaveBeenCalled();
   (document.querySelector('#query-mode') as HTMLSelectElement).value='saved';document.querySelector('#query-mode')!.dispatchEvent(new Event('change'));

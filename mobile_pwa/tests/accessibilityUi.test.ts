@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState,type AppState} from '../src/models';
 import {saveState,loadState} from '../src/availabilityStore';
 
@@ -11,7 +12,7 @@ test('keyboard focus survives tier saves, region/species edits, fleet management
     if(slow) return new Promise((_,reject)=>init?.signal?.addEventListener('abort',()=>reject(new DOMException('cancelled','AbortError')),{once:true}));
     const url=new URL(String(input)),uid=url.searchParams.get('uid')!,month=url.searchParams.get('month')!,observedAt=new Date().toISOString();
     return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-123456789012345678901234',uid,date:month+'-06',trip:uid==='9971'?'쭈꾸미, 갑오징어':'갑오징어',port:'비응항',departure:'05:00',remaining:4,observedAt}]});
-  });vi.stubGlobal('fetch',network);
+  });vi.stubGlobal('fetch',vesselFetch(network));
   try {
     await import('../src/main');const el=<T extends HTMLElement=HTMLElement>(selector:string)=>document.querySelector<T>(selector)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

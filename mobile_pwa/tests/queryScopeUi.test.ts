@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState,type AppState} from '../src/models';
 import {saveState,loadState} from '../src/availabilityStore';
 
@@ -9,7 +10,7 @@ test('actual UI flags region/platform/tier/month/people changes, keeps search an
   state.tiers={tier1:['9961'],tier2:['9962'],tier3:['9963'],other:[]};state.selectedUids=['9962'];
   await saveState(state);document.body.innerHTML='<div id="app"></div>';localStorage.clear();
   let slow=false;const pending:Array<()=>void>=[];
-  const network=vi.fn<typeof fetch>(async input=>{const url=new URL(String(input)),uid=url.searchParams.get('uid')!,month=url.searchParams.get('month')!,observedAt=new Date().toISOString();if(slow) await new Promise<void>(resolve=>pending.push(resolve));return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-12345678901234567890'+uid,uid,date:month+'-06',trip:uid==='9961'?'쭈꾸미, 갑오징어':'갑오징어',remaining:4,verified:true,observedAt}]});});vi.stubGlobal('fetch',network);
+  const network=vi.fn<typeof fetch>(async input=>{const url=new URL(String(input)),uid=url.searchParams.get('uid')!,month=url.searchParams.get('month')!,observedAt=new Date().toISOString();if(slow) await new Promise<void>(resolve=>pending.push(resolve));return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-12345678901234567890'+uid,uid,date:month+'-06',trip:uid==='9961'?'쭈꾸미, 갑오징어':'갑오징어',remaining:4,verified:true,observedAt}]});});vi.stubGlobal('fetch',vesselFetch(network));
   try {
     await import('../src/main');const el=<T extends HTMLElement=HTMLElement>(s:string)=>document.querySelector<T>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {defaultFleet} from '../src/defaultFleet';
 import {loadState,saveState} from '../src/availabilityStore';
 import {localMonth,type AppState} from '../src/models';
@@ -12,7 +13,7 @@ test('calendar opens on current month, aliases integrate with day view, and prio
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
   const network=vi.fn<typeof fetch>(async input=>{const url=new URL(String(input)),uid=url.searchParams.get('uid'),month=url.searchParams.get('month'),observedAt=new Date().toISOString();
     return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:uid==='1441'?'direct-111111111111111111111111':'direct-222222222222222222222222',uid,date:month+'-02',remaining:8,trip:uid==='1441'?'주꾸미':'광어다운샷',observedAt}]});
-  });vi.stubGlobal('fetch',network);
+  });vi.stubGlobal('fetch',vesselFetch(network));
   await import('../src/main');
   const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
   const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

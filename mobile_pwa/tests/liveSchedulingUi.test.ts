@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState,type AppState} from '../src/models';
 import {saveState,loadState} from '../src/availabilityStore';
 import captured from './fixtures/species-real-20261026.json';
@@ -8,7 +9,7 @@ import captured from './fixtures/species-real-20261026.json';
 test('Sunsang24 paints fresh partial results while three TheFishing calls wait, and a second query fetches all seats again',async()=>{
   const state=emptyState();state.month='2026-11';state.boats=[...['9971','9972','9973'].map(uid=>({uid,name:'가상 선박 '+uid,port:'시험항',url:`https://thefishing.kr/reservation/list.php?uid=${uid}`})),{uid:'sunsang24:ship:312',name:'꽃돼지호',port:'오천항',url:'https://www.sunsang24.com/ship/list/?ship_no=312'}];state.tiers.tier1=state.boats.map(b=>b.uid);state.selectedUids=[...state.tiers.tier1];await saveState(state);localStorage.clear();document.body.innerHTML='<div id="app"></div>';
   const pending:{url:string;resolve:(response:Response)=>void}[]=[];
-  const network=vi.fn<typeof fetch>((url,init)=>new Promise((resolve,reject)=>{pending.push({url:String(url),resolve});init?.signal?.addEventListener('abort',()=>reject(new DOMException('cancelled','AbortError')),{once:true});}));vi.stubGlobal('fetch',network);
+  const network=vi.fn<typeof fetch>((url,init)=>new Promise((resolve,reject)=>{pending.push({url:String(url),resolve});init?.signal?.addEventListener('abort',()=>reject(new DOMException('cancelled','AbortError')),{once:true});}));vi.stubGlobal('fetch',vesselFetch(network));
   try {
     await import('../src/main');const el=<T extends HTMLElement=HTMLElement>(s:string)=>document.querySelector<T>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

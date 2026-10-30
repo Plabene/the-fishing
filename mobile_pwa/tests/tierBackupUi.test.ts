@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {saveState,loadState} from '../src/availabilityStore';
 import {defaultFleet} from '../src/defaultFleet';
 import {boatPlatform} from '../src/platforms';
@@ -12,7 +13,7 @@ vi.mock('../src/fileSave',()=>({canShareJson:()=>true,saveJsonFile:vi.fn(async()
 
 test('the complete fleet is usable, platform filters keep every match, and tier files save, restore and undo',async()=>{
   const state=defaultFleet();await saveState(state);document.body.innerHTML='<div id="app"></div>';localStorage.clear();
-  const network=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',network);
+  const network=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',vesselFetch(network));
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'),{timeout:10000});await settle();

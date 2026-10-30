@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState} from '../src/models';
 import {loadState,saveState} from '../src/availabilityStore';
 test('regional API requests, calendar, filtered boat selection and month changes stay consistent',async()=>{
@@ -9,7 +10,7 @@ test('regional API requests, calendar, filtered boat selection and month changes
     {uid:'9988',name:'남해 시험호',port:'삼천포항',url:'https://thefishing.kr/reservation/list.php?uid=9988',region:{sea:'남해권',province:'경상남도',local:'사천'}},
   ];state.selectedUids=state.boats.map(b=>b.uid);state.tiers.tier1=['9987'];state.tiers.tier2=['9988'];await saveState(state);
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
-  const request=vi.fn<typeof fetch>(async input=>{const url=new URL(String(input)),uid=url.searchParams.get('uid')!,month=url.searchParams.get('month')!,observedAt=new Date().toISOString();return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-123456789012345678901234',uid,date:`${month}-22`,trip:'문어',species:'문어',speciesKey:'문어',port:'항구',departure:'05:00',remaining:4,verified:true,source:'api',observedAt}]});});vi.stubGlobal('fetch',request);
+  const request=vi.fn<typeof fetch>(async input=>{const url=new URL(String(input)),uid=url.searchParams.get('uid')!,month=url.searchParams.get('month')!,observedAt=new Date().toISOString();return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-123456789012345678901234',uid,date:`${month}-22`,trip:'문어',species:'문어',speciesKey:'문어',port:'항구',departure:'05:00',remaining:4,verified:true,source:'api',observedAt}]});});vi.stubGlobal('fetch',vesselFetch(request));
   await import('../src/main');
   const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
   const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

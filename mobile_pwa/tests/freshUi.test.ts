@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState} from '../src/models';
 import {loadState,saveState} from '../src/availabilityStore';
 
@@ -12,7 +13,7 @@ test('new queries clear old seats, display 4 to 0 changes, and do not show old a
   state.events=[old];state.monthChecks=[{uid:boat.uid,month:state.month,requiredPeople:1,observedAt:old.observedAt,source:'api'}];await saveState(state);
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
   let resolve!:(response:Response)=>void;
-  const request=vi.fn<typeof fetch>(()=>new Promise(r=>{resolve=r;}));vi.stubGlobal('fetch',request);await import('../src/main');
+  const request=vi.fn<typeof fetch>(()=>new Promise(r=>{resolve=r;}));vi.stubGlobal('fetch',vesselFetch(request));await import('../src/main');
   const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
   const submit=()=>el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));
   const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

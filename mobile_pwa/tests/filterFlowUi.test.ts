@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState,type AppState} from '../src/models';
 import {defaultFleet} from '../src/defaultFleet';
 import {saveState,loadState} from '../src/availabilityStore';
@@ -12,7 +13,7 @@ test('mixed options and multi-tier requests survive refresh; panels close only a
   state.selectedUids=state.boats.map(b=>b.uid);state.tiers={tier1:['sunsang24:ship:312'],tier2:['1441'],tier3:['9988'],other:['9989']};await saveState(state);
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
   const pending:{url:string;resolve:(r:Response)=>void}[]=[];
-  const network=vi.fn<typeof fetch>((url,init)=>new Promise((resolve,reject)=>{pending.push({url:String(url),resolve});init?.signal?.addEventListener('abort',()=>reject(new DOMException('cancelled','AbortError')),{once:true});}));vi.stubGlobal('fetch',network);
+  const network=vi.fn<typeof fetch>((url,init)=>new Promise((resolve,reject)=>{pending.push({url:String(url),resolve});init?.signal?.addEventListener('abort',()=>reject(new DOMException('cancelled','AbortError')),{once:true});}));vi.stubGlobal('fetch',vesselFetch(network));
   try {
     await import('../src/main');const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState} from '../src/models';
 import {saveState,loadState} from '../src/availabilityStore';
 import {defaultFleet} from '../src/defaultFleet';
@@ -10,7 +11,7 @@ test('platform selector scopes both live sources, integrated calendar keeps name
   document.body.innerHTML='<div id="app"></div>';localStorage.clear();
   const request=vi.fn<typeof fetch>(async input=>{const u=new URL(String(input)),month=u.searchParams.get('month')!,observedAt=new Date().toISOString();
     if(u.pathname.includes('sunsang24')) return Response.json({status:'ALLOWED_READABLE',host:'nature.sunsang24.com',month,shipIds:['698'],fresh:true,cached:false,observedAt,events:[{id:'sunsang24-schedule-123',uid:'sunsang24:ship:698',date:`${month}-25`,trip:'갑오징어',remaining:4,departure:'05:00',observedAt,verified:true,reservationStatus:'available',reservationUrl:`https://www.sunsang24.com/ship/list?ship_no=698&sdate=${month}-25`}]});
-    return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-123456789012345678901234',uid:'9987',date:`${month}-25`,trip:'문어',remaining:3,departure:'05:00',observedAt}]});});vi.stubGlobal('fetch',request);
+    return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-123456789012345678901234',uid:'9987',date:`${month}-25`,trip:'문어',remaining:3,departure:'05:00',observedAt}]});});vi.stubGlobal('fetch',vesselFetch(request));
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));await settle();

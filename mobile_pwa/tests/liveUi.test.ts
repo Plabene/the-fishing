@@ -2,17 +2,18 @@
 import { expect, test, vi } from 'vitest';
 import { webcrypto } from 'node:crypto';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import calendar from './fixtures/month-202609.html?raw';
 import { emptyState } from '../src/models';
 import { loadState, saveState } from '../src/availabilityStore';
 
-test('default query button actually reads the month and persists verified results; page load makes no requests',async()=>{
+test('default query button actually reads the month and persists verified results; page load makes no vessel requests',async()=>{
   vi.stubGlobal('crypto',webcrypto);
   const state=emptyState();state.month='2026-09';state.boats=[{uid:'6130',name:'테스트 선박',port:'무창포항',url:'https://thefishing.kr/reservation/list.php?uid=6130'}];state.selectedUids=['6130'];state.tiers.tier1=['6130'];
   await saveState(state);document.body.innerHTML='<div id="app"></div>';
   const detail=`<script>var data='date6='+date6+'&st_uid=981&pa_uid=6130';$.ajax({url:'../reservation/list.view.view.1.ajax.new.php'});</script>`;
   const network=vi.fn<typeof fetch>().mockResolvedValueOnce(new Response(detail,{headers:{'Content-Type':'text/html'}})).mockResolvedValueOnce(new Response(calendar,{headers:{'Content-Type':'text/html'}}));
-  vi.stubGlobal('fetch',network);await import('../src/main');
+  vi.stubGlobal('fetch',vesselFetch(network));await import('../src/main');
   const month=document.querySelector('#month') as HTMLInputElement;month.value='2026-09';month.dispatchEvent(new Event('change'));await vi.waitFor(()=>expect(document.querySelector('#app')?.getAttribute('aria-busy')).toBe('false'));
   expect(network).not.toHaveBeenCalled();expect((document.querySelector('#query-mode') as HTMLSelectElement).value).toBe('api');(document.querySelector('#query-mode') as HTMLSelectElement).value='direct';
   document.querySelector('#query-form')!.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));

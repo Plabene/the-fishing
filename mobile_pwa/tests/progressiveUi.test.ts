@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState,type AppState} from '../src/models';
 import {saveState,loadState} from '../src/availabilityStore';
 
@@ -11,7 +12,7 @@ test('completed boats appear before the batch finishes, remain interactive, and 
   await saveState(state);document.body.innerHTML='<div id="app"></div>';
   const resolvers=new Map<string,(response:Response)=>void>();
   const request=vi.fn<typeof fetch>((input,init)=>new Promise((resolve,reject)=>{resolvers.set(new URL(String(input)).searchParams.get('uid')!,resolve);init?.signal?.addEventListener('abort',()=>reject(new DOMException('Cancelled','AbortError')),{once:true});}));
-  vi.stubGlobal('fetch',request);await import('../src/main');
+  vi.stubGlobal('fetch',vesselFetch(request));await import('../src/main');
   const before=await loadState() as AppState;
   const el=(selector:string)=>document.querySelector<HTMLElement>(selector)!;
   el('#query-form').dispatchEvent(new Event('submit',{cancelable:true}));await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(3));

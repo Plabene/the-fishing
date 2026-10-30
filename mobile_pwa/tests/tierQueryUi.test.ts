@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {emptyState,type AppState} from '../src/models';
 import {saveState,loadState} from '../src/availabilityStore';
 
@@ -11,7 +12,7 @@ test('region/tier summary, target requests and calendar agree without individual
   const request=vi.fn<typeof fetch>(async input=>{
     const url=new URL(String(input)),uid=url.searchParams.get('uid')!,month=url.searchParams.get('month')!,observedAt=new Date().toISOString();
     return Response.json({status:'ALLOWED_READABLE',fresh:true,cached:false,observedAt,events:[{id:'direct-12345678901234567890'+uid,uid,date:month+'-06',trip:'갑오징어',remaining:4,verified:true,observedAt}]});
-  });vi.stubGlobal('fetch',request);
+  });vi.stubGlobal('fetch',vesselFetch(request));
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'));

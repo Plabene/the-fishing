@@ -1,15 +1,16 @@
 // @vitest-environment jsdom
 import {expect,test,vi} from 'vitest';
 import 'fake-indexeddb/auto';
+import {vesselFetch} from './vesselFetch';
 import {defaultFleet} from '../src/defaultFleet';
 import {saveState,loadState} from '../src/availabilityStore';
 import {suppliedPreferences,initializePreferenceRecovery} from '../src/preferenceRecovery';
 import {TIERS,type AppState} from '../src/models';
 
-test('recovery preview, exact apply, automatic history and month navigation persist without any external query',async()=>{
+test('recovery preview, exact apply, automatic history and month navigation persist without any vessel query',async()=>{
   const state=defaultFleet();state.tiers={tier1:[],tier2:[suppliedPreferences.tiers.tier1[0]],tier3:[],other:[]};state.selectedUids=[];
   await saveState(state);document.body.innerHTML='<div id="app"></div>';localStorage.clear();
-  const request=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',request);
+  const request=vi.fn(()=>Promise.reject(new Error('Unexpected network')));vi.stubGlobal('fetch',vesselFetch(request));
   try {
     await import('../src/main');const el=(s:string)=>document.querySelector<HTMLElement>(s)!;
     const settle=()=>vi.waitFor(()=>expect(el('#app').getAttribute('aria-busy')).toBe('false'),{timeout:10000});await settle();
